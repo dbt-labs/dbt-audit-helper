@@ -1,0 +1,4 @@
+packages:
+  # this is temporary, and will be updated to use the package syntax
+  - git: "https://github.com/fishtown-analytics/dbt-utils.git"
+    revision: "feature/macro-intersect"
