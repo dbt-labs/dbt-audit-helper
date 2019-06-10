@@ -42,7 +42,7 @@ The query is best used in dbt Develop so you can interactively check results
 
 {% set dbt_relation=ref('fct_orders') %}
 
-{{ etl_transitions.check_equality(
+{{ audit_helper.check_equality(
     a_relation=old_etl_relation,
     b_relation=dbt_relation,
     exclude_columns=["loaded_at"],

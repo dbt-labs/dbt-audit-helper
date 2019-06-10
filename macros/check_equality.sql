@@ -17,7 +17,7 @@
 
 {%- set a_columns = adapter.get_columns_in_relation(a_relation) -%}
 
-{% set check_columns=etl_transitions.pop_columns(a_columns, exclude_columns) %}
+{% set check_columns=audit_helper.pop_columns(a_columns, exclude_columns) %}
 
 {% set check_cols_csv = check_columns | map(attribute='quoted') | join(', ') %}
 
