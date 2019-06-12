@@ -13,7 +13,7 @@
 
 ----
 
-{% macro check_equality(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
+{% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
 
 {%- set a_columns = adapter.get_columns_in_relation(a_relation) -%}
 
