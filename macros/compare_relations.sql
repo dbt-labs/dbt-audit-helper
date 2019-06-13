@@ -2,7 +2,7 @@
 {% set popped_columns=[] %}
 
 {% for column in columns %}
-    {% if column.name not in columns_to_pop %}
+    {% if column.name | lower not in columns_to_pop | lower %}
         {% do popped_columns.append(column) %}
     {% endif %}
 {% endfor %}
@@ -48,7 +48,7 @@ a_intersect_b as (
 
 ),
 
-a_minus_b as (
+a_except_b as (
 
     select * from a
     {{ dbt_utils.except() }}
@@ -56,7 +56,7 @@ a_minus_b as (
 
 ),
 
-b_minus_a as (
+b_except_a as (
 
     select * from b
     {{ dbt_utils.except() }}
@@ -64,7 +64,7 @@ b_minus_a as (
 
 ),
 
-unioned as (
+all_records as (
 
     select
         *,
@@ -78,7 +78,7 @@ unioned as (
         *,
         true as in_a,
         false as in_b
-    from a_minus_b
+    from a_except_b
 
     union all
 
@@ -86,7 +86,7 @@ unioned as (
         *,
         false as in_a,
         true as in_b
-    from b_minus_a
+    from b_except_a
 
 ),
 
@@ -94,12 +94,12 @@ summary_stats as (
     select
         in_a,
         in_b,
-        count(*)
-    from unioned
+        count(*) as count
+    from all_records
 
     group by 1, 2
 )
--- select * from unioned
+-- select * from all_records
 -- where not (in_a and in_b)
 -- order by {{ primary_key ~ ", " if primary_key is not none }} in_a desc, in_b desc
 
