@@ -29,14 +29,6 @@ audit_helper_integration_tests:
       schema: audit_helper_integration_tests_redshift
       threads: 1
 
-    bigquery:
-      type: bigquery
-      method: service-account
-      keyfile: "{{ env_var('GCLOUD_SERVICE_KEY_PATH') }}"
-      project: 'dbt-integration-tests'
-      schema: audit_helper_integration_tests_bigquery
-      threads: 1
-
     snowflake:
       type: snowflake
       account: "{{ env_var('CI_SNOWFLAKE_DBT_ACCOUNT') }}"
