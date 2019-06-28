@@ -3,7 +3,7 @@
 Useful macros when performing data audits
 
 # Macros
-## check_equality ([source](macros/check_equality.sql))
+## compare_relations ([source](macros/compare_relations.sql))
 This macro generates SQL that can be used to do a row-by-row validation of two
 relations. It is largely based on the [equality](https://github.com/fishtown-analytics/dbt-utils#equality-source)
 test in dbt-utils. By default, the generated query returns a summary of audit
@@ -42,7 +42,7 @@ The query is best used in dbt Develop so you can interactively check results
 
 {% set dbt_relation=ref('fct_orders') %}
 
-{{ audit_helper.check_equality(
+{{ audit_helper.compare_relations(
     a_relation=old_etl_relation,
     b_relation=dbt_relation,
     exclude_columns=["loaded_at"],
@@ -62,4 +62,4 @@ Arguments:
 # To-do:
 * Macro to check if two models have the same structure
 * Macro to check if two schemas contain the same relations
-* Extend `check_equality` macro to handle edge cases
+* Extend `compare_relations` macro to handle edge cases

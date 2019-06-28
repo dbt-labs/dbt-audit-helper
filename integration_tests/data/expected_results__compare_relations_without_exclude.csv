@@ -1,0 +1,4 @@
+in_a,in_b,count
+True,True,1
+True,False,1
+False,True,1
