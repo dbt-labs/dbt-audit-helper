@@ -61,9 +61,9 @@ Arguments:
 
 ## compare_queries ([source](macros/compare_queries.sql))
 Super similar to `compare_relations`, except it takes two select statements. This macro is useful when:
-* You need to filter out records from one of the relations
-* You need to rename or recast some columns to get them to match up
-* You only want to compare a small number of column, so it's easier write the columns you want to compare, rather than the columns you want to exclude,
+* You need to filter out records from one of the relations.
+* You need to rename or recast some columns to get them to match up.
+* You only want to compare a small number of columns, so it's easier write the columns you want to compare, rather than the columns you want to exclude.
 
 ```sql
 {# in dbt Develop #}
@@ -96,4 +96,3 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 # To-do:
 * Macro to check if two models have the same structure
 * Macro to check if two schemas contain the same relations
-* Extend `compare_relations` macro to handle edge cases
