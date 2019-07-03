@@ -1,6 +1,11 @@
 version: 2
 
 models:
+  - name: compare_queries
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__compare_relations_without_exclude')
+
   - name: compare_relations_with_exclude
     tests:
       - dbt_utils.equality:
