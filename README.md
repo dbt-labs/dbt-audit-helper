@@ -202,8 +202,46 @@ Comparing column "status"
 | 🤷: missing from b    |            26 |             0.06 |
 | 🙅: ‍values do not... |         4,070 |             9.73 |
 
+## compare_relation_columns ([source](macros/compare_relation_columns.sql))
+This macro will return a query, that, when executed, compares the ordinal_position
+and data_types of columns in two [Relations](https://docs.getdbt.com/docs/api-variable#section-relation).
+
+| column_name | a_ordinal_position | b_ordinal_position | a_data_type       | b_data_type       |
+|-------------|--------------------|--------------------|-------------------|-------------------|
+| order_id    | 1                  | 1                  | integer           | integer           |
+| customer_id | 2                  | 2                  | integer           | integer           |
+| order_date  | 3                  | 3                  | timestamp         | date              |
+| status      | 4                  | 5                  | character varying | character varying |
+| amount      | 5                  | 4                  | bigint            | bigint            |
+
+
+This is especially useful in two situations:
+1. Comparing a new version of a relation with an old one, to make sure that the
+structure is the same
+2. Helping figure out why a `union` of two relations won't work (often because
+the data types are different)
+
+For example, in the above result set, we can see that `status` and `amount` have
+switched order. Further, `order_date` is a timestamp in our "a" relation, whereas
+it is a date in our "b" relation.
+
+```sql
+{#- in dbt Develop -#}
+
+{% set old_etl_relation=adapter.get_relation(
+      database=target.database,
+      schema="old_etl_schema",
+      identifier="fct_orders"
+) -%}
+
+{% set dbt_relation=ref('fct_orders') %}
+
+{{ audit_helper.compare_relation_columns(
+    a_relation=old_etl_relation,
+    b_relation=dbt_relation
+) }}
+
 ```
 
 # To-do:
-* Macro to check if two models have the same structure
 * Macro to check if two schemas contain the same relations
