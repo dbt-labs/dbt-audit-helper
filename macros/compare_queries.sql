@@ -76,7 +76,6 @@ summary_stats as (
 -- order by {{ primary_key ~ ", " if primary_key is not none }} in_a desc, in_b desc
 
 select * from summary_stats
-
 order by in_a desc, in_b desc
 
 {% endmacro %}
