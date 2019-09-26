@@ -93,6 +93,116 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 
 ```
 
+## compare_column_values
+This macro is useful when:
+* You've used the `compare_queries` macro (above) and found that a significant
+number of your records don't match.
+* So now you want to check if a particular column is problematic.
+```
+{# in dbt Develop #}
+
+
+{% set old_etl_relation_query %}
+    select * from public.dim_product
+    where is_latest
+{% endset %}
+
+{% set new_etl_relation_query %}
+    select * from {{ ref('dim_product') }}
+{% endset %}
+
+{% set audit_query = audit_helper.compare_column_values(
+    a_query=old_etl_relation_query,
+    b_query=new_etl_relation_query,
+    primary_key="product_id",
+    column_to_compare="status"
+) %}
+
+{% set audit_results = run_query(audit_query) %}
+
+{% do audit_results.print_table() %}
+```
+This will give you an output like:
+```
+Comparing column "status"
+| match_status            |  count |
+| ----------------------- | ------ |
+| ✅: perfect match       | 37,721 |
+| 🤷: missing from b      |     25 |
+| 🙅: ‍values do not match |  4,064 |
+```
+
+Usage notes:
+* `primary_key` must be a unique key in both tables, otherwise the join won't
+work as expected.
+
+
+### Advanced usage
+Got a wide table, and want to iterate through all the columns? Try something
+like this:
+```
+{%- set columns_to_compare=adapter.get_columns_in_relation(ref('dim_product'))  -%}
+
+{% set old_etl_relation_query %}
+    select * from public.dim_product
+    where is_latest
+{% endset %}
+
+{% set new_etl_relation_query %}
+    select * from {{ ref('dim_product') }}
+{% endset %}
+
+{% if execute %}
+    {% for column in columns_to_compare %}
+        {{ log('Comparing column "' ~ column.name ~'"', info=True) }}
+
+        {% set audit_query = audit_helper.compare_column_values(
+            a_query=old_etl_relation_query,
+            b_query=new_etl_relation_query,
+            primary_key="product_id",
+            column_to_compare=column.name
+        ) %}
+
+        {% set audit_results = run_query(audit_query) %}
+        {% do audit_results.print_table() %}
+        {{ log("", info=True) }}
+
+    {% endfor %}
+{% endif %}
+```
+
+This will give you an output like:
+```
+| match_status      |  count |
+| ----------------- | ------ |
+| ✅: perfect match  | 41,785 |
+| 🤷: missing from b |     26 |
+
+Comparing column "name"
+| match_status         |  count |
+| -------------------- | ------ |
+| ✅: perfect match     | 41,573 |
+| 🤷: missing from b    |     26 |
+| 🙅: ‍values do not... |    212 |
+
+Comparing column "cost_per_unit"
+| match_status         |  count |
+| -------------------- | ------ |
+| ✅: perfect match     | 27,449 |
+| ✅: both are null     | 14,294 |
+| 🤷: missing from b    |     23 |
+| 🤷: exists, but nu... |      1 |
+| 🤷: exists, but nu... |     40 |
+| 🙅: ‍values do not... |      4 |
+
+Comparing column "status"
+| match_status         |  count |
+| -------------------- | ------ |
+| ✅: perfect match     | 37,715 |
+| 🤷: missing from b    |     26 |
+| 🙅: ‍values do not... |  4,070 |
+```
+
 # To-do:
 * Macro to check if two models have the same structure
 * Macro to check if two schemas contain the same relations
