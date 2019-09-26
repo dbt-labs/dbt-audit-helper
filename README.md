@@ -94,13 +94,9 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 ```
 
 ## compare_column_values ([source](macros/compare_column_values.sql))
-This macro is useful when:
-* You've used the `compare_queries` macro (above) and found that a significant
-number of your records don't match.
-* So now you want to check if a particular column is problematic.
-
-This macro will return a query, that, when executed, summarizes the number of
-records that match perfectly:
+This macro will return a query, that, when executed, compares a column across
+two queries, and summarizes which records match perfectly for a given primary
+key:
 
 | match_status                |  count |
 | --------------------------- | ------ |
@@ -111,10 +107,14 @@ records that match perfectly:
 | 🤷: value is null in b only |     73 |
 | 🙅: ‍values do not match     |  4,064 |
 
+This macro is useful when:
+* You've used the `compare_queries` macro (above) and found that a significant
+number of your records don't match.
+* So now you want to find which column is causing most of these discrepancies.
+
 ### Usage:
 ```
 {# in dbt Develop #}
-
 
 {% set old_etl_relation_query %}
     select * from public.dim_product
@@ -178,11 +178,6 @@ like this:
 
 This will give you an output like:
 ```
-| match_status      |  count |
-| ----------------- | ------ |
-| ✅: perfect match  | 41,785 |
-| 🤷: missing from b |     26 |
-
 Comparing column "name"
 | match_status         |  count |
 | -------------------- | ------ |
