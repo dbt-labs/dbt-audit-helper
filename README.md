@@ -98,14 +98,14 @@ This macro will return a query, that, when executed, compares a column across
 two queries, and summarizes which records match perfectly for a given primary
 key:
 
-| match_status                |  count |
-| --------------------------- | ------ |
-| ✅: perfect match           | 37,721 |
-| ✅: both are null           |  5,789 |
-| 🤷: missing from b          |     25 |
-| 🤷: value is null in a only |     59 |
-| 🤷: value is null in b only |     73 |
-| 🙅: ‍values do not match     |  4,064 |
+| match_status                | count  | percent_of_total |
+|-----------------------------|--------|------------------|
+| ✅: perfect match            | 37,721 | 79.03            |
+| ✅: both are null            | 5,789  | 12.13            |
+| 🤷: missing from b          | 25     | 0.05             |
+| 🤷: value is null in a only | 59     | 0.12             |
+| 🤷: value is null in b only | 73     | 0.15             |
+| 🙅: ‍values do not match    | 4,064  | 8.51             |
 
 This macro is useful when:
 * You've used the `compare_queries` macro (above) and found that a significant
@@ -179,28 +179,29 @@ like this:
 This will give you an output like:
 ```
 Comparing column "name"
-| match_status         |  count |
-| -------------------- | ------ |
-| ✅: perfect match     | 41,573 |
-| 🤷: missing from b    |     26 |
-| 🙅: ‍values do not... |    212 |
+| match_status         | count_records | percent_of_total |
+| -------------------- | ------------- | ---------------- |
+| ✅: perfect match     |        41,573 |            99.43 |
+| 🤷: missing from b    |            26 |             0.06 |
+| 🙅: ‍values do not... |           212 |             0.51 |
 
-Comparing column "cost_per_unit"
-| match_status         |  count |
-| -------------------- | ------ |
-| ✅: perfect match     | 27,449 |
-| ✅: both are null     | 14,294 |
-| 🤷: missing from b    |     23 |
-| 🤷: exists, but nu... |      1 |
-| 🤷: exists, but nu... |     40 |
-| 🙅: ‍values do not... |      4 |
+Comparing column "msrp"
+| match_status         | count_records | percent_of_total |
+| -------------------- | ------------- | ---------------- |
+| ✅: perfect match     |        31,145 |            74.49 |
+| ✅: both are null     |        10,557 |            25.25 |
+| 🤷: missing from b    |            22 |             0.05 |
+| 🤷: value is null ... |            31 |             0.07 |
+| 🤷: value is null ... |             4 |             0.01 |
+| 🙅: ‍values do not... |            52 |             0.12 |
 
 Comparing column "status"
-| match_status         |  count |
-| -------------------- | ------ |
-| ✅: perfect match     | 37,715 |
-| 🤷: missing from b    |     26 |
-| 🙅: ‍values do not... |  4,070 |
+| match_status         | count_records | percent_of_total |
+| -------------------- | ------------- | ---------------- |
+| ✅: perfect match     |        37,715 |            90.20 |
+| 🤷: missing from b    |            26 |             0.06 |
+| 🙅: ‍values do not... |         4,070 |             9.73 |
+
 ```
 
 # To-do:

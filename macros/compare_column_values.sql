@@ -36,14 +36,24 @@ joined as (
     from a_query
 
     full outer join b_query on a_query.{{ primary_key }} = b_query.{{ primary_key }}
+),
+
+aggregated as (
+    select
+        match_status,
+        match_order,
+        count(*) as count_records
+    from joined
+
+    group by match_status, match_order
 )
 
 select
     match_status,
-    count(*) as count_records
-from joined
+    count_records,
+    round(100.0 * count_records / sum(count_records) over (), 2) as percent_of_total
 
-group by match_status, match_order
+from aggregated
 
 order by match_order
 
