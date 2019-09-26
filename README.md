@@ -98,6 +98,20 @@ This macro is useful when:
 * You've used the `compare_queries` macro (above) and found that a significant
 number of your records don't match.
 * So now you want to check if a particular column is problematic.
+
+This macro will return a query, that, when executed, summarizes the number of
+records that match perfectly:
+
+| match_status                |  count |
+| --------------------------- | ------ |
+| ✅: perfect match           | 37,721 |
+| ✅: both are null           |  5,789 |
+| 🤷: missing from b          |     25 |
+| 🤷: value is null in a only |     59 |
+| 🤷: value is null in b only |     73 |
+| 🙅: ‍values do not match     |  4,064 |
+
+### Usage:
 ```
 {# in dbt Develop #}
 
@@ -122,22 +136,13 @@ number of your records don't match.
 
 {% do audit_results.print_table() %}
 ```
-This will give you an output like:
-```
-Comparing column "status"
-| match_status            |  count |
-| ----------------------- | ------ |
-| ✅: perfect match       | 37,721 |
-| 🤷: missing from b      |     25 |
-| 🙅: ‍values do not match |  4,064 |
-```
 
-Usage notes:
+**Usage notes:**
 * `primary_key` must be a unique key in both tables, otherwise the join won't
 work as expected.
 
 
-### Advanced usage
+### Advanced usage:
 Got a wide table, and want to iterate through all the columns? Try something
 like this:
 ```

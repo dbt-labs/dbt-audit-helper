@@ -17,8 +17,8 @@ joined as (
             when a_query.{{ column_to_compare }} is null and b_query.{{ column_to_compare }} is null then '✅: both are null'
             when a_query.{{ primary_key }} is null then '🤷: ‍missing from a'
             when b_query.{{ primary_key }} is null then '🤷: missing from b'
-            when a_query.{{ column_to_compare }} is null then '🤷: exists, but null in a'
-            when b_query.{{ column_to_compare }} is null then '🤷: exists, but null in b'
+            when a_query.{{ column_to_compare }} is null then '🤷: value is null in a only'
+            when b_query.{{ column_to_compare }} is null then '🤷: value is null in b only'
             when a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }} then '🙅: ‍values do not match'
             else 'unknown' -- this should never happen
         end as match_status,
