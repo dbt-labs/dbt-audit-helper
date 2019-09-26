@@ -93,7 +93,7 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 
 ```
 
-## compare_column_values
+## compare_column_values ([source](macros/compare_column_values.sql))
 This macro is useful when:
 * You've used the `compare_queries` macro (above) and found that a significant
 number of your records don't match.
