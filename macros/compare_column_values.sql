@@ -40,7 +40,7 @@ joined as (
 
 select
     match_status,
-    count(*)
+    count(*) as count_records
 from joined
 
 group by match_status, match_order
