@@ -95,8 +95,8 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 
 ## compare_column_values ([source](macros/compare_column_values.sql))
 This macro will return a query, that, when executed, compares a column across
-two queries, and summarizes which records match perfectly for a given primary
-key:
+two queries, and summarizes how many records match perfectly (note: a primary
+key is required to match values across the two queries).
 
 | match_status                | count  | percent_of_total |
 |-----------------------------|--------|------------------|
