@@ -42,6 +42,7 @@ jobs:
             cd integration_tests
             dbt deps --target postgres
             dbt seed --target postgres --full-refresh
+            dbt compile --target postgres
             dbt run --target postgres
             dbt test --target postgres
 
@@ -53,6 +54,7 @@ jobs:
             cd integration_tests
             dbt deps --target redshift
             dbt seed --target redshift --full-refresh
+            dbt compile --target redshift
             dbt run --target redshift
             dbt test --target redshift
 
@@ -64,6 +66,7 @@ jobs:
             cd integration_tests
             dbt deps --target snowflake
             dbt seed --target snowflake --full-refresh
+            dbt compile --target snowflake
             dbt run --target snowflake
             dbt test --target snowflake
 
@@ -78,6 +81,7 @@ jobs:
             cd integration_tests
             dbt deps --target bigquery
             dbt seed --target bigquery --full-refresh
+            dbt compile --target bigquery
             dbt run --target bigquery
             dbt test --target bigquery
 

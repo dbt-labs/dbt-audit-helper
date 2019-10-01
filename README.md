@@ -93,6 +93,117 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 
 ```
 
+## compare_column_values ([source](macros/compare_column_values.sql))
+This macro will return a query, that, when executed, compares a column across
+two queries, and summarizes how many records match perfectly (note: a primary
+key is required to match values across the two queries).
+
+| match_status                | count  | percent_of_total |
+|-----------------------------|--------|------------------|
+| ✅: perfect match            | 37,721 | 79.03            |
+| ✅: both are null            | 5,789  | 12.13            |
+| 🤷: missing from b          | 25     | 0.05             |
+| 🤷: value is null in a only | 59     | 0.12             |
+| 🤷: value is null in b only | 73     | 0.15             |
+| 🙅: ‍values do not match    | 4,064  | 8.51             |
+
+This macro is useful when:
+* You've used the `compare_queries` macro (above) and found that a significant
+number of your records don't match.
+* So now you want to find which column is causing most of these discrepancies.
+
+### Usage:
+```
+{# in dbt Develop #}
+
+{% set old_etl_relation_query %}
+    select * from public.dim_product
+    where is_latest
+{% endset %}
+
+{% set new_etl_relation_query %}
+    select * from {{ ref('dim_product') }}
+{% endset %}
+
+{% set audit_query = audit_helper.compare_column_values(
+    a_query=old_etl_relation_query,
+    b_query=new_etl_relation_query,
+    primary_key="product_id",
+    column_to_compare="status"
+) %}
+
+{% set audit_results = run_query(audit_query) %}
+
+{% do audit_results.print_table() %}
+```
+
+**Usage notes:**
+* `primary_key` must be a unique key in both tables, otherwise the join won't
+work as expected.
+
+
+### Advanced usage:
+Got a wide table, and want to iterate through all the columns? Try something
+like this:
+```
+{%- set columns_to_compare=adapter.get_columns_in_relation(ref('dim_product'))  -%}
+
+{% set old_etl_relation_query %}
+    select * from public.dim_product
+    where is_latest
+{% endset %}
+
+{% set new_etl_relation_query %}
+    select * from {{ ref('dim_product') }}
+{% endset %}
+
+{% if execute %}
+    {% for column in columns_to_compare %}
+        {{ log('Comparing column "' ~ column.name ~'"', info=True) }}
+
+        {% set audit_query = audit_helper.compare_column_values(
+            a_query=old_etl_relation_query,
+            b_query=new_etl_relation_query,
+            primary_key="product_id",
+            column_to_compare=column.name
+        ) %}
+
+        {% set audit_results = run_query(audit_query) %}
+        {% do audit_results.print_table() %}
+        {{ log("", info=True) }}
+
+    {% endfor %}
+{% endif %}
+```
+
+This will give you an output like:
+```
+Comparing column "name"
+| match_status         | count_records | percent_of_total |
+| -------------------- | ------------- | ---------------- |
+| ✅: perfect match     |        41,573 |            99.43 |
+| 🤷: missing from b    |            26 |             0.06 |
+| 🙅: ‍values do not... |           212 |             0.51 |
+
+Comparing column "msrp"
+| match_status         | count_records | percent_of_total |
+| -------------------- | ------------- | ---------------- |
+| ✅: perfect match     |        31,145 |            74.49 |
+| ✅: both are null     |        10,557 |            25.25 |
+| 🤷: missing from b    |            22 |             0.05 |
+| 🤷: value is null ... |            31 |             0.07 |
+| 🤷: value is null ... |             4 |             0.01 |
+| 🙅: ‍values do not... |            52 |             0.12 |
+
+Comparing column "status"
+| match_status         | count_records | percent_of_total |
+| -------------------- | ------------- | ---------------- |
+| ✅: perfect match     |        37,715 |            90.20 |
+| 🤷: missing from b    |            26 |             0.06 |
+| 🙅: ‍values do not... |         4,070 |             9.73 |
+
+```
+
 # To-do:
 * Macro to check if two models have the same structure
 * Macro to check if two schemas contain the same relations
