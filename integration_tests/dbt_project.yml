@@ -1,5 +1,5 @@
 
-name: 'adit_helper_integration_tests'
+name: 'audit_helper_integration_tests'
 version: '1.0'
 
 profile: 'audit_helper_integration_tests'
