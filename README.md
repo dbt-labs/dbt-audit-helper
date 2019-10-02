@@ -201,6 +201,7 @@ Comparing column "status"
 | ✅: perfect match     |        37,715 |            90.20 |
 | 🤷: missing from b    |            26 |             0.06 |
 | 🙅: ‍values do not... |         4,070 |             9.73 |
+```
 
 ## compare_relation_columns ([source](macros/compare_relation_columns.sql))
 This macro will return a query, that, when executed, compares the ordinal_position
