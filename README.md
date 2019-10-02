@@ -105,7 +105,7 @@ two queries, and summarizes how many records match perfectly (note: a primary
 key is required to match values across the two queries).
 
 | match_status                | count  | percent_of_total |
-|-----------------------------|--------|------------------|
+|-----------------------------|-------:|-----------------:|
 | ✅: perfect match            | 37,721 | 79.03            |
 | ✅: both are null            | 5,789  | 12.13            |
 | 🤷: missing from b          | 25     | 0.05             |
