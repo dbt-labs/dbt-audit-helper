@@ -15,11 +15,11 @@ relations. It is largely based on the [equality](https://github.com/fishtown-ana
 test in dbt-utils. By default, the generated query returns a summary of audit
 results, like so:
 
-| in_a  | in_b  | count |
-|-------|-------|-------|
-| True  | True  | 6870  |
-| True  | False | 9     |
-| False | True  | 9     |
+| in_a  | in_b  | count | percent_of_total |
+|-------|-------|------:|-----------------:|
+| True  | True  | 6870  | 99.74            |
+| True  | False | 9     | 0.13             |
+| False | True  | 9     | 0.13             |
 
 The generated SQL also contains commented-out SQL that you can use to check
 the rows that do not match perfectly:

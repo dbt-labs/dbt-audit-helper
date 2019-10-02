@@ -75,7 +75,11 @@ summary_stats as (
 -- where not (in_a and in_b)
 -- order by {{ primary_key ~ ", " if primary_key is not none }} in_a desc, in_b desc
 
-select * from summary_stats
+select
+    *,
+    round(100.0 * count / sum(count) over (), 2) as percent_of_total
+
+from summary_stats
 order by in_a desc, in_b desc
 
 {% endmacro %}
