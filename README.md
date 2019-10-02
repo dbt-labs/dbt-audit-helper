@@ -2,6 +2,12 @@
 
 Useful macros when performing data audits
 
+# Contents
+* [compare_relations](#compare_relations-source)
+* [compare_queries](#compare_queries-source)
+* [compare_column_values](#compare_column_values-source)
+* [compare_relation_columns](#compare_relation_columns-source)
+
 # Macros
 ## compare_relations ([source](macros/compare_relations.sql))
 This macro generates SQL that can be used to do a row-by-row validation of two
