@@ -140,7 +140,9 @@ number of your records don't match.
 
 {% set audit_results = run_query(audit_query) %}
 
+{% if execute %}
 {% do audit_results.print_table() %}
+{% endif %}
 ```
 
 **Usage notes:**
