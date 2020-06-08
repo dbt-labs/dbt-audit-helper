@@ -12,7 +12,9 @@ select
     a_cols.ordinal_position as a_ordinal_position,
     b_cols.ordinal_position as b_ordinal_position,
     a_cols.data_type as a_data_type,
-    b_cols.data_type as b_data_type
+    b_cols.data_type as b_data_type,
+    coalesce(a_cols.ordinal_position = b_cols.ordinal_position, false) as has_ordinal_position_match,
+    coalesce(a_cols.data_type = b_cols.data_type, false) as has_data_type_match
 from a_cols
 full outer join b_cols using (column_name)
 order by a_ordinal_position, b_ordinal_position
