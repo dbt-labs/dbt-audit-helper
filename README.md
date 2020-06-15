@@ -10,7 +10,7 @@ Useful macros when performing data audits
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
-1. Include this package in your `packages.yml` file — check [here](https://hub.getdbt.com/fishtown-analytics/segment/latest/) for the latest version number.
+1. Include this package in your `packages.yml` file — check [here](https://hub.getdbt.com/fishtown-analytics/audit_helper/latest/) for the latest version number.
 2. Run `dbt deps` to install the package.
 
 # Macros
