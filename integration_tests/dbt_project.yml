@@ -1,6 +1,6 @@
-
 name: 'audit_helper_integration_tests'
 version: '1.0'
+config-version: 2
 
 profile: 'audit_helper_integration_tests'
 
@@ -14,3 +14,6 @@ target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`
     - "target"
     - "dbt_modules"
+
+seeds:
+  +quote_columns: false
