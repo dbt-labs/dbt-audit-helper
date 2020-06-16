@@ -8,6 +8,11 @@ Useful macros when performing data audits
 * [compare_column_values](#compare_column_values-source)
 * [compare_relation_columns](#compare_relation_columns-source)
 
+# Installation instructions
+New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
+1. Include this package in your `packages.yml` file — check [here](https://hub.getdbt.com/fishtown-analytics/audit_helper/latest/) for the latest version number.
+2. Run `dbt deps` to install the package.
+
 # Macros
 ## compare_relations ([source](macros/compare_relations.sql))
 This macro generates SQL that can be used to do a row-by-row validation of two
