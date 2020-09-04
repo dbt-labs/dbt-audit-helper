@@ -24,7 +24,7 @@ order by a_ordinal_position, b_ordinal_position
 
 {% macro get_columns_in_relation_sql(relation) %}
 
-{{ adapter_macro('audit_helper.get_columns_in_relation_sql', relation) }}
+{{ adapter.dispatch('get_columns_in_relation_sql', packages=audit_helper._get_audit_helper_namespaces())(relation) }}
 
 {% endmacro %}
 
