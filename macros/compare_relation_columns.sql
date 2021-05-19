@@ -1,4 +1,9 @@
 {% macro compare_relation_columns(a_relation, b_relation) %}
+{{ adapter.dispatch('compare_relation_columns', packages=audit_helper._get_audit_helper_namespaces())(a_relation, b_relation) }}
+{% endmacro %}
+
+{% macro default__compare_relation_columns(a_relation, b_relation) %}
+
 with a_cols as (
     {{ audit_helper.get_columns_in_relation_sql(a_relation) }}
 ),
