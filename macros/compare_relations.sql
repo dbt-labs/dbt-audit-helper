@@ -12,11 +12,8 @@
 
 
 ----
-{% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
-    {{ return(adapter.dispatch('compare_relations', packages=audit_helper._get_audit_helper_namespaces())(a_relation, b_relation, exclude_columns=[], primary_key=None)) }}
-{% endmacro %}
 
-{% macro default__compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
+{% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
 
 {%- set a_columns = adapter.get_columns_in_relation(a_relation) -%}
 
