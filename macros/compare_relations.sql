@@ -13,7 +13,7 @@
 
 ----
 {% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
-{{ adapter.dispatch('compare_relations', packages=audit_helper._get_audit_helper_namespaces())(a_relation, b_relation, exclude_columns=[], primary_key=None) }}
+    {{ return(adapter.dispatch('compare_relations', packages=audit_helper._get_audit_helper_namespaces())(a_relation, b_relation, exclude_columns=[], primary_key=None)) }}
 {% endmacro %}
 
 {% macro default__compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
