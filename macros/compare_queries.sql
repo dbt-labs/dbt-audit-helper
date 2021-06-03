@@ -1,4 +1,8 @@
-{% macro compare_queries(a_query, b_query, primary_key=None) %}
+{% macro compare_queries(a_query, b_query, primary_key=None) -%}
+  {{ return(adapter.dispatch('compare_queries', packages = audit_helper._get_audit_helper_namespaces())(a_query, b_query, primary_key)) }}
+{%- endmacro %}
+
+{% macro default__compare_queries(a_query, b_query, primary_key=None) %}
 
 with a as (
 
