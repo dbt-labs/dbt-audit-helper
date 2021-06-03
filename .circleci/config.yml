@@ -1,9 +1,10 @@
+
 version: 2
 
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.13-stretch
+      - image: circleci/python:3.6.3-stretch
       - image: circleci/postgres:9.6.5-alpine-ram
 
     steps:
@@ -13,6 +14,7 @@ jobs:
           run: setup_creds
           command: |
             echo $BIGQUERY_SERVICE_ACCOUNT_JSON > ${HOME}/bigquery-service-key.json
+
       - restore_cache:
           key: deps1-{{ .Branch }}
 
@@ -21,10 +23,13 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
+
             pip install --upgrade pip setuptools
             pip install dbt
+
             mkdir -p ~/.dbt
             cp integration_tests/ci/sample.profiles.yml ~/.dbt/profiles.yml
+
       - run:
           name: "Run Tests - Postgres"
           environment:
@@ -41,6 +46,7 @@ jobs:
             dbt --warn-error compile --target postgres
             dbt --warn-error run --target postgres
             dbt --warn-error test --target postgres
+
       - run:
           name: "Run Tests - Redshift"
           command: |
@@ -52,6 +58,7 @@ jobs:
             dbt --warn-error compile --target redshift
             dbt --warn-error run --target redshift
             dbt --warn-error test --target redshift
+
       - run:
           name: "Run Tests - Snowflake"
           command: |
@@ -63,6 +70,7 @@ jobs:
             dbt --warn-error compile --target snowflake
             dbt --warn-error run --target snowflake
             dbt --warn-error test --target snowflake
+
       - run:
           name: "Run Tests - BigQuery"
           environment:
@@ -77,8 +85,9 @@ jobs:
             dbt --warn-error compile --target bigquery
             dbt --warn-error run --target bigquery
             dbt --warn-error test --target bigquery
+
+
       - save_cache:
           key: deps1-{{ .Branch }}
           paths:
             - "venv"
-            
