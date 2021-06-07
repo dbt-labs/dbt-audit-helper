@@ -1,5 +1,5 @@
 {% macro compare_relation_columns(a_relation, b_relation) %}
-  {{ return(adapter.dispatch('compare_relation_columns', packages=audit_helper._get_audit_helper_namespaces())(a_relation, b_relation)) }}
+  {{ return(adapter.dispatch('compare_relation_columns', 'audit_helper')(a_relation, b_relation)) }}
 {% endmacro %}
 
 {% macro default__compare_relation_columns(a_relation, b_relation) %}
@@ -29,7 +29,7 @@ order by coalesce(a_cols.ordinal_position, b_cols.ordinal_position)
 
 {% macro get_columns_in_relation_sql(relation) %}
 
-{{ adapter.dispatch('get_columns_in_relation_sql', packages=audit_helper._get_audit_helper_namespaces())(relation) }}
+{{ adapter.dispatch('get_columns_in_relation_sql', 'audit_helper')(relation) }}
 
 {% endmacro %}
 
