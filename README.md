@@ -10,13 +10,13 @@ Useful macros when performing data audits
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
-1. Include this package in your `packages.yml` file — check [here](https://hub.getdbt.com/fishtown-analytics/audit_helper/latest/) for the latest version number.
+1. Include this package in your `packages.yml` file — check [here](https://hub.getdbt.com/dbt-labs/audit_helper/latest/) for the latest version number.
 2. Run `dbt deps` to install the package.
 
 # Macros
 ## compare_relations ([source](macros/compare_relations.sql))
 This macro generates SQL that can be used to do a row-by-row validation of two
-relations. It is largely based on the [equality](https://github.com/fishtown-analytics/dbt-utils#equality-source)
+relations. It is largely based on the [equality](https://github.com/dbt-labs/dbt-utils#equality-source)
 test in dbt-utils. By default, the generated query returns a summary of audit
 results, like so:
 

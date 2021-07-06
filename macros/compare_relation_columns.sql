@@ -35,7 +35,7 @@ order by coalesce(a_cols.ordinal_position, b_cols.ordinal_position)
 
 {% macro redshift__get_columns_in_relation_sql(relation) %}
 {#-
-See https://github.com/fishtown-analytics/dbt/blob/23484b18b71010f701b5312f920f04529ceaa6b2/plugins/redshift/dbt/include/redshift/macros/adapters.sql#L71
+See https://github.com/dbt-labs/dbt/blob/23484b18b71010f701b5312f920f04529ceaa6b2/plugins/redshift/dbt/include/redshift/macros/adapters.sql#L71
 Edited to include ordinal_position
 -#}
 with bound_views as (
@@ -108,7 +108,7 @@ order by ordinal_position
 
 {% macro snowflake__get_columns_in_relation_sql(relation) %}
 {#-
-From: https://github.com/fishtown-analytics/dbt/blob/dev/louisa-may-alcott/plugins/snowflake/dbt/include/snowflake/macros/adapters.sql#L48
+From: https://github.com/dbt-labs/dbt/blob/dev/louisa-may-alcott/plugins/snowflake/dbt/include/snowflake/macros/adapters.sql#L48
 Edited to include ordinal_position
 -#}
   select
@@ -134,7 +134,7 @@ Edited to include ordinal_position
 
 {% macro postgres__get_columns_in_relation_sql(relation) %}
 {#-
-From: https://github.com/fishtown-analytics/dbt/blob/23484b18b71010f701b5312f920f04529ceaa6b2/plugins/postgres/dbt/include/postgres/macros/adapters.sql#L32
+From: https://github.com/dbt-labs/dbt/blob/23484b18b71010f701b5312f920f04529ceaa6b2/plugins/postgres/dbt/include/postgres/macros/adapters.sql#L32
 Edited to include ordinal_position
 -#}
   select
