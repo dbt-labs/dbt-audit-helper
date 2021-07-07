@@ -1,5 +1,5 @@
 {% macro compare_column_values(a_query, b_query, primary_key, column_to_compare) -%}
-  {{ return(adapter.dispatch('compare_column_values', packages = audit_helper._get_audit_helper_namespaces())(a_query, b_query, primary_key, column_to_compare)) }}
+  {{ return(adapter.dispatch('compare_column_values', 'audit_helper')(a_query, b_query, primary_key, column_to_compare)) }}
 {%- endmacro %}
 
 {% macro default__compare_column_values(a_query, b_query, primary_key, column_to_compare) -%}
