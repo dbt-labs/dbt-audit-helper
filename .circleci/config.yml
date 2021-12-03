@@ -25,12 +25,12 @@ jobs:
             1>&2 pwd
             1>&2 ls venv/bin
 
-            python3 -m venv venv
+            # python3 -m venv venv
             1>&2 ls venv
 
             . venv/bin/activate
 
-            1>&2
+            test -f venv/bin/python3 || 1>&2 echo "file does not exist"
 
             pip install --upgrade pip setuptools
             pip install --pre dbt-core dbt-postgres dbt-redshift dbt-snowflake dbt-bigquery
