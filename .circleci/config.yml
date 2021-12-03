@@ -23,7 +23,7 @@ jobs:
           command: |
             1>&2 ls
             1>&2 pwd
-            1>&2 ls venv
+            1>&2 ls venv/bin
 
             python3 -m venv venv
             1>&2 ls venv
