@@ -20,11 +20,14 @@ jobs:
 
       - run:
           name: "Setup dbt"
-          command: |
+          command: | 
+            set -x
             1>&2 which python
 
             python -m venv venv
             
+            1>&2 which python
+
             . venv/bin/activate
 
             1>&2 which python3
