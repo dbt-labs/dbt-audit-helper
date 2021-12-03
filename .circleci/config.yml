@@ -21,8 +21,11 @@ jobs:
       - run:
           name: "Setup dbt"
           command: |
-            python -m venv venv
+            python3 -m venv venv
             . venv/bin/activate
+
+
+            print(which python3)
 
             pip install --upgrade pip setuptools
             pip install --pre dbt-core dbt-postgres dbt-redshift dbt-snowflake dbt-bigquery
