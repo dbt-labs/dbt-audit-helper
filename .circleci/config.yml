@@ -34,8 +34,8 @@ jobs:
 
             test -f venv/bin/python3 || 1>&2 echo "file does not exist"
 
-            pip3 install --upgrade pip setuptools
-            pip3 install --pre dbt-core dbt-postgres dbt-redshift dbt-snowflake dbt-bigquery
+            python3 -m pip install --upgrade pip setuptools
+            python3 -m pip install --pre dbt-core dbt-postgres dbt-redshift dbt-snowflake dbt-bigquery
 
             mkdir -p ~/.dbt
             cp integration_tests/ci/sample.profiles.yml ~/.dbt/profiles.yml
