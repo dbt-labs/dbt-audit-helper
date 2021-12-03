@@ -4,7 +4,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/python:3.9.9
+      - image: cimg/python:3.7.12
       - image: circleci/postgres:9.6.5-alpine-ram
 
     steps:
@@ -25,7 +25,7 @@ jobs:
             1>&2 pwd
             1>&2 ls venv/bin
 
-            # python3 -m venv venv
+            python3 -m venv venv
             1>&2 ls venv
 
             . venv/bin/activate
