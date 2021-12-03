@@ -55,11 +55,11 @@ jobs:
             . dbt_venv/bin/activate
             echo `pwd`
             cd integration_tests
-            dbt --warn-error deps --target redshift
-            dbt --warn-error seed --target redshift --full-refresh
-            dbt --warn-error compile --target redshift
-            dbt --warn-error run --target redshift
-            dbt --warn-error test --target redshift
+            dbt deps --target redshift
+            dbt seed --target redshift --full-refresh
+            dbt compile --target redshift
+            dbt run --target redshift
+            dbt test --target redshift
 
       - run:
           name: "Run Tests - Snowflake"
@@ -67,11 +67,11 @@ jobs:
             . dbt_venv/bin/activate
             echo `pwd`
             cd integration_tests
-            dbt --warn-error deps --target snowflake
-            dbt --warn-error seed --target snowflake --full-refresh
-            dbt --warn-error compile --target snowflake
-            dbt --warn-error run --target snowflake
-            dbt --warn-error test --target snowflake
+            dbt deps --target snowflake
+            dbt seed --target snowflake --full-refresh
+            dbt compile --target snowflake
+            dbt run --target snowflake
+            dbt test --target snowflake
 
       - run:
           name: "Run Tests - BigQuery"
@@ -82,11 +82,11 @@ jobs:
             . dbt_venv/bin/activate
             echo `pwd`
             cd integration_tests
-            dbt --warn-error deps --target bigquery
-            dbt --warn-error seed --target bigquery --full-refresh
-            dbt --warn-error compile --target bigquery
-            dbt --warn-error run --target bigquery
-            dbt --warn-error test --target bigquery
+            dbt deps --target bigquery
+            dbt seed --target bigquery --full-refresh
+            dbt compile --target bigquery
+            dbt run --target bigquery
+            dbt test --target bigquery
 
 
       - save_cache:
