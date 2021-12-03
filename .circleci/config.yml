@@ -24,11 +24,11 @@ jobs:
             set -x
             1>&2 which python
 
-            python -m venv venv
+            python -m venv dbt_venv
             
             1>&2 which python
 
-            . venv/bin/activate
+            . dbt_venv/bin/activate
 
             1>&2 which python3
 
@@ -49,7 +49,7 @@ jobs:
             POSTGRES_TEST_PORT: 5432
             POSTGRES_TEST_DBNAME: circle_test
           command: |
-            . venv/bin/activate
+            . dbt_venv/bin/activate
             cd integration_tests
             dbt --warn-error deps --target postgres
             dbt --warn-error seed --target postgres --full-refresh
@@ -60,7 +60,7 @@ jobs:
       - run:
           name: "Run Tests - Redshift"
           command: |
-            . venv/bin/activate
+            . dbt_venv/bin/activate
             echo `pwd`
             cd integration_tests
             dbt --warn-error deps --target redshift
@@ -72,7 +72,7 @@ jobs:
       - run:
           name: "Run Tests - Snowflake"
           command: |
-            . venv/bin/activate
+            . dbt_venv/bin/activate
             echo `pwd`
             cd integration_tests
             dbt --warn-error deps --target snowflake
@@ -87,7 +87,7 @@ jobs:
               BIGQUERY_SERVICE_KEY_PATH: "/home/circleci/bigquery-service-key.json"
 
           command: |
-            . venv/bin/activate
+            . dbt_venv/bin/activate
             echo `pwd`
             cd integration_tests
             dbt --warn-error deps --target bigquery
@@ -100,4 +100,4 @@ jobs:
       - save_cache:
           key: deps1-{{ .Branch }}
           paths:
-            - "venv"
+            - "dbt_venv"
