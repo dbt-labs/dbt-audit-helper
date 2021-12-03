@@ -25,7 +25,7 @@ jobs:
             . venv/bin/activate
 
 
-            print(which python3)
+            which python3
 
             pip install --upgrade pip setuptools
             pip install --pre dbt-core dbt-postgres dbt-redshift dbt-snowflake dbt-bigquery
