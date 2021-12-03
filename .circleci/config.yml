@@ -21,9 +21,9 @@ jobs:
       - run:
           name: "Setup dbt"
           command: |
-            which python3
+            python3 --version
 
-            
+
             python3 -m venv venv
             . venv/bin/activate
 
