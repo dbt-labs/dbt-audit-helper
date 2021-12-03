@@ -22,10 +22,10 @@ jobs:
           name: "Setup dbt"
           command: |
             1>&2 ls
+            1>&2 pwd
             
             python3 -m venv venv
-
-            1>&2 ls
+            1>&2 ls venv
 
             . venv/bin/activate
 
