@@ -27,6 +27,8 @@ jobs:
 
             # python3 -m venv venv
             1>&2 ls venv
+            
+            test -f venv/bin/activate || 1>&2 echo "activate file does not exist"
 
             . venv/bin/activate
 
