@@ -216,6 +216,31 @@ Comparing column "status"
 | 🙅: ‍values do not... |         4,070 |             9.73 |
 ```
 
+
+## compare_columns_values ([source](macros/compare_columns_values.sql))
+This macro extends the functionality of `compare_column_values` and compares multiple columns'
+values in the same query. In addition, it can be passed a map to compare columns with different
+names in the source and target tables
+
+## audit_model ([source](macros/audit_mdeol.sql))])
+This macro accepts a model name and unique key, and compares the model of that name in the current
+schema with the same model in a target schema, by default `"prod"`.
+
+#### Parameters
+
+- `model_name`: The name of the dbt model
+- `unique_key`: The unique key on which to join the two models
+- `prod_schema`: The name of the target schema with the model of the same name in it. **Note**, this
+  works with dbt's schema renaming rules, so if the given model is configured as being under the
+  `staging` schema, this will look for a model in the `prod_staging` schema
+- `source_name`: Name of the source (current) model in the output query, by default `"source"`
+- `target_name`: Name of the target (i.e. prod) model in the output query, by default `"target"`
+- `renamed_columns_map`: A dictionary mapping a column in the _source_ model to a column in the
+  _target_ model. For instance, if the source model has a column named `created_at` which is called
+  `created_timestamp` in the target model, the the passed dictionary would be `{"created_at": "created_timestamp"}.
+  These names are _case sensitive_!
+
+
 ## compare_relation_columns ([source](macros/compare_relation_columns.sql))
 This macro will return a query, that, when executed, compares the ordinal_position
 and data_types of columns in two [Relations](https://docs.getdbt.com/docs/api-variable#section-relation).
