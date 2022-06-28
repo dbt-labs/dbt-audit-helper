@@ -216,6 +216,24 @@ Comparing column "status"
 | 🙅: ‍values do not... |         4,070 |             9.73 |
 ```
 
+### Advanced usage - dbt Cloud:
+The ``.print_table()`` function is not compatible with dbt Cloud so an adjustment needs to be made in order to print the results. Replace the following section of code:
+```
+        {% set audit_results = run_query(audit_query) %}
+        {% do audit_results.print_table() %}
+        {{ log("", info=True) }}
+```
+with:
+```
+        {% set audit_results = run_query(audit_query) %}
+
+        {% do log(audit_results.column_names, info=True) %}
+        {% for row in audit_results.rows %}
+            {% do log(row.values(), info=True) %}
+        {% endfor %}
+```
+
+
 ## compare_relation_columns ([source](macros/compare_relation_columns.sql))
 This macro will return a query, that, when executed, compares the ordinal_position
 and data_types of columns in two [Relations](https://docs.getdbt.com/docs/api-variable#section-relation).
