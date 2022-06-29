@@ -44,6 +44,7 @@ joined as (
 
 aggregated as (
     select
+        {{ column_to_compare }} as column,
         match_status,
         match_order,
         count(*) as count_records
@@ -53,6 +54,7 @@ aggregated as (
 )
 
 select
+    column,
     match_status,
     count_records,
     round(100.0 * count_records / sum(count_records) over (), 2) as percent_of_total
