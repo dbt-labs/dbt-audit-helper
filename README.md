@@ -7,6 +7,7 @@ Useful macros when performing data audits
 * [compare_queries](#compare_queries-source)
 * [compare_column_values](#compare_column_values-source)
 * [compare_relation_columns](#compare_relation_columns-source)
+* [compare_all_columns](#compare_all_columns-source)
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
@@ -273,6 +274,40 @@ it is a date in our "b" relation.
     b_relation=dbt_relation
 ) }}
 
+```
+
+## compare_all_columns ([source](macros/compare_all_columns.sql))
+This macro is designed to be added to a dbt test suite to monitor changes
+to values when code is changed, as part of a PR or during development. It
+draws from the Advanced Usage of the `compare_column_values` described above,
+and additionally sets up a test that will fail if any column values do not
+match. If there is a test failure, results can be inspected in the warehouse,
+as well as in the logs that are generated when the test runs.
+
+### Usage:
+
+To create a test for the `stg_jaffle__customers` model, create a custom test 
+in the `tests` subdirectory of your dbt project that looks like this:
+
+```
+{{ audit_helper.compare_all_columns('stg_jaffle__customers', 'id', 'prod_warehouse_schema') }}
+```
+
+where `stg_jaffle__customers` is the model you're testing; `id` is the primary 
+key of that model, and `prod_warehouse_schema` is the name of the schema your dbt 
+project writes to when running in production.
+
+The results (emoji and all!) will be written out to the console if you run this code:
+
+```
+dbt test --select stg_jaffle__customers --store-failures
+```
+
+If you want to [store results in the warehouse for further analysis](https://docs.getdbt.com/docs/building-a-dbt-project/tests#storing-test-failures), add the `--store-failures`
+flag.
+
+```
+dbt test --select stg_jaffle__customers --store-failures
 ```
 
 # To-do:
