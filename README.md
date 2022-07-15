@@ -300,7 +300,7 @@ project writes to when running in production.
 The results (emoji and all!) will be written out to the console if you run this code:
 
 ```
-dbt test --select stg_jaffle__customers --store-failures
+dbt test --select stg_jaffle__customers
 ```
 
 If you want to [store results in the warehouse for further analysis](https://docs.getdbt.com/docs/building-a-dbt-project/tests#storing-test-failures), add the `--store-failures`
