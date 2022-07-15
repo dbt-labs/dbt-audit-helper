@@ -4,14 +4,14 @@
 
 {% macro default__compare_all_columns(model_name, primary_key, prod_schema) -%}
 
-{%- set columns_to_compare=adapter.get_columns_in_relation(ref('{{ model_name }}')) %}
+{%- set columns_to_compare=adapter.get_columns_in_relation(ref(model_name)) %}
 
 {% set old_etl_relation_query %}
     select * from {{prod_schema}}.{{ model_name }}
 {% endset %}
 
 {% set new_etl_relation_query %}
-    select * from {{ ref('{{ model_name }}') }}
+    select * from {{ ref(model_name) }}
 {% endset %}
 
 {% if execute %}
@@ -23,7 +23,7 @@
         {% set audit_query = audit_helper.compare_column_values(
             a_query=old_etl_relation_query,
             b_query=new_etl_relation_query,
-            primary_key='{{primary_key}}',
+            primary_key=primary_key,
             column_to_compare=column.name
         ) %}
 
