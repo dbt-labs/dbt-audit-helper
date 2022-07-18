@@ -2,9 +2,11 @@
   {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( model_name, primary_key, prod_schema,  exclude_columns=[] )) }}
 {%- endmacro %}
 
-{% macro default__compare_all_columns( model_name, primary_key, prod_schema,  exclude_columns=[] ) -%}
+{% macro default__compare_all_columns( model_name, primary_key, prod_schema, exclude_columns=[] ) -%}
 
-{%- set columns_to_compare= list(set(adapter.get_columns_in_relation(ref(model_name))) - set(exclude_columns)) %}
+{%- set all_columns=adapter.get_columns_in_relation(ref(model_name)) %}
+
+{% set columns_to_compare=audit_helper.pop_columns(all_columns, exclude_columns) %}
 
 {% set old_etl_relation_query %}
     select * from {{prod_schema}}.{{ model_name }}

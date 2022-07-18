@@ -1,18 +1,3 @@
-{% macro pop_columns(columns, columns_to_pop) %}
-{% set popped_columns=[] %}
-
-{% for column in columns %}
-    {% if column.name | lower not in columns_to_pop | lower %}
-        {% do popped_columns.append(column) %}
-    {% endif %}
-{% endfor %}
-
-{{ return(popped_columns) }}
-{% endmacro %}
-
-
-----
-
 {% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
 
 {%- set a_columns = adapter.get_columns_in_relation(a_relation) -%}
