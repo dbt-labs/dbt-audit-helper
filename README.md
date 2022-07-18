@@ -281,8 +281,7 @@ This macro is designed to be added to a dbt test suite to monitor changes
 to values when code is changed, as part of a PR or during development. It
 draws from the Advanced Usage of the `compare_column_values` described above,
 and additionally sets up a test that will fail if any column values do not
-match. If there is a test failure, results can be inspected in the warehouse,
-as well as in the logs that are generated when the test runs.
+match. If there is a test failure, results can be inspected in the warehouse.
 
 ### Usage:
 
@@ -297,7 +296,8 @@ where `stg_jaffle__customers` is the model you're testing; `id` is the primary
 key of that model, and `prod_warehouse_schema` is the name of the schema your dbt 
 project writes to when running in production.
 
-The results (emoji and all!) will be written out to the console if you run this code:
+Then, you can run this code to test an individual table; and the test will be run 
+as part of a full test suite run.
 
 ```
 dbt test --select stg_jaffle__customers
