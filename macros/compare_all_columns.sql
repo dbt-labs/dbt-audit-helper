@@ -13,12 +13,8 @@
 {% set new_etl_relation_query %}
     select * from {{ ref(model_name) }}
 {% endset %}
-
-{% if execute %}
     
     {% for column in columns_to_compare %}
-
-        {{ log('Comparing column "' ~ column.name ~'"', info=True) }}
 
         {% set audit_query = audit_helper.compare_column_values(
             a_query=old_etl_relation_query,
@@ -26,10 +22,6 @@
             primary_key=primary_key,
             column_to_compare=column.name
         ) %}
-
-        {% set audit_results = run_query(audit_query) %}
-        {% do audit_results.print_table() %}
-        {{ log("", info=True) }}
 
         /*  Create a query combining results from all columns so that the user, or the 
         test suite, can examine all at once.
@@ -55,6 +47,6 @@
 
     {% endfor %}
 
-{% endif %}
+
 
 {% endmacro %}
