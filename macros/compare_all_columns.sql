@@ -1,4 +1,4 @@
-{% macro compare_all_columns(model_name, primary_key, prod_schema,  exclude_columns=[] ) -%}
+{% macro compare_all_columns(model_name, primary_key, prod_schema,  exclude_columns ) -%}
   {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( model_name, primary_key, prod_schema,  exclude_columns=[] )) }}
 {%- endmacro %}
 
