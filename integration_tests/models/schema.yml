@@ -15,4 +15,8 @@ models:
     tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_relations_without_exclude')
+  
+  - name: pop_columns
+
+  - name: compare_all_columns
           
