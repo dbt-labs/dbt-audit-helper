@@ -1,17 +1,19 @@
-{% macro compare_all_columns(model_name, primary_key, prod_schema, exclude_columns ) -%}
-  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( model_name, primary_key, prod_schema, exclude_columns )) }}
+{% macro compare_all_columns(model_name, primary_key, prod_schema, exclude_columns, updated_at_column, exclude_recent_hours, direct_conflicts_only) -%}
+  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( model_name, primary_key, prod_schema, exclude_columns, updated_at_column, exclude_recent_hours, direct_conflicts_only )) }}
 {%- endmacro %}
 
-{% macro default__compare_all_columns( model_name, primary_key, prod_schema, exclude_columns ) -%}
+{% macro default__compare_all_columns( model_name, primary_key, prod_schema, exclude_columns, updated_at_column, exclude_recent_hours, direct_conflicts_only ) -%}
 
   {% set columns_to_compare=audit_helper.pop_columns(model_name, exclude_columns) %}
 
   {% set old_etl_relation_query %}
       select * from {{prod_schema}}.{{ model_name }}
+      where {{updated_at_column}} < dateadd(hour, -{{exclude_recent_hours}}, current_timestamp)
   {% endset %}
 
   {% set new_etl_relation_query %}
     select * from {{ ref(model_name) }}
+    where {{updated_at_column}} < dateadd(hour, -{{exclude_recent_hours}}, current_timestamp)
   {% endset %}
 
   {% for column in columns_to_compare %}
@@ -40,8 +42,15 @@
     {% else %}
     ) select * from main 
     /*  Identify records that are not perfect matches. These are dbt test failures.
+        - if direct_conflicts_only = true, ONLY a direct conflict will raise an error.
+        - if direct_conflicts_only !- true, anything other than '\u2705: perfect match' will raise an error.
     */
-    where match_status != '\u2705: perfect match' and count_records > 0 
+      {% if direct_conflicts_only is true %}
+        where match_status = '\u1F645: ‍values do not match' and count_records > 0 
+      {% else %}
+        where match_status != '\u2705: perfect match' and count_records > 0 
+      {% endif %}
+    
 
     {% endif %}
 
