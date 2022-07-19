@@ -1,8 +1,6 @@
 {% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
 
-{%- set a_columns = adapter.get_columns_in_relation(a_relation) -%}
-
-{% set check_columns=audit_helper.pop_columns(a_columns, exclude_columns) %}
+{% set check_columns=audit_helper.pop_columns(a_relation, exclude_columns) %}
 
 {% set check_cols_csv = check_columns | map(attribute='quoted') | join(', ') %}
 
