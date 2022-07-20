@@ -289,14 +289,32 @@ To create a test for the `stg_jaffle__customers` model, create a custom test
 in the `tests` subdirectory of your dbt project that looks like this:
 
 ```
-{{ audit_helper.compare_all_columns('stg_jaffle__customers', 'id', 'prod_warehouse_schema') }}
+{{ 
+  audit_helper.compare_all_columns(
+    model_name='stg_jaffle__customers', 
+    primary_key='id', 
+    prod_schema='prod_warehouse_schema', 
+    exclude_columns=['updated_at'],
+    updated_at_column='updated_at',
+    exclude_recent_hours=2,
+    direct_conflicts_only=true
+  ) 
+}}
 ```
 
-where `stg_jaffle__customers` is the model you're testing; `id` is the primary 
-key of that model, and `prod_warehouse_schema` is the name of the schema your dbt 
-project writes to when running in production.
+`model_name`: The model you're testing.
+`primary_key`: The primary key of that model.
+`prod_schema`: The schema that dbt writes to in production. This is what you'll test your code changes
+against, such as during a PR run of the dbt test suite.
+`exclude_columns`: A list of columns that you will not expect to match.
+`updated_at_column`: This is a column that will be used to exclude very recent data, since your prod
+warehouse data might not include very recent data that is present in your PR run.
+`exclude_recent_hours`: A numeric value that specifies which recent data will be excluded. e.g., with a
+value of `2`, the test will exclude data with an `updated_at` value more recently than 2 hours ago.
+`direct_conflicts_only`: If true, the test will fail _only if_ the test identifies a direct conflict.
 
-Then, you can run this code to test an individual table; and the test will be run 
+
+You can write a `compare_all_columns` test on individual table; and the test will be run 
 as part of a full test suite run.
 
 ```
