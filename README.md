@@ -302,16 +302,16 @@ in the `tests` subdirectory of your dbt project that looks like this:
 }}
 ```
 
-`model_name`: The model you're testing.
-`primary_key`: The primary key of that model.
-`prod_schema`: The schema that dbt writes to in production. This is what you'll test your code changes
+* `model_name`: The model you're testing.
+* `primary_key`: The primary key of that model.
+* `prod_schema`: The schema that dbt writes to in production. This is what you'll test your code changes
 against, such as during a PR run of the dbt test suite.
-`exclude_columns`: A list of columns that you will not expect to match.
-`updated_at_column`: This is a column that will be used to exclude very recent data, since your prod
+* `exclude_columns`: A list of columns that you will not expect to match.
+* `updated_at_column`: This is a column that will be used to exclude very recent data, since your prod
 warehouse data might not include very recent data that is present in your PR run.
-`exclude_recent_hours`: A numeric value that specifies which recent data will be excluded. e.g., with a
+* `exclude_recent_hours`: A numeric value that specifies which recent data will be excluded. e.g., with a
 value of `2`, the test will exclude data with an `updated_at` value more recently than 2 hours ago.
-`direct_conflicts_only`: If true, the test will fail _only if_ the test identifies a direct conflict.
+* `direct_conflicts_only`: If true, the test will fail _only if_ the test identifies a direct conflict.
 
 
 You can write a `compare_all_columns` test on individual table; and the test will be run 
