@@ -44,15 +44,17 @@ joined as (
 
 aggregated as (
     select
+        '{{ column_to_compare }}' as column_name,
         match_status,
         match_order,
         count(*) as count_records
     from joined
 
-    group by match_status, match_order
+    group by column_name, match_status, match_order
 )
 
 select
+    column_name,
     match_status,
     count_records,
     round(100.0 * count_records / sum(count_records) over (), 2) as percent_of_total
