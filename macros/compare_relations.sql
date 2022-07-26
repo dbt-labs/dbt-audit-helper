@@ -4,7 +4,7 @@
 
 {% set check_cols_csv = '"%s"' %'", "'.join(column_names) %}
 -- note: I tried to use this less hacky approach ( https://stackoverflow.com/a/12007707/5037635 ),
--- but Jinja doesn't seem to allow it.
+-- but Jinja doesn't seem to allow it, even though it should work in Python.
 
 {% set a_query %}
 select
