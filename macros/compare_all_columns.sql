@@ -4,7 +4,9 @@
 
 {% macro default__compare_all_columns( model_name, primary_key, prod_schema, exclude_columns, updated_at_column, exclude_recent_hours, direct_conflicts_only ) -%}
 
-  {% set columns_to_compare=audit_helper.pop_columns(model_name, exclude_columns) %}
+  {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=ref(model_name), except=exclude_columns) %}
+
+  {% set columns_to_compare = '"%s"' %'", "'.join(column_names) %}
 
   {% set old_etl_relation_query %}
       select * from {{prod_schema}}.{{ model_name }}
@@ -22,7 +24,7 @@
       a_query=old_etl_relation_query,
       b_query=new_etl_relation_query,
       primary_key=primary_key,
-      column_to_compare=column.name
+      column_to_compare=column
     ) %}
 
     /*  Create a query combining results from all columns so that the user, or the 

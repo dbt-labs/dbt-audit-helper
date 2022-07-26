@@ -1,8 +1,10 @@
 {% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
 
-{% set check_columns=audit_helper.pop_columns(a_relation, exclude_columns) %}
+{% set column_names = dbt_utils.get_filtered_columns_in_relation(from=ref(a_relation), except=exclude_columns) %}
 
-{% set check_cols_csv = check_columns | map(attribute='quoted') | join(', ') %}
+{% set check_cols_csv = '"%s"' %'", "'.join(column_names) %}
+-- note: I tried to use this less hacky approach ( https://stackoverflow.com/a/12007707/5037635 ),
+-- but Jinja doesn't seem to allow it.
 
 {% set a_query %}
 select
