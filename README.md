@@ -6,6 +6,7 @@ Useful macros when performing data audits
 * [compare_relations](#compare_relations-source)
 * [compare_queries](#compare_queries-source)
 * [compare_column_values](#compare_column_values-source)
+* [compare_column_values_count](#compare_column_values_count-source)
 * [compare_relation_columns](#compare_relation_columns-source)
 * [compare_all_columns](#compare_all_columns-source)
 
@@ -235,6 +236,13 @@ with:
 ```
 
 
+## compare_column_values_count ([source](macros/compare_column_values_count.sql))
+This macro will return a query that, when executed, returns the same information as 
+`compare_column_values`, but organized into columns with count values instead of rows.
+`compare_column_values_count` enables `compare_all_columns` to give the user more
+flexibility around what will result in a test failure.
+
+
 ## compare_relation_columns ([source](macros/compare_relation_columns.sql))
 This macro will return a query, that, when executed, compares the ordinal_position
 and data_types of columns in two [Relations](https://docs.getdbt.com/docs/api-variable#section-relation).
@@ -295,9 +303,7 @@ in the `tests` subdirectory of your dbt project that looks like this:
     primary_key='id', 
     prod_schema='prod_warehouse_schema', 
     exclude_columns=['updated_at'],
-    updated_at_column='updated_at',
-    exclude_recent_hours=2,
-    direct_conflicts_only=true
+    updated_at_column='updated_at'
   ) 
 }}
 ```
@@ -307,11 +313,9 @@ in the `tests` subdirectory of your dbt project that looks like this:
 * `prod_schema`: The schema that dbt writes to in production. This is what you'll test your code changes
 against, such as during a PR run of the dbt test suite.
 * `exclude_columns`: A list of columns that you will not expect to match.
-* `updated_at_column`: This is a column that will be used to exclude very recent data, since your prod
-warehouse data might not include very recent data that is present in your PR run.
-* `exclude_recent_hours`: A numeric value that specifies which recent data will be excluded. e.g., with a
-value of `2`, the test will exclude data with an `updated_at` value more recently than 2 hours ago.
-* `direct_conflicts_only`: If true, the test will fail _only if_ the test identifies a direct conflict.
+* `updated_at_column`: This is a column that will be used to exclude very 
+recent data, since your prod warehouse data might not include very recent 
+data that is present in your PR run.
 
 
 You can write a `compare_all_columns` test on individual table; and the test will be run 
