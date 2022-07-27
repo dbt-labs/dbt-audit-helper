@@ -6,9 +6,9 @@ Useful macros when performing data audits
 * [compare_relations](#compare_relations-source)
 * [compare_queries](#compare_queries-source)
 * [compare_column_values](#compare_column_values-source)
-* [compare_column_values_verbose](#compare_column_values_verbose-source)
 * [compare_relation_columns](#compare_relation_columns-source)
 * [compare_all_columns](#compare_all_columns-source)
+* [compare_column_values_verbose](#compare_column_values_verbose-source)
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
@@ -157,67 +157,6 @@ number of your records don't match.
 work as expected.
 
 
-### Advanced usage:
-Got a wide table, and want to iterate through all the columns? Try something
-like this:
-```
-{%- set columns_to_compare=adapter.get_columns_in_relation(ref('dim_product'))  -%}
-
-{% set old_etl_relation_query %}
-    select * from public.dim_product
-    where is_latest
-{% endset %}
-
-{% set new_etl_relation_query %}
-    select * from {{ ref('dim_product') }}
-{% endset %}
-
-{% if execute %}
-    {% for column in columns_to_compare %}
-        {{ log('Comparing column "' ~ column.name ~'"', info=True) }}
-
-        {% set audit_query = audit_helper.compare_column_values(
-            a_query=old_etl_relation_query,
-            b_query=new_etl_relation_query,
-            primary_key="product_id",
-            column_to_compare=column.name
-        ) %}
-
-        {% set audit_results = run_query(audit_query) %}
-        {% do audit_results.print_table() %}
-        {{ log("", info=True) }}
-
-    {% endfor %}
-{% endif %}
-```
-
-This will give you an output like:
-```
-Comparing column "name"
-| match_status         | count_records | percent_of_total |
-| -------------------- | ------------- | ---------------- |
-| ✅: perfect match     |        41,573 |            99.43 |
-| 🤷: missing from b    |            26 |             0.06 |
-| 🙅: ‍values do not... |           212 |             0.51 |
-
-Comparing column "msrp"
-| match_status         | count_records | percent_of_total |
-| -------------------- | ------------- | ---------------- |
-| ✅: perfect match     |        31,145 |            74.49 |
-| ✅: both are null     |        10,557 |            25.25 |
-| 🤷: missing from b    |            22 |             0.05 |
-| 🤷: value is null ... |            31 |             0.07 |
-| 🤷: value is null ... |             4 |             0.01 |
-| 🙅: ‍values do not... |            52 |             0.12 |
-
-Comparing column "status"
-| match_status         | count_records | percent_of_total |
-| -------------------- | ------------- | ---------------- |
-| ✅: perfect match     |        37,715 |            90.20 |
-| 🤷: missing from b    |            26 |             0.06 |
-| 🙅: ‍values do not... |         4,070 |             9.73 |
-```
-
 ### Advanced usage - dbt Cloud:
 The ``.print_table()`` function is not compatible with dbt Cloud so an adjustment needs to be made in order to print the results. Replace the following section of code:
 ```
@@ -234,11 +173,6 @@ with:
             {% do log(row.values(), info=True) %}
         {% endfor %}
 ```
-
-
-## compare_column_values_verbose ([source](macros/compare_column_values_verbose.sql))
-This macro will return a query that, when executed, returns the same information as 
-`compare_column_values`, but not summarized. `compare_column_values_verbose` enables `compare_all_columns` to give the user more flexibility around what will result in a test failure.
 
 
 ## compare_relation_columns ([source](macros/compare_relation_columns.sql))
@@ -284,10 +218,11 @@ it is a date in our "b" relation.
 
 ## compare_all_columns ([source](macros/compare_all_columns.sql))
 This macro is designed to be added to a dbt test suite to monitor changes
-to values when code is changed, as part of a PR or during development. It
-draws from the Advanced Usage of the `compare_column_values` described above,
-and additionally sets up a test that will fail if any column values do not
-match. If there is a test failure, results can be inspected in the warehouse.
+to values when code is changed, as part of a PR or during development. It sets 
+up a test that will fail if any column values do not match, with options for more 
+or less stringent requirements. If there is a test failure, results can be inspected 
+in the warehouse, including by using the primary key in the test output to join to
+relevant tables in your dev or prod schema to investigate the error.
 
 ### Usage:
 
@@ -297,12 +232,16 @@ in the `tests` subdirectory of your dbt project that looks like this:
 ```
 {{ 
   audit_helper.compare_all_columns(
-    model_name='stg_jaffle__customers', 
+    model_name='stg_vendr__deals', 
     primary_key='id', 
-    prod_schema='prod_warehouse_schema', 
+    prod_schema='warehouse', 
     exclude_columns=['updated_at']
   ) 
 }}
+where not perfect_match
+/* This `where` statement is an example of a filter you can apply to determine what
+constitutes a test failure
+*/
 ```
 
 * `model_name`: The model you're testing.
@@ -325,6 +264,11 @@ flag.
 ```
 dbt test --select stg_jaffle__customers --store-failures
 ```
+
+## compare_column_values_verbose ([source](macros/compare_column_values_verbose.sql))
+This macro will return a query that, when executed, returns the same information as 
+`compare_column_values`, but not summarized. `compare_column_values_verbose` enables `compare_all_columns` to give the user more flexibility around what will result in a test failure.
+
 
 # To-do:
 * Macro to check if two schemas contain the same relations
