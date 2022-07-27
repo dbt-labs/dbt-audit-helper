@@ -2,6 +2,7 @@
   {{ return(adapter.dispatch('compare_column_values_verbose', 'audit_helper')(a_query, b_query, primary_key, column_to_compare)) }}
 {%- endmacro %}
 
+
 {% macro default__compare_column_values_verbose(a_query, b_query, primary_key, column_to_compare) -%}
 with a_query as (
     {{ a_query }}
@@ -13,17 +14,15 @@ b_query as (
     select
         coalesce(a_query.{{ primary_key }}, b_query.{{ primary_key }}) as {{ primary_key }},
         '{{ column_to_compare }}' as column_name,
-        a_query.{{ column_to_compare }} as a_query_value,
-        b_query.{{ column_to_compare }} as b_query_value,
         a_query.{{ column_to_compare }} = b_query.{{ column_to_compare }} as perfect_match,
         a_query.{{ column_to_compare }} is null as null_in_a,
         b_query.{{ column_to_compare }} is null as null_in_b,
         a_query.{{ primary_key }} is null as missing_from_a,
         b_query.{{ primary_key }} is null as missing_from_b,
-        a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }} and 
-          (a_query.{{ column_to_compare }} is not null or b_query.{{ column_to_compare }} is not null)
+        a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }} and
+            (a_query.{{ column_to_compare }} is not null or b_query.{{ column_to_compare }} is not null)
           as conflicting_values
-           -- considered a conflict if the values do not match AND at least one of the values is not null
+           -- considered a conflict if the values do not match AND at least one of the values is not null.
 
     from a_query
 
