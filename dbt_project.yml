@@ -13,3 +13,4 @@ seeds:
   audit_helper:
     prod_schema:
       schema: prod_schema
+      

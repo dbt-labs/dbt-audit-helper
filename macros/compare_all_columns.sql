@@ -37,7 +37,7 @@
     */
     ( {{ audit_query }} )
     {% if not loop.last %}
-      union
+      union all
     {% else %}
     ) select * from main     
 
