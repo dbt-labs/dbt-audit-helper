@@ -6,7 +6,7 @@ Useful macros when performing data audits
 * [compare_relations](#compare_relations-source)
 * [compare_queries](#compare_queries-source)
 * [compare_column_values](#compare_column_values-source)
-* [compare_column_values_count](#compare_column_values_count-source)
+* [compare_column_values_verbose](#compare_column_values_verbose-source)
 * [compare_relation_columns](#compare_relation_columns-source)
 * [compare_all_columns](#compare_all_columns-source)
 
@@ -236,11 +236,9 @@ with:
 ```
 
 
-## compare_column_values_count ([source](macros/compare_column_values_count.sql))
+## compare_column_values_verbose ([source](macros/compare_column_values_verbose.sql))
 This macro will return a query that, when executed, returns the same information as 
-`compare_column_values`, but organized into columns with count values instead of rows.
-`compare_column_values_count` enables `compare_all_columns` to give the user more
-flexibility around what will result in a test failure.
+`compare_column_values`, but not summarized. `compare_column_values_verbose` enables `compare_all_columns` to give the user more flexibility around what will result in a test failure.
 
 
 ## compare_relation_columns ([source](macros/compare_relation_columns.sql))
@@ -302,8 +300,7 @@ in the `tests` subdirectory of your dbt project that looks like this:
     model_name='stg_jaffle__customers', 
     primary_key='id', 
     prod_schema='prod_warehouse_schema', 
-    exclude_columns=['updated_at'],
-    updated_at_column='updated_at'
+    exclude_columns=['updated_at']
   ) 
 }}
 ```
@@ -313,9 +310,6 @@ in the `tests` subdirectory of your dbt project that looks like this:
 * `prod_schema`: The schema that dbt writes to in production. This is what you'll test your code changes
 against, such as during a PR run of the dbt test suite.
 * `exclude_columns`: A list of columns that you will not expect to match.
-* `updated_at_column`: This is a column that will be used to exclude very 
-recent data, since your prod warehouse data might not include very recent 
-data that is present in your PR run.
 
 
 You can write a `compare_all_columns` test on individual table; and the test will be run 
