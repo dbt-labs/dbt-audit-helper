@@ -221,20 +221,20 @@ This macro is designed to be added to a dbt test suite to monitor changes
 to values when code is changed, as part of a PR or during development. It sets 
 up a test that will fail if any column values do not match, with options for more 
 or less stringent requirements. If there is a test failure, results can be inspected 
-in the warehouse, including by using the primary key in the test output to join to
+in the warehouse, possibly by using the primary key in the test output to join to
 relevant tables in your dev or prod schema to investigate the error.
 
 ### Usage:
 
-To create a test for the `stg_jaffle__customers` model, create a custom test 
+To create a test for the `stg_customers` model, create a custom test 
 in the `tests` subdirectory of your dbt project that looks like this:
 
 ```
 {{ 
   audit_helper.compare_all_columns(
-    model_name='stg_vendr__deals', 
+    model_name='stg_customers', 
     primary_key='id', 
-    prod_schema='warehouse', 
+    prod_schema='analytics', 
     exclude_columns=['updated_at']
   ) 
 }}
@@ -250,19 +250,56 @@ constitutes a test failure
 against, such as during a PR run of the dbt test suite.
 * `exclude_columns`: A list of columns that you will not expect to match.
 
+If you want to create test results that include columns for attributes from the model itself 
+for easier inspection, that can be written into the test:
+
+```
+{{ 
+  audit_helper.compare_all_columns(
+    model_name='stg_customers', 
+    primary_key='id', 
+    prod_schema='analytics', 
+    exclude_columns=['updated_at']
+  ) 
+}}
+left join {{ ref('stg_customers') }} using(id)
+```
+
+This structure also allows for the test to group or filter by any attribute in the model or in 
+the macro's output as part of the test, for example:
+
+```
+with base_test_cte as (
+  {{
+    audit_helper.compare_all_columns(
+      model_name='stg_customers', 
+      primary_key='id', 
+      prod_schema='analytics', 
+      exclude_columns=['updated_at']
+    ) 
+  }}
+  left join {{ ref('stg_customers') }} using(id)
+  where not perfect_match
+)
+select
+  status, --let's say there's a "status" column in the model you're testing
+  count(distinct case when conflicting_values then id end) as conflicting_values
+from base_test_cte
+group by 1
+```
 
 You can write a `compare_all_columns` test on individual table; and the test will be run 
 as part of a full test suite run.
 
 ```
-dbt test --select stg_jaffle__customers
+dbt test --select stg_customers
 ```
 
 If you want to [store results in the warehouse for further analysis](https://docs.getdbt.com/docs/building-a-dbt-project/tests#storing-test-failures), add the `--store-failures`
 flag.
 
 ```
-dbt test --select stg_jaffle__customers --store-failures
+dbt test --select stg_customers --store-failures
 ```
 
 ## compare_column_values_verbose ([source](macros/compare_column_values_verbose.sql))
