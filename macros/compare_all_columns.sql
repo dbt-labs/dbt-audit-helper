@@ -4,11 +4,12 @@
 
 {% macro default__compare_all_columns( model_name, primary_key, prod_schema, exclude_columns ) -%}
 
+  {% set relation = api.Relation.create(schema=prod_schema, identifier=model_name) %}
 
   {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=ref(model_name), except=exclude_columns) %}
 
   {% set old_etl_relation_query %}
-      select * from {{prod_schema}}.{{ model_name }}
+      select * from {{ target.database }}.{{ relation.schema }}.{{ relation.identifier }}
   {% endset %}
 
   {% set new_etl_relation_query %}
