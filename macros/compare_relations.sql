@@ -1,6 +1,6 @@
 {% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
 
-{% set column_names = dbt_utils.get_filtered_columns_in_relation(from=ref(a_relation), except=exclude_columns) %}
+{% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
 {% set check_cols_csv = '"%s"' %'", "'.join(column_names) %}
 -- note: I tried to use this less hacky approach ( https://stackoverflow.com/a/12007707/5037635 ),
