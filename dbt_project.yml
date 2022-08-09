@@ -8,9 +8,3 @@ target-path: "target"
 clean-targets: ["target", "dbt_packages"]
 macro-paths: ["macros"]
 log-path: "logs"
-
-seeds:
-  audit_helper:
-    prod_schema:
-      schema: prod_schema
-      
