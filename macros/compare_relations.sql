@@ -6,7 +6,7 @@
   {% set check_cols_csv = '`%s`' %'`, `'.join(column_names) %}
 {% else %}
   {% set check_cols_csv = '"%s"' %'", "'.join(column_names) %}
-{% end %}
+{% endif %}
 
 {% set a_query %}
 select
