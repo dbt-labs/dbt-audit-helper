@@ -4,8 +4,10 @@
 
 {% if target.name == 'bigquery' %}
   {% set check_cols_csv = '`%s`' %'`, `'.join(column_names) %}
+  -- bigquery likes it like this: select `col_a`, `col_b` from 
 {% else %}
   {% set check_cols_csv = '"%s"' %'", "'.join(column_names) %}
+  -- everyone else likes it like this: select "col_a", "col_b" from
 {% endif %}
 
 {% set a_query %}
