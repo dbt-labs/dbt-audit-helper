@@ -1,0 +1,4 @@
+in_a,in_b,count,percent_of_total
+True,True,1,33.33
+True,False,1,33.33
+False,True,1,33.33

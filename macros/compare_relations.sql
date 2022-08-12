@@ -1,4 +1,4 @@
-{% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
+{% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None, summarize=true) %}
 
 {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
@@ -24,6 +24,6 @@ select
 from {{ b_relation }}
 {% endset %}
 
-{{ audit_helper.compare_queries(a_query, b_query, primary_key) }}
+{{ audit_helper.compare_queries(a_query, b_query, primary_key, summarize) }}
 
 {% endmacro %}
