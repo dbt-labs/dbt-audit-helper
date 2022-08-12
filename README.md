@@ -68,8 +68,8 @@ Arguments:
   validation.
 * `primary_key` (optional): The primary key of the model. Used to sort unmatched
   results for row-by-row validation.
-* `summary` (optional): Allows you to switch between a summary or detaied view
-  of the compared data. Accepts `true` or `false` vaules. Defaults to `true`.
+* `summary` (optional): Allows you to switch between a summary or detailed view
+  of the compared data. Accepts `true` or `false` values. Defaults to `true`.
 
 ## compare_queries ([source](macros/compare_queries.sql))
 Super similar to `compare_relations`, except it takes two select statements. This macro is useful when:
