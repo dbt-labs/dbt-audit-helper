@@ -60,7 +60,6 @@ The query is best used in dbt Develop so you can interactively check results
     primary_key="order_id"
 ) }}
 
-
 ```
 Arguments:
 * `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
@@ -69,6 +68,8 @@ Arguments:
   validation.
 * `primary_key` (optional): The primary key of the model. Used to sort unmatched
   results for row-by-row validation.
+* `summarize` (optional): Allows you to switch between a summary or detailed view
+  of the compared data. Accepts `true` or `false` values. Defaults to `true`.
 
 ## compare_queries ([source](macros/compare_queries.sql))
 Super similar to `compare_relations`, except it takes two select statements. This macro is useful when:
@@ -103,6 +104,10 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 
 
 ```
+
+Arguments:
+* `summarize` (optional): Allows you to switch between a summary or detaied view
+  of the compared data. Accepts `true` or `false` vaules. Defaults to `true`.
 
 ## compare_column_values ([source](macros/compare_column_values.sql))
 This macro will return a query, that, when executed, compares a column across
