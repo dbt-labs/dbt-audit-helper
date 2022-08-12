@@ -1,8 +1,8 @@
-{% macro compare_queries(a_query, b_query, primary_key=None, summary=true) -%}
-  {{ return(adapter.dispatch('compare_queries', 'audit_helper')(a_query, b_query, primary_key, summary)) }}
+{% macro compare_queries(a_query, b_query, primary_key=None, summarize=true) -%}
+  {{ return(adapter.dispatch('compare_queries', 'audit_helper')(a_query, b_query, primary_key, summarize)) }}
 {%- endmacro %}
 
-{% macro default__compare_queries(a_query, b_query, primary_key=None, summary=true) %}
+{% macro default__compare_queries(a_query, b_query, primary_key=None, summarize=true) %}
 
 with a as (
 
@@ -66,7 +66,7 @@ all_records as (
 
 ),
 
-{%- if summary %}
+{%- if summarize %}
 
 summary_stats as (
 

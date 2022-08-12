@@ -10,5 +10,5 @@
     a_query=a_query,
     b_query=b_query,
     primary_key="col_a",
-    summary=false
+    summarize=false
 ) }}
