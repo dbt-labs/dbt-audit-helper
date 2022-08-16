@@ -1,26 +1,28 @@
-{% macro compare_all_columns(model_name, primary_key, prod_schema, exclude_columns) -%}
-  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( model_name, primary_key, prod_schema, exclude_columns )) }}
+{% macro compare_all_columns( a_relation, b_relation, primary_key, exclude_columns ) -%}
+  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( a_relation, b_relation, primary_key, exclude_columns )) }}
 {%- endmacro %}
 
-{% macro default__compare_all_columns( model_name, primary_key, prod_schema, exclude_columns ) -%}
+{% macro default__compare_all_columns( a_relation, b_relation, primary_key, exclude_columns ) -%}
 
-  {% set relation = api.Relation.create(schema=prod_schema, identifier=model_name) %}
+  {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
-  {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=ref(model_name), except=exclude_columns) %}
-
-  {% set old_etl_relation_query %}
-      select * from {{ target.database }}.{{ relation.schema }}.{{ relation.identifier }}
+  {% set a_query %}      
+    select
+      *
+    from {{ a_relation }}
   {% endset %}
 
-  {% set new_etl_relation_query %}
-    select * from {{ ref(model_name) }}
+  {% set b_query %}
+    select
+      *
+    from {{ b_relation }}
   {% endset %}
 
   {% for column in column_names %}
 
     {% set audit_query = audit_helper.compare_column_values_verbose(
-      a_query=old_etl_relation_query,
-      b_query=new_etl_relation_query,
+      a_query=a_query,
+      b_query=b_query,
       primary_key=primary_key,
       column_to_compare=column
     ) %}
