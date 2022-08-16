@@ -1,8 +1,8 @@
-{% macro compare_all_columns( a_relation, b_relation, primary_key, exclude_columns ) -%}
-  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( a_relation, b_relation, primary_key, exclude_columns )) }}
+{% macro compare_all_columns( a_relation, b_relation, exclude_columns, primary_key ) -%}
+  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( a_relation, b_relation, exclude_columns, primary_key )) }}
 {%- endmacro %}
 
-{% macro default__compare_all_columns( a_relation, b_relation, primary_key, exclude_columns ) -%}
+{% macro default__compare_all_columns( a_relation, b_relation, exclude_columns, primary_key ) -%}
 
   {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 

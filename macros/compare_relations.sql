@@ -2,24 +2,29 @@
 
 {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
-{% if target.name == 'bigquery' %}
-  {% set check_cols_csv = '`%s`' %'`, `'.join(column_names) %}
-  -- bigquery likes it like this: select `col_a`, `col_b` from 
-{% else %}
-  {% set check_cols_csv = '"%s"' %'", "'.join(column_names) %}
-  -- everyone else likes it like this: select "col_a", "col_b" from
-{% endif %}
+{% set column_selection %}
+
+  {% for column_name in column_names %} 
+    {{ adapter.quote(column_name) }} 
+    {% if not loop.last %}
+      , 
+    {% endif %} 
+  {% endfor %}
+
+{% endset %}
 
 {% set a_query %}
 select
-    {{ check_cols_csv }}
+
+  {{ column_selection }}
 
 from {{ a_relation }}
 {% endset %}
 
 {% set b_query %}
 select
-    {{ check_cols_csv }}
+
+  {{ column_selection }}
 
 from {{ b_relation }}
 {% endset %}
