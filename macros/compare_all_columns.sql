@@ -1,5 +1,5 @@
 {% macro compare_all_columns( a_relation, b_relation, primary_key,  exclude_columns,summarize=true ) -%}
-  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( a_relation, b_relation, exclude_columns, primary_key, summarize )) }}
+  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( a_relation, b_relation, primary_key, exclude_columns, summarize )) }}
 {%- endmacro %}
 
 {% macro default__compare_all_columns( a_relation, b_relation, primary_key, exclude_columns, summarize=true ) -%}
