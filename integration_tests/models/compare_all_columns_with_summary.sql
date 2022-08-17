@@ -5,5 +5,5 @@
 {{ audit_helper.compare_all_columns(
     a_relation=a_relation,
     b_relation=b_relation,
-    primary_key="id"
+    primary_key="col_a"
 ) }}
