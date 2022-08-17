@@ -1,4 +1,4 @@
-{% macro compare_all_columns( a_relation, b_relation, exclude_columns, primary_key, summarize=true ) -%}
+{% macro compare_all_columns( a_relation, b_relation, exclude_columns=[], primary_key, summarize=true ) -%}
   {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( a_relation, b_relation, exclude_columns, primary_key, summarize )) }}
 {%- endmacro %}
 
