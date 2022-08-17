@@ -5,6 +5,6 @@
 {{ audit_helper.compare_all_columns(
     a_relation=a_relation,
     b_relation=b_relation,
-    exclude_columns=['col_b'],
     primary_key="col_a"
+    exclude_columns=['col_b'],
 ) }}
