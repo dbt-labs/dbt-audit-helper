@@ -2,7 +2,7 @@
   {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( a_relation, b_relation, exclude_columns, primary_key, summarize )) }}
 {%- endmacro %}
 
-{% macro default__compare_all_columns( a_relation, b_relation, exclude_columns, primary_key, summarize=true ) -%}
+{% macro default__compare_all_columns( a_relation, b_relation, exclude_columns=[], primary_key, summarize=true ) -%}
 
   {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
