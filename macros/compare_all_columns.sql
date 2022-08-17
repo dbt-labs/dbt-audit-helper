@@ -1,8 +1,8 @@
-{% macro compare_all_columns( a_relation, b_relation, exclude_columns, primary_key ) -%}
-  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( a_relation, b_relation, exclude_columns, primary_key )) }}
+{% macro compare_all_columns( a_relation, b_relation, exclude_columns, primary_key, summarize=true ) -%}
+  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( a_relation, b_relation, exclude_columns, primary_key, summarize )) }}
 {%- endmacro %}
 
-{% macro default__compare_all_columns( a_relation, b_relation, exclude_columns, primary_key ) -%}
+{% macro default__compare_all_columns( a_relation, b_relation, exclude_columns, primary_key, summarize=true ) -%}
 
   {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
@@ -42,9 +42,39 @@
     {% if not loop.last %}
       union all
     {% else %}
-    ) select * from main     
+    ), 
+    
+      {%- if summarize %}
+        final as (
+            select
 
+                column_name,
+                sum(case when perfect_match then 1 else 0 end) as perfect_match,
+                sum(case when null_in_a then 1 else 0 end) as null_in_a,
+                sum(case when null_in_b then 1 else 0 end) as null_in_b,
+                sum(case when missing_from_a then 1 else 0 end) as missing_from_a,
+                sum(case when missing_from_b then 1 else 0 end) as missing_from_b,
+                sum(case when conflicting_values then 1 else 0 end) as conflicting_values
+
+            from main
+            group by 1
+
+        )
+
+
+
+      {%- else %}
+      final as (
+      select * from main     
+      )
+      {%- endif %}
+
+      select * from final
+    
+    
     {% endif %}
+
+    
 
   {% endfor %}
     
