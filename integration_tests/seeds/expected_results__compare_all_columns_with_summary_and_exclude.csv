@@ -1,0 +1,3 @@
+col_a,column_name,perfect_match,null_in_a,null_in_b,missing_from_a,missing_from_b,conflicting_values
+1,col_a,true,false,false,false,false,false
+2,col_a,true,false,false,false,false,false
