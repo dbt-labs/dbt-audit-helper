@@ -237,10 +237,10 @@ in the `tests` subdirectory of your dbt project that looks like this:
 ```
 {{ 
   audit_helper.compare_all_columns(
-    model_name='stg_customers', 
-    primary_key='id', 
-    prod_schema='analytics', 
-    exclude_columns=['updated_at']
+    a_relation=ref('stg_customers'), -- in a test, this ref will compile as your dev or PR schema.
+    b_relation=api.Relation.create(database='dbt_db', schema='analytics_prod', identifier='stg_customers'), -- you can explicitly write a relation to select your production schema, or any other db/schema/table you'd like to use for comparison testing.
+    exclude_columns=['updated_at'], 
+    primary_key='id'
   ) 
 }}
 where not perfect_match
@@ -249,11 +249,14 @@ constitutes a test failure
 */
 ```
 
-* `model_name`: The model you're testing.
-* `primary_key`: The primary key of that model.
-* `prod_schema`: The schema that dbt writes to in production. This is what you'll test your code changes
-against, such as during a PR run of the dbt test suite.
-* `exclude_columns`: A list of columns that you will not expect to match.
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
+  you want to compare. In the example above, two different approaches to writing relations 
+  (using `ref` and using `api.Relation.create) are demonstrated. Any two relations that 
+  have the same columns can be used.
+* `exclude_columns` (optional): Any columns you wish to exclude from the
+  validation.
+* `primary_key`: The primary key of the model. Used to sort unmatched
+  results for row-by-row validation.
 
 If you want to create test results that include columns for attributes from the model itself 
 for easier inspection, that can be written into the test:
@@ -261,10 +264,10 @@ for easier inspection, that can be written into the test:
 ```
 {{ 
   audit_helper.compare_all_columns(
-    model_name='stg_customers', 
-    primary_key='id', 
-    prod_schema='analytics', 
-    exclude_columns=['updated_at']
+    a_relation=ref('stg_customers'),
+    b_relation=api.Relation.create(database='dbt_db', schema='analytics_prod', identifier='stg_customers'), 
+    exclude_columns=['updated_at'], 
+    primary_key='id'
   ) 
 }}
 left join {{ ref('stg_customers') }} using(id)
@@ -275,12 +278,12 @@ the macro's output as part of the test, for example:
 
 ```
 with base_test_cte as (
-  {{
+  {{ 
     audit_helper.compare_all_columns(
-      model_name='stg_customers', 
-      primary_key='id', 
-      prod_schema='analytics', 
-      exclude_columns=['updated_at']
+      a_relation=ref('stg_customers'),
+      b_relation=api.Relation.create(database='dbt_db', schema='analytics_prod', identifier='stg_customers'), 
+      exclude_columns=['updated_at'], 
+      primary_key='id'
     ) 
   }}
   left join {{ ref('stg_customers') }} using(id)
