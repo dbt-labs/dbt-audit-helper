@@ -18,13 +18,13 @@
     from {{ b_relation }}
   {% endset %}
 
-  {% for column in column_names %}
+  {% for column_name in column_names %}
 
     {% set audit_query = audit_helper.compare_column_values_verbose(
       a_query=a_query,
       b_query=b_query,
       primary_key=primary_key,
-      column_to_compare=adapter.quote(column)
+      column_to_compare={{ adapter.quote(column_name) }} 
     ) %}
 
     /*  Create a query combining results from all columns so that the user, or the 
