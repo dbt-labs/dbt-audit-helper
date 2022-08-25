@@ -24,7 +24,7 @@
       a_query=a_query,
       b_query=b_query,
       primary_key=primary_key,
-      column_to_compare={{ adapter.quote(column_name) }} 
+      column_to_compare=column_name
     ) %}
 
     /*  Create a query combining results from all columns so that the user, or the 
