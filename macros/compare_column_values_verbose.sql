@@ -26,7 +26,6 @@ b_query as (
 
     from a_query
 
-    full outer join b_query on (a_query.{{ primary_key }}::text = b_query.{{ primary_key }}::text) or (a_query.{{ primary_key }} is null and b_query.{{ primary_key }} is null)
-
+    full outer join b_query on (a_query.{{ primary_key }}::text = b_query.{{ primary_key }}::text)
 
 {% endmacro %}
