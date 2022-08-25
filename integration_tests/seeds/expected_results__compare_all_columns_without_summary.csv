@@ -1,5 +1,7 @@
 col_a,column_name,perfect_match,null_in_a,null_in_b,missing_from_a,missing_from_b,conflicting_values
 1,col_a,true,false,false,false,false,false
 2,col_a,true,false,false,false,false,false
+3,col_a,true,false,false,false,false,false
 1,col_b,true,false,false,false,false,false
 2,col_b,false,false,false,false,false,true
+3,col_b,true,false,false,false,false,false
