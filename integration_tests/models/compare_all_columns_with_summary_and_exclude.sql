@@ -6,5 +6,5 @@
     a_relation=a_relation,
     b_relation=b_relation,
     primary_key="col_a",
-    exclude_columns=['col_b']
+    exclude_columns=["col_b"]
 ) }}
