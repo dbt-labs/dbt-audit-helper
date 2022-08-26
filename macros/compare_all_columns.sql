@@ -6,8 +6,6 @@
 
   {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
-  {% do log(column_names, info=True) %}
-
   {% set a_query %}      
     select
       *
