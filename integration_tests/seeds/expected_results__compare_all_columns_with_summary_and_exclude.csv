@@ -1,3 +1,2 @@
 column_name,perfect_match,null_in_a,null_in_b,missing_from_a,missing_from_b,conflicting_values
 col_a,3,0,0,0,0,0
-col_b,2,0,0,0,0,1
