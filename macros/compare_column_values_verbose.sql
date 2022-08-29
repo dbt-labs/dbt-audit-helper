@@ -28,4 +28,4 @@ b_query as (
 
     full outer join b_query on (a_query.{{ adapter.quote(primary_key) }} = b_query.{{ adapter.quote(primary_key) }})
 
-{% endmacro %}
+{% endmacro %} 
