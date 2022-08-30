@@ -13,7 +13,7 @@ b_query as (
 )
     select
         coalesce(a_query.{{ adapter.quote(primary_key) }}, b_query.{{ adapter.quote(primary_key) }}) as {{ primary_key }},
-        '{{ column_to_compare }}' as column_name,
+       '{{ column_to_compare }}'::text as column_name,
         a_query.{{ adapter.quote(column_to_compare) }} = b_query.{{ adapter.quote(column_to_compare) }} as perfect_match,
         a_query.{{ adapter.quote(column_to_compare) }} is null as null_in_a,
         b_query.{{ adapter.quote(column_to_compare) }} is null as null_in_b,
