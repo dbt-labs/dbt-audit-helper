@@ -21,8 +21,8 @@ b_query as (
         {% endif %}
 
         a_query.{{ column_to_compare }} = b_query.{{ column_to_compare }} as perfect_match,
-        a_query.{{ column_to_compare }} is null as null_in_a,
-        b_query.{{ column_to_compare }} is null as null_in_b,
+        a_query.{{ column_to_compare }} is null and a_query.{{ primary_key }} is not null as null_in_a,
+        b_query.{{ column_to_compare }} is null and b_query.{{ primary_key }} is not null as null_in_b,
         a_query.{{ primary_key }} is null as missing_from_a,
         b_query.{{ primary_key }} is null as missing_from_b,
         a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }} and

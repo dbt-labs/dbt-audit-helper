@@ -65,6 +65,7 @@
             sum(case when conflicting_values then 1 else 0 end) as conflicting_values
           from main
           group by 1
+          order by column_name
         )
 
       {%- else %}
@@ -80,6 +81,7 @@
             missing_from_b,
             conflicting_values
           from main    
+          order by primary_key
         )
 
       {%- endif %}
