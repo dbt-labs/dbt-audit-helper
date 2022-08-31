@@ -56,7 +56,7 @@
 
         final as (
           select
-            column_name,
+            upper(column_name) as column_name,
             sum(case when perfect_match then 1 else 0 end) as perfect_match,
             sum(case when null_in_a then 1 else 0 end) as null_in_a,
             sum(case when null_in_b then 1 else 0 end) as null_in_b,
@@ -70,7 +70,16 @@
       {%- else %}
 
         final as (
-          select * from main     
+          select
+            primary_key,           
+            upper(column_name) as column_name,
+            perfect_match,
+            null_in_a,
+            null_in_b,
+            missing_from_a,
+            missing_from_b,
+            conflicting_values
+          from main    
         )
 
       {%- endif %}
