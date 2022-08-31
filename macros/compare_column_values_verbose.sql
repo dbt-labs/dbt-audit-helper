@@ -13,8 +13,13 @@ b_query as (
 )
     select
         coalesce(a_query.{{ primary_key }}, b_query.{{ primary_key }}) as primary_key,
-        -- cast('{{ column_to_compare }}' as string) as column_name,
-        {{ adapter.quote(column_to_compare) }} as column_name,
+        
+        {% if target.name == 'postgres' %}
+            '{{ column_to_compare }}'::text as column_name,
+        {% else %}
+            '{{ column_to_compare }}' as column_name,
+        {% endif %}
+
         a_query.{{ column_to_compare }} = b_query.{{ column_to_compare }} as perfect_match,
         a_query.{{ column_to_compare }} is null as null_in_a,
         b_query.{{ column_to_compare }} is null as null_in_b,
