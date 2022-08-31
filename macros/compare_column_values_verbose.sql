@@ -20,18 +20,20 @@ b_query as (
             '{{ column_to_compare }}' as column_name,
         {% endif %}
 
-        a_query.{{ column_to_compare }} = b_query.{{ column_to_compare }} as perfect_match,
+        coalesce(a_query.{{ column_to_compare }} = b_query.{{ column_to_compare }}, false) as perfect_match,
         a_query.{{ column_to_compare }} is null and a_query.{{ primary_key }} is not null as null_in_a,
         b_query.{{ column_to_compare }} is null and b_query.{{ primary_key }} is not null as null_in_b,
         a_query.{{ primary_key }} is null as missing_from_a,
         b_query.{{ primary_key }} is null as missing_from_b,
-        a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }} and
-            (a_query.{{ column_to_compare }} is not null or b_query.{{ column_to_compare }} is not null)
+        coalesce(a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }} and
+            (a_query.{{ column_to_compare }} is not null or b_query.{{ column_to_compare }} is not null), false)
           as conflicting_values
            -- considered a conflict if the values do not match AND at least one of the values is not null.
 
     from a_query
 
     full outer join b_query on (a_query.{{ primary_key }} = b_query.{{ primary_key }})
+
+
 
 {% endmacro %} 
