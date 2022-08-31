@@ -13,8 +13,8 @@ b_query as (
 )
     select
         coalesce(a_query.{{ primary_key }}, b_query.{{ primary_key }}) as primary_key,
-        
-        {% if target.name == 'postgres' %}
+
+        {% if target.name == 'postgres' or target.name == 'redshift' %}
             '{{ column_to_compare }}'::text as column_name,
         {% else %}
             '{{ column_to_compare }}' as column_name,
