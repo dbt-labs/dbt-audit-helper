@@ -51,3 +51,8 @@ models:
     tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_all_columns_with_summary_and_exclude')
+  
+  - name: compare_all_columns_where_clause
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__compare_all_columns_where_clause')
