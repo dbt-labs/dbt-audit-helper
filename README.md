@@ -222,14 +222,19 @@ it is a date in our "b" relation.
 ```
 
 ## compare_all_columns ([source](macros/compare_all_columns.sql))
-This macro is designed to be added to a dbt test suite to monitor changes
-to values when code is changed, as part of a PR or during development. It sets 
-up a test that will fail if any column values do not match, with options for more 
-or less stringent requirements. If there is a test failure, results can be inspected 
-in the warehouse, possibly by using the primary key in the test output to join to
-relevant tables in your dev or prod schema to investigate the error.
+This macro is designed to be added to a dbt test suite as a custom test. A 
+`compare_all_columns` test monitors changes data values when code is changed 
+as part of a PR or during development. It sets up a test that will fail 
+if any column values do not match. 
+
+Users can configure what exactly constitutes a value match or failure. If 
+there is a test failure, results can be inspected in the warehouse. The primary key 
+and the column name can be included in the test output that gets written to the warehouse. 
+This enables the user to join test results to relevant tables in your dev or prod schema to investigate the error.
 
 ### Usage:
+
+_Note: this test should only be used on (and will only work on) models that have a primary key that is reliably `unique` and `not_null`. [Generic dbt tests](https://docs.getdbt.com/docs/building-a-dbt-project/tests#generic-tests) should be used to ensure the model being tested meets the requirements of `unique` and `not_null`._
 
 To create a test for the `stg_customers` model, create a custom test 
 in the `tests` subdirectory of your dbt project that looks like this:
@@ -244,21 +249,40 @@ in the `tests` subdirectory of your dbt project that looks like this:
   ) 
 }}
 where not perfect_match
-/* This `where` statement is an example of a filter you can apply to determine what
-constitutes a test failure
-*/
 ```
+The `where not perfect_match` statement is an example of a filter you can apply to define what
+constitutes a test failure. The test will fail if any rows don't meet the
+requirement of a perfect match. Failures would include:
+
+* If the primary key exists in both relations, but one model has a null value in a column.
+* If a primary key is missing from one relation.
+* If the primary key exists in both relations, but the value conflicts.
+
+If you'd like the test to only fail when there are conflicting values, you could configure it like this:
+
+```
+{{ 
+  audit_helper.compare_all_columns(
+    a_relation=ref('stg_customers'), 
+    b_relation=api.Relation.create(database='dbt_db', schema='analytics_prod', identifier='stg_customers'),
+    primary_key='id'
+  ) 
+}}
+where conflicting_values
+```
+
+#### Arguemnts:
 
 * `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
   you want to compare. In the example above, two different approaches to writing relations 
-  (using `ref` and using `api.Relation.create) are demonstrated. Any two relations that 
+  (using `ref` and using `api.Relation.create`) are demonstrated. Any two relations that 
   have the same columns can be used.
 * `exclude_columns` (optional): Any columns you wish to exclude from the
   validation.
 * `primary_key`: The primary key of the model. Used to sort unmatched
   results for row-by-row validation.
 
-If you want to create test results that include columns for attributes from the model itself 
+If you want to create test results that include columns from the model itself 
 for easier inspection, that can be written into the test:
 
 ```
@@ -287,10 +311,10 @@ with base_test_cte as (
     ) 
   }}
   left join {{ ref('stg_customers') }} using(id)
-  where not perfect_match
+  where conflicting_values
 )
 select
-  status, --let's say there's a "status" column in the model you're testing
+  status, -- assume there's a "status" column in stg_customers
   count(distinct case when conflicting_values then id end) as conflicting_values
 from base_test_cte
 group by 1
