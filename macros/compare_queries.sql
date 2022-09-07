@@ -19,7 +19,7 @@ b as (
 a_intersect_b as (
 
     select * from a
-    {{ dbt_utils.intersect() }}
+    {{ dbt.intersect() }}
     select * from b
 
 ),
@@ -27,7 +27,7 @@ a_intersect_b as (
 a_except_b as (
 
     select * from a
-    {{ dbt_utils.except() }}
+    {{ dbt.except() }}
     select * from b
 
 ),
@@ -35,7 +35,7 @@ a_except_b as (
 b_except_a as (
 
     select * from b
-    {{ dbt_utils.except() }}
+    {{ dbt.except() }}
     select * from a
 
 ),
