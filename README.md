@@ -271,7 +271,7 @@ If you'd like the test to only fail when there are conflicting values, you could
 where conflicting_values
 ```
 
-#### Arguemnts:
+#### Arguments:
 
 * `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
   you want to compare. Any two relations that have the same columns can be used. In the 
