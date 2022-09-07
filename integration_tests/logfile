@@ -216,3 +216,8 @@
 2022-08-31 13:02:06.244 PDT [3335] WARNING:  there is already a transaction in progress
 2022-08-31 13:02:06.330 PDT [3336] WARNING:  there is already a transaction in progress
 2022-08-31 13:02:06.363 PDT [3337] WARNING:  there is already a transaction in progress
+2022-08-31 16:47:08.396 PDT [2839] LOG:  received fast shutdown request
+2022-08-31 16:47:08.396 PDT [2839] LOG:  aborting any active transactions
+2022-08-31 16:47:08.398 PDT [2839] LOG:  background worker "logical replication launcher" (PID 2846) exited with exit code 1
+2022-08-31 16:47:08.398 PDT [2841] LOG:  shutting down
+2022-08-31 16:47:08.407 PDT [2839] LOG:  database system is shut down
