@@ -274,9 +274,11 @@ where conflicting_values
 #### Arguemnts:
 
 * `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
-  you want to compare. In the example above, two different approaches to writing relations 
-  (using `ref` and using `api.Relation.create`) are demonstrated. Any two relations that 
-  have the same columns can be used.
+  you want to compare. Any two relations that have the same columns can be used. In the 
+  example above, two different approaches to writing relations, using `ref` and 
+  using `api.Relation.create`, are demonstrated. (When writing one-off code, it might make sense to
+  hard-code a relation, like this: `analytics_prod.stg_customers`. A hard-coded relation
+  is not recommended when building this macro into a CI cycle.)
 * `exclude_columns` (optional): Any columns you wish to exclude from the
   validation.
 * `primary_key`: The primary key of the model. Used to sort unmatched
