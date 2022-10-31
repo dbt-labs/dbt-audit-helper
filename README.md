@@ -28,7 +28,7 @@ results, like so:
 | True  | False | 9     | 0.13             |
 | False | True  | 9     | 0.13             |
 
-Setting the `summarize` argument to `false` lets you to check which rows do not match between relations:
+Setting the `summarize` argument to `false` lets you check which rows do not match between relations:
 
 | order_id | order_date | status    | in_a  | in_b  |
 |----------|------------|-----------|-------|-------|
