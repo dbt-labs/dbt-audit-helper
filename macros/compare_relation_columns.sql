@@ -33,6 +33,23 @@ order by coalesce(a_cols.ordinal_position, b_cols.ordinal_position)
 
 {% endmacro %}
 
+{% macro default__get_columns_in_relation_sql(relation) %}
+    
+  {% set columns = adapter.get_columns_in_relation(relation) %}
+  {% for column in columns %}
+    select 
+      {{ dbt.string_literal(column.name) }} as column_name, 
+      {{ loop.index }} as ordinal_position,
+      {{ dbt.string_literal(column.data_type) }} as data_type
+
+  {% if not loop.last -%}
+    union all 
+  {%- endif %}
+  {% endfor %}
+
+
+{% endmacro %}
+
 {% macro redshift__get_columns_in_relation_sql(relation) %}
 {#-
 See https://github.com/dbt-labs/dbt/blob/23484b18b71010f701b5312f920f04529ceaa6b2/plugins/redshift/dbt/include/redshift/macros/adapters.sql#L71
