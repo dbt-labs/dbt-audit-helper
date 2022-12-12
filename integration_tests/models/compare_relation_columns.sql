@@ -7,7 +7,7 @@ with audit_helper_results as (
 )
 
 select 
-    cast(column_name as dbt.type_string()) as column_name, --otherwise it is technically a "sql_identifier" type on Redshift
+    cast(column_name as {{ dbt.type_string() }}) as column_name, --otherwise it is technically a "sql_identifier" type on Redshift
     a_ordinal_position,
     b_ordinal_position,
     --not checking the specific datatypes, as long as they match/don't match as expected then that's still checking the audit behaviour
