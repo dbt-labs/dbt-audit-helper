@@ -50,7 +50,9 @@ order by coalesce(a_cols.ordinal_position, b_cols.ordinal_position)
 
 {% endmacro %}
 {#
--- {% macro redshift__get_columns_in_relation_sql(relation) %}
+ {% macro redshift__get_columns_in_relation_sql(relation) %}
+  {{ default__get_columns_in_relation_sql(relation) }}
+ {% endmacro %}
 -- {#-
 -- See https://github.com/dbt-labs/dbt/blob/23484b18b71010f701b5312f920f04529ceaa6b2/plugins/redshift/dbt/include/redshift/macros/adapters.sql#L71
 -- Edited to include ordinal_position
