@@ -7,7 +7,7 @@ with audit_helper_results as (
 )
 
 select 
-    {% if target.type == 'snowflake' %} column_name {% else %} lower(column_name) {% endif %} as column_name,
+    column_name,
     a_ordinal_position,
     b_ordinal_position,
     --not checking the specific datatypes, as long as they match/don't match as expected then that's still checking the audit behaviour
