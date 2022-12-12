@@ -152,27 +152,28 @@ Edited to include ordinal_position
   order by ordinal_position
 {% endmacro %}
 
-{% macro postgres__get_columns_in_relation_sql(relation) %}
-{#-
-From: https://github.com/dbt-labs/dbt/blob/23484b18b71010f701b5312f920f04529ceaa6b2/plugins/postgres/dbt/include/postgres/macros/adapters.sql#L32
-Edited to include ordinal_position
--#}
-  select
-      ordinal_position,
-      column_name,
-      data_type,
-      character_maximum_length,
-      numeric_precision,
-      numeric_scale
+{#
+-- {% macro postgres__get_columns_in_relation_sql(relation) %}
+-- {#-
+-- From: https://github.com/dbt-labs/dbt/blob/23484b18b71010f701b5312f920f04529ceaa6b2/plugins/postgres/dbt/include/postgres/macros/adapters.sql#L32
+-- Edited to include ordinal_position
+-- -#}
+--   select
+--       ordinal_position,
+--       column_name,
+--       data_type,
+--       character_maximum_length,
+--       numeric_precision,
+--       numeric_scale
 
-  from {{ relation.information_schema('columns') }}
-  where table_name = '{{ relation.identifier }}'
-    {% if relation.schema %}
-    and table_schema = '{{ relation.schema }}'
-    {% endif %}
-  order by ordinal_position
-{% endmacro %}
-
+--   from {{ relation.information_schema('columns') }}
+--   where table_name = '{{ relation.identifier }}'
+--     {% if relation.schema %}
+--     and table_schema = '{{ relation.schema }}'
+--     {% endif %}
+--   order by ordinal_position
+-- {% endmacro %}
+#}
 
 {% macro bigquery__get_columns_in_relation_sql(relation) %}
 
