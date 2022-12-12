@@ -49,79 +49,80 @@ order by coalesce(a_cols.ordinal_position, b_cols.ordinal_position)
 
 
 {% endmacro %}
+{#
+-- {% macro redshift__get_columns_in_relation_sql(relation) %}
+-- {#-
+-- See https://github.com/dbt-labs/dbt/blob/23484b18b71010f701b5312f920f04529ceaa6b2/plugins/redshift/dbt/include/redshift/macros/adapters.sql#L71
+-- Edited to include ordinal_position
+-- -#}
+-- with bound_views as (
+--   select
+--     ordinal_position,
+--     table_schema,
+--     column_name,
+--     data_type,
+--     character_maximum_length,
+--     numeric_precision,
+--     numeric_scale
 
-{% macro redshift__get_columns_in_relation_sql(relation) %}
-{#-
-See https://github.com/dbt-labs/dbt/blob/23484b18b71010f701b5312f920f04529ceaa6b2/plugins/redshift/dbt/include/redshift/macros/adapters.sql#L71
-Edited to include ordinal_position
--#}
-with bound_views as (
-  select
-    ordinal_position,
-    table_schema,
-    column_name,
-    data_type,
-    character_maximum_length,
-    numeric_precision,
-    numeric_scale
+--   from information_schema."columns"
+--   where table_name = '{{ relation.identifier }}'
+-- ),
 
-  from information_schema."columns"
-  where table_name = '{{ relation.identifier }}'
-),
+-- unbound_views as (
+-- select
+--   ordinal_position,
+--   view_schema,
+--   col_name,
+--   case
+--     when col_type ilike 'character varying%' then
+--       'character varying'
+--     when col_type ilike 'numeric%' then 'numeric'
+--     else col_type
+--   end as col_type,
+--   case
+--     when col_type like 'character%'
+--     then nullif(REGEXP_SUBSTR(col_type, '[0-9]+'), '')::int
+--     else null
+--   end as character_maximum_length,
+--   case
+--     when col_type like 'numeric%'
+--     then nullif(
+--       SPLIT_PART(REGEXP_SUBSTR(col_type, '[0-9,]+'), ',', 1),
+--       '')::int
+--     else null
+--   end as numeric_precision,
+--   case
+--     when col_type like 'numeric%'
+--     then nullif(
+--       SPLIT_PART(REGEXP_SUBSTR(col_type, '[0-9,]+'), ',', 2),
+--       '')::int
+--     else null
+--   end as numeric_scale
 
-unbound_views as (
-select
-  ordinal_position,
-  view_schema,
-  col_name,
-  case
-    when col_type ilike 'character varying%' then
-      'character varying'
-    when col_type ilike 'numeric%' then 'numeric'
-    else col_type
-  end as col_type,
-  case
-    when col_type like 'character%'
-    then nullif(REGEXP_SUBSTR(col_type, '[0-9]+'), '')::int
-    else null
-  end as character_maximum_length,
-  case
-    when col_type like 'numeric%'
-    then nullif(
-      SPLIT_PART(REGEXP_SUBSTR(col_type, '[0-9,]+'), ',', 1),
-      '')::int
-    else null
-  end as numeric_precision,
-  case
-    when col_type like 'numeric%'
-    then nullif(
-      SPLIT_PART(REGEXP_SUBSTR(col_type, '[0-9,]+'), ',', 2),
-      '')::int
-    else null
-  end as numeric_scale
+-- from pg_get_late_binding_view_cols()
+-- cols(view_schema name, view_name name, col_name name,
+--      col_type varchar, ordinal_position int)
+-- where view_name = '{{ relation.identifier }}'
+-- ),
 
-from pg_get_late_binding_view_cols()
-cols(view_schema name, view_name name, col_name name,
-     col_type varchar, ordinal_position int)
-where view_name = '{{ relation.identifier }}'
-),
+-- unioned as (
+-- select * from bound_views
+-- union all
+-- select * from unbound_views
+-- )
 
-unioned as (
-select * from bound_views
-union all
-select * from unbound_views
-)
+-- select
+-- *
 
-select
-*
+-- from unioned
+-- {% if relation.schema %}
+-- where table_schema = '{{ relation.schema }}'
+-- {% endif %}
+-- order by ordinal_position
 
-from unioned
-{% if relation.schema %}
-where table_schema = '{{ relation.schema }}'
-{% endif %}
-order by ordinal_position
-
-{% endmacro %}
+-- {% endmacro %}
+#}
 
 {% macro snowflake__get_columns_in_relation_sql(relation) %}
 {#-
