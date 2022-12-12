@@ -60,4 +60,4 @@ models:
   - name: compare_relation_columns
     tests:
       - dbt_utils.equality:
-          compare_model: ref('expected_results_compare_relation_columns')
+          compare_model: ref('expected_results__compare_relation_columns')
