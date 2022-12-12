@@ -8,7 +8,7 @@ with audit_helper_results as (
 
 select 
     --These need to be cast, otherwise they are technically typed as "sql_identifier" or "cardinal_number" on Redshift
-    {% "upper(" if target.type == 'snowflake' %} cast(column_name as {{ dbt.type_string() }}) {%")" if target.type == 'snowflake' %} as column_name, 
+    {{ "upper(" if target.type == 'snowflake' }} cast(column_name as {{ dbt.type_string() }}) {{ ")" if target.type == 'snowflake' }} as column_name, 
     cast(a_ordinal_position as {{ dbt.type_int() }}) as a_ordinal_position,
     cast(b_ordinal_position as {{ dbt.type_int() }}) as b_ordinal_position,
     --not checking the specific datatypes, as long as they match/don't match as expected then that's still checking the audit behaviour
