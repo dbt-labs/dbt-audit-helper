@@ -51,7 +51,8 @@ order by coalesce(a_cols.ordinal_position, b_cols.ordinal_position)
 {% endmacro %}
 
 {% macro redshift__get_columns_in_relation_sql(relation) %}
-  {{ return (default__get_columns_in_relation_sql(relation)) }}
+  {# You can't store the results of an info schema query to a table/view in Redshift, because the data only lives on the leader node #}
+  {{ return (audit_helper.default__get_columns_in_relation_sql(relation)) }}
 {% endmacro %}
 
 
