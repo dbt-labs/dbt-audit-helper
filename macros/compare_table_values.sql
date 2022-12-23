@@ -42,7 +42,7 @@ dbt run-operation compare_table_values --args '{"old_table": "my_production_data
 
         {% set audit_results = run_query(audit_query) %}
 
-        {% print_table(audit_results) %}
+        {% cloud_safe_print_table(audit_results) %}
     {% endfor %}
 {% endif %}
 
@@ -54,7 +54,7 @@ dbt run-operation compare_table_values --args '{"old_table": "my_production_data
     {{ return(is_cloud) }}
 {% endmacro %}
 
-{% macro print_table(audit_results) %}
+{% macro cloud_safe_print_table(audit_results) %}
 {% if execute %}
     {% if is_cloud() %}
         {% do log(audit_results.column_names, info=True) %}
