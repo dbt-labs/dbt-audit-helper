@@ -42,7 +42,7 @@ dbt run-operation compare_table_values --args '{"old_table": "my_production_data
 
         {% set audit_results = run_query(audit_query) %}
 
-        {% do audit_results.print_table() %}
+        {% print_table(audit_results) %}
     {% endfor %}
 {% endif %}
 
