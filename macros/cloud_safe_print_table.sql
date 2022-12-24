@@ -7,9 +7,19 @@
 {% macro cloud_safe_print_table(audit_results) %}
 {% if execute %}
     {% if is_cloud() %}
-        {% do log(audit_results.column_names, info=True) %}
+        {% set header = [] %}
+        {% for i in range(0,audit_results.column_names|length) %}
+            {{ header.append(audit_results.column_names[i]) }}
+        {% endfor %}
+        {% do log('| ' ~ header|join(' | ') ~ ' |', info=True) %}
+        {# do log(audit_results.column_names, info=True) #}
         {% for row in audit_results.rows %}
-            {% do log(row.values(), info=True) %}
+            {% set clean_row = [''] %}
+            {% for val in row.values() %}
+                {{ clean_row.append(val) }}
+            {% endfor %}
+            {% do log(clean_row|join(' | ') ~ ' |', info=True) %}
+            {# do log(row.values(), info=True) #}
         {% endfor %}
     {% else %}
         {% do audit_results.print_table() %}
