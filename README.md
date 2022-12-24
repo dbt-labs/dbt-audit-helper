@@ -7,6 +7,8 @@ Useful macros when performing data audits
 * [compare_queries](#compare_queries-source)
 * [compare_column_values](#compare_column_values-source)
 * [compare_relation_columns](#compare_relation_columns-source)
+* [compare_all_columns](#compare_all_columns-source)
+* [compare_column_values_verbose](#compare_column_values_verbose-source)
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
@@ -26,8 +28,7 @@ results, like so:
 | True  | False | 9     | 0.13             |
 | False | True  | 9     | 0.13             |
 
-The generated SQL also contains commented-out SQL that you can use to check
-the rows that do not match perfectly:
+Setting the `summarize` argument to `false` lets you check which rows do not match between relations:
 
 | order_id | order_date | status    | in_a  | in_b  |
 |----------|------------|-----------|-------|-------|
@@ -60,7 +61,6 @@ The query is best used in dbt Develop so you can interactively check results
     primary_key="order_id"
 ) }}
 
-
 ```
 Arguments:
 * `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
@@ -69,6 +69,8 @@ Arguments:
   validation.
 * `primary_key` (optional): The primary key of the model. Used to sort unmatched
   results for row-by-row validation.
+* `summarize` (optional): Allows you to switch between a summary or detailed view
+  of the compared data. Accepts `true` or `false` values. Defaults to `true`.
 
 ## compare_queries ([source](macros/compare_queries.sql))
 Super similar to `compare_relations`, except it takes two select statements. This macro is useful when:
@@ -103,6 +105,10 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 
 
 ```
+
+Arguments:
+* `summarize` (optional): Allows you to switch between a summary or detaied view
+  of the compared data. Accepts `true` or `false` vaules. Defaults to `true`.
 
 ## compare_column_values ([source](macros/compare_column_values.sql))
 This macro will return a query, that, when executed, compares a column across
@@ -154,67 +160,6 @@ number of your records don't match.
 * `primary_key` must be a unique key in both tables, otherwise the join won't
 work as expected.
 
-
-### Advanced usage:
-Got a wide table, and want to iterate through all the columns? Try something
-like this:
-```
-{%- set columns_to_compare=adapter.get_columns_in_relation(ref('dim_product'))  -%}
-
-{% set old_etl_relation_query %}
-    select * from public.dim_product
-    where is_latest
-{% endset %}
-
-{% set new_etl_relation_query %}
-    select * from {{ ref('dim_product') }}
-{% endset %}
-
-{% if execute %}
-    {% for column in columns_to_compare %}
-        {{ log('Comparing column "' ~ column.name ~'"', info=True) }}
-
-        {% set audit_query = audit_helper.compare_column_values(
-            a_query=old_etl_relation_query,
-            b_query=new_etl_relation_query,
-            primary_key="product_id",
-            column_to_compare=column.name
-        ) %}
-
-        {% set audit_results = run_query(audit_query) %}
-        {% do audit_results.print_table() %}
-        {{ log("", info=True) }}
-
-    {% endfor %}
-{% endif %}
-```
-
-This will give you an output like:
-```
-Comparing column "name"
-| match_status         | count_records | percent_of_total |
-| -------------------- | ------------- | ---------------- |
-| ✅: perfect match     |        41,573 |            99.43 |
-| 🤷: missing from b    |            26 |             0.06 |
-| 🙅: ‍values do not... |           212 |             0.51 |
-
-Comparing column "msrp"
-| match_status         | count_records | percent_of_total |
-| -------------------- | ------------- | ---------------- |
-| ✅: perfect match     |        31,145 |            74.49 |
-| ✅: both are null     |        10,557 |            25.25 |
-| 🤷: missing from b    |            22 |             0.05 |
-| 🤷: value is null ... |            31 |             0.07 |
-| 🤷: value is null ... |             4 |             0.01 |
-| 🙅: ‍values do not... |            52 |             0.12 |
-
-Comparing column "status"
-| match_status         | count_records | percent_of_total |
-| -------------------- | ------------- | ---------------- |
-| ✅: perfect match     |        37,715 |            90.20 |
-| 🤷: missing from b    |            26 |             0.06 |
-| 🙅: ‍values do not... |         4,070 |             9.73 |
-```
 
 ### Advanced usage - dbt Cloud:
 The ``.print_table()`` function is not compatible with dbt Cloud so an adjustment needs to be made in order to print the results. Replace the following section of code:
@@ -274,6 +219,126 @@ it is a date in our "b" relation.
 ) }}
 
 ```
+
+## compare_all_columns ([source](macros/compare_all_columns.sql))
+This macro is designed to be added to a dbt test suite as a custom test. A 
+`compare_all_columns` test monitors changes data values when code is changed 
+as part of a PR or during development. It sets up a test that will fail 
+if any column values do not match. 
+
+Users can configure what exactly constitutes a value match or failure. If 
+there is a test failure, results can be inspected in the warehouse. The primary key 
+and the column name can be included in the test output that gets written to the warehouse. 
+This enables the user to join test results to relevant tables in your dev or prod schema to investigate the error.
+
+### Usage:
+
+_Note: this test should only be used on (and will only work on) models that have a primary key that is reliably `unique` and `not_null`. [Generic dbt tests](https://docs.getdbt.com/docs/building-a-dbt-project/tests#generic-tests) should be used to ensure the model being tested meets the requirements of `unique` and `not_null`._
+
+To create a test for the `stg_customers` model, create a custom test 
+in the `tests` subdirectory of your dbt project that looks like this:
+
+```
+{{ 
+  audit_helper.compare_all_columns(
+    a_relation=ref('stg_customers'), -- in a test, this ref will compile as your dev or PR schema.
+    b_relation=api.Relation.create(database='dbt_db', schema='analytics_prod', identifier='stg_customers'), -- you can explicitly write a relation to select your production schema, or any other db/schema/table you'd like to use for comparison testing.
+    exclude_columns=['updated_at'], 
+    primary_key='id'
+  ) 
+}}
+where not perfect_match
+```
+The `where not perfect_match` statement is an example of a filter you can apply to define what
+constitutes a test failure. The test will fail if any rows don't meet the
+requirement of a perfect match. Failures would include:
+
+* If the primary key exists in both relations, but one model has a null value in a column.
+* If a primary key is missing from one relation.
+* If the primary key exists in both relations, but the value conflicts.
+
+If you'd like the test to only fail when there are conflicting values, you could configure it like this:
+
+```
+{{ 
+  audit_helper.compare_all_columns(
+    a_relation=ref('stg_customers'), 
+    b_relation=api.Relation.create(database='dbt_db', schema='analytics_prod', identifier='stg_customers'),
+    primary_key='id'
+  ) 
+}}
+where conflicting_values
+```
+
+#### Arguments:
+
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
+  you want to compare. Any two relations that have the same columns can be used. In the 
+  example above, two different approaches to writing relations, using `ref` and 
+  using `api.Relation.create`, are demonstrated. (When writing one-off code, it might make sense to
+  hard-code a relation, like this: `analytics_prod.stg_customers`. A hard-coded relation
+  is not recommended when building this macro into a CI cycle.)
+* `exclude_columns` (optional): Any columns you wish to exclude from the
+  validation.
+* `primary_key`: The primary key of the model. Used to sort unmatched
+  results for row-by-row validation.
+
+If you want to create test results that include columns from the model itself 
+for easier inspection, that can be written into the test:
+
+```
+{{ 
+  audit_helper.compare_all_columns(
+    a_relation=ref('stg_customers'),
+    b_relation=api.Relation.create(database='dbt_db', schema='analytics_prod', identifier='stg_customers'), 
+    exclude_columns=['updated_at'], 
+    primary_key='id'
+  ) 
+}}
+left join {{ ref('stg_customers') }} using(id)
+```
+
+This structure also allows for the test to group or filter by any attribute in the model or in 
+the macro's output as part of the test, for example:
+
+```
+with base_test_cte as (
+  {{ 
+    audit_helper.compare_all_columns(
+      a_relation=ref('stg_customers'),
+      b_relation=api.Relation.create(database='dbt_db', schema='analytics_prod', identifier='stg_customers'), 
+      exclude_columns=['updated_at'], 
+      primary_key='id'
+    ) 
+  }}
+  left join {{ ref('stg_customers') }} using(id)
+  where conflicting_values
+)
+select
+  status, -- assume there's a "status" column in stg_customers
+  count(distinct case when conflicting_values then id end) as conflicting_values
+from base_test_cte
+group by 1
+```
+
+You can write a `compare_all_columns` test on individual table; and the test will be run 
+as part of a full test suite run.
+
+```
+dbt test --select stg_customers
+```
+
+If you want to [store results in the warehouse for further analysis](https://docs.getdbt.com/docs/building-a-dbt-project/tests#storing-test-failures), add the `--store-failures`
+flag.
+
+```
+dbt test --select stg_customers --store-failures
+```
+
+## compare_column_values_verbose ([source](macros/compare_column_values_verbose.sql))
+This macro will return a query that, when executed, returns the same information as 
+`compare_column_values`, but not summarized. `compare_column_values_verbose` enables `compare_all_columns` to give the user more flexibility around what will result in a test failure.
+
 
 # To-do:
 * Macro to check if two schemas contain the same relations

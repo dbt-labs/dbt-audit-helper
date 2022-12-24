@@ -1,0 +1,4 @@
+column_name,perfect_match,null_in_a,null_in_b,missing_from_a,missing_from_b,conflicting_values
+ID,7,0,0,1,1,0
+FRUIT,6,0,1,1,1,0
+RIPENESS,5,1,0,1,1,1

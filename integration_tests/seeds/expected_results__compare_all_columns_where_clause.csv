@@ -1,0 +1,10 @@
+primary_key,column_name,perfect_match,null_in_a,null_in_b,missing_from_a,missing_from_b,conflicting_values
+8,ID,false,false,false,false,true,false
+9,ID,false,false,false,true,false,false
+6,FRUIT,false,false,true,false,false,false
+8,FRUIT,false,false,false,false,true,false
+9,FRUIT,false,false,false,true,false,false
+2,RIPENESS,false,false,false,false,false,true
+7,RIPENESS,false,true,false,false,false,false
+8,RIPENESS,false,false,false,false,true,false
+9,RIPENESS,false,false,false,true,false,false

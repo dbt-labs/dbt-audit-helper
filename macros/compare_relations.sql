@@ -1,40 +1,34 @@
-{% macro pop_columns(columns, columns_to_pop) %}
-{% set popped_columns=[] %}
+{% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None, summarize=true) %}
 
-{% for column in columns %}
-    {% if column.name | lower not in columns_to_pop | lower %}
-        {% do popped_columns.append(column) %}
-    {% endif %}
-{% endfor %}
+{% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
-{{ return(popped_columns) }}
-{% endmacro %}
+{% set column_selection %}
 
+  {% for column_name in column_names %} 
+    {{ adapter.quote(column_name) }} 
+    {% if not loop.last %}
+      , 
+    {% endif %} 
+  {% endfor %}
 
-----
-
-{% macro compare_relations(a_relation, b_relation, exclude_columns=[], primary_key=None) %}
-
-{%- set a_columns = adapter.get_columns_in_relation(a_relation) -%}
-
-{% set check_columns=audit_helper.pop_columns(a_columns, exclude_columns) %}
-
-{% set check_cols_csv = check_columns | map(attribute='quoted') | join(', ') %}
+{% endset %}
 
 {% set a_query %}
 select
-    {{ check_cols_csv }}
+
+  {{ column_selection }}
 
 from {{ a_relation }}
 {% endset %}
 
 {% set b_query %}
 select
-    {{ check_cols_csv }}
+
+  {{ column_selection }}
 
 from {{ b_relation }}
 {% endset %}
 
-{{ audit_helper.compare_queries(a_query, b_query, primary_key) }}
+{{ audit_helper.compare_queries(a_query, b_query, primary_key, summarize) }}
 
 {% endmacro %}
