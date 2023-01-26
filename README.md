@@ -162,20 +162,39 @@ work as expected.
 
 
 ### Advanced usage - dbt Cloud:
-The ``.print_table()`` function is not compatible with dbt Cloud so an adjustment needs to be made in order to print the results. Replace the following section of code:
+The ``.print_table()`` function is not compatible with dbt Cloud so an adjustment needs to be made in order to print the results. Add the following code to a new macro file. To run the macro, execute `dbt run-operation print_audit_output()` in the command bar.
 ```
-        {% set audit_results = run_query(audit_query) %}
-        {% do audit_results.print_table() %}
-        {{ log("", info=True) }}
-```
-with:
-```
+{% macro print_audit_output() %}
+{%- set columns_to_compare=adapter.get_columns_in_relation(ref('fct_orders'))  -%}
+
+{% set old_etl_relation_query %}
+    select * from public.dim_product
+{% endset %}
+
+{% set new_etl_relation_query %}
+    select * from {{ ref('fct_orders') }}
+{% endset %}
+
+{% if execute %}
+    {% for column in columns_to_compare %}
+        {{ log('Comparing column "' ~ column.name ~'"', info=True) }}
+        {% set audit_query = audit_helper.compare_column_values(
+                a_query=old_etl_relation_query,
+                b_query=new_etl_relation_query,
+                primary_key="order_id",
+                column_to_compare=column.name
+        ) %}
+
         {% set audit_results = run_query(audit_query) %}
 
         {% do log(audit_results.column_names, info=True) %}
-        {% for row in audit_results.rows %}
-            {% do log(row.values(), info=True) %}
-        {% endfor %}
+            {% for row in audit_results.rows %}
+                  {% do log(row.values(), info=True) %}
+            {% endfor %}
+    {% endfor %}
+{% endif %}
+
+{% endmacro %}
 ```
 
 

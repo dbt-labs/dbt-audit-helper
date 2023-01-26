@@ -99,8 +99,19 @@ jobs:
           key: deps1-{{ .Branch }}
           paths:
             - "dbt_venv"
+
             
       - store_artifacts:
           path: integration_tests/logs
       - store_artifacts:
           path: integration_tests/target
+
+workflows:
+  version: 2
+  test-all:
+    jobs:
+      - build:
+          context:
+            - profile-redshift
+            - profile-snowflake
+            - profile-bigquery
