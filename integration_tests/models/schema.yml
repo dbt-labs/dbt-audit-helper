@@ -56,3 +56,8 @@ models:
     tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_all_columns_where_clause')
+
+  - name: compare_relation_columns
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__compare_relation_columns')

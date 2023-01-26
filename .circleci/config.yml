@@ -17,7 +17,7 @@ jobs:
       - checkout
 
       - run:
-          run: setup_creds
+          name: setup_creds
           command: |
             echo $BIGQUERY_SERVICE_ACCOUNT_JSON > ${HOME}/bigquery-service-key.json
 
@@ -91,7 +91,7 @@ jobs:
             dbt deps --target bigquery
             dbt seed --target bigquery --full-refresh
             dbt compile --target bigquery
-            dbt run --target bigquery
+            dbt run --target bigquery --full-refresh
             dbt test --target bigquery
 
 
@@ -99,6 +99,12 @@ jobs:
           key: deps1-{{ .Branch }}
           paths:
             - "dbt_venv"
+
+            
+      - store_artifacts:
+          path: integration_tests/logs
+      - store_artifacts:
+          path: integration_tests/target
 
 workflows:
   version: 2

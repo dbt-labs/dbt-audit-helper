@@ -221,6 +221,8 @@ For example, in the above result set, we can see that `status` and `amount` have
 switched order. Further, `order_date` is a timestamp in our "a" relation, whereas
 it is a date in our "b" relation.
 
+Note: For adapters other than BigQuery, Postgres, Redshift, and Snowflake, the ordinal_position is inferred based on the response from dbt Core's `adapter.get_columns_in_relation()`, as opposed to being loaded from the information schema.
+
 ```sql
 {#- in dbt Develop -#}
 

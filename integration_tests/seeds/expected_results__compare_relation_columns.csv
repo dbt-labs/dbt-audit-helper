@@ -1,0 +1,9 @@
+COLUMN_NAME,A_ORDINAL_POSITION,B_ORDINAL_POSITION,HAS_ORDINAL_POSITION_MATCH,HAS_DATA_TYPE_MATCH
+awesome_column,1,7,false,true
+magnificent_column,,1,false,false
+zany_column,2,2,true,false
+brave_column,3,3,true,true
+young_column,4,4,true,true
+cool_column,5,5,true,true
+xpeditionary_column,,6,false,false
+xcellent_column,6,,false,false

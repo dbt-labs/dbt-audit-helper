@@ -33,78 +33,28 @@ order by coalesce(a_cols.ordinal_position, b_cols.ordinal_position)
 
 {% endmacro %}
 
-{% macro redshift__get_columns_in_relation_sql(relation) %}
-{#-
-See https://github.com/dbt-labs/dbt/blob/23484b18b71010f701b5312f920f04529ceaa6b2/plugins/redshift/dbt/include/redshift/macros/adapters.sql#L71
-Edited to include ordinal_position
--#}
-with bound_views as (
-  select
-    ordinal_position,
-    table_schema,
-    column_name,
-    data_type,
-    character_maximum_length,
-    numeric_precision,
-    numeric_scale
+{% macro default__get_columns_in_relation_sql(relation) %}
+    
+  {% set columns = adapter.get_columns_in_relation(relation) %}
+  {% for column in columns %}
+    select 
+      {{ dbt.string_literal(column.name) }} as column_name, 
+      {{ loop.index }} as ordinal_position,
+      {{ dbt.string_literal(column.data_type) }} as data_type
 
-  from information_schema."columns"
-  where table_name = '{{ relation.identifier }}'
-),
+  {% if not loop.last -%}
+    union all 
+  {%- endif %}
+  {% endfor %}
 
-unbound_views as (
-select
-  ordinal_position,
-  view_schema,
-  col_name,
-  case
-    when col_type ilike 'character varying%' then
-      'character varying'
-    when col_type ilike 'numeric%' then 'numeric'
-    else col_type
-  end as col_type,
-  case
-    when col_type like 'character%'
-    then nullif(REGEXP_SUBSTR(col_type, '[0-9]+'), '')::int
-    else null
-  end as character_maximum_length,
-  case
-    when col_type like 'numeric%'
-    then nullif(
-      SPLIT_PART(REGEXP_SUBSTR(col_type, '[0-9,]+'), ',', 1),
-      '')::int
-    else null
-  end as numeric_precision,
-  case
-    when col_type like 'numeric%'
-    then nullif(
-      SPLIT_PART(REGEXP_SUBSTR(col_type, '[0-9,]+'), ',', 2),
-      '')::int
-    else null
-  end as numeric_scale
-
-from pg_get_late_binding_view_cols()
-cols(view_schema name, view_name name, col_name name,
-     col_type varchar, ordinal_position int)
-where view_name = '{{ relation.identifier }}'
-),
-
-unioned as (
-select * from bound_views
-union all
-select * from unbound_views
-)
-
-select
-*
-
-from unioned
-{% if relation.schema %}
-where table_schema = '{{ relation.schema }}'
-{% endif %}
-order by ordinal_position
 
 {% endmacro %}
+
+{% macro redshift__get_columns_in_relation_sql(relation) %}
+  {# You can't store the results of an info schema query to a table/view in Redshift, because the data only lives on the leader node #}
+  {{ return (audit_helper.default__get_columns_in_relation_sql(relation)) }}
+{% endmacro %}
+
 
 {% macro snowflake__get_columns_in_relation_sql(relation) %}
 {#-
@@ -131,6 +81,7 @@ Edited to include ordinal_position
     {% endif %}
   order by ordinal_position
 {% endmacro %}
+
 
 {% macro postgres__get_columns_in_relation_sql(relation) %}
 {#-
