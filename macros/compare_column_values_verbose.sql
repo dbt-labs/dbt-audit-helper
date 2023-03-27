@@ -31,9 +31,13 @@ b_query as (
         a_query.{{ primary_key }} is null as missing_from_a,
         b_query.{{ primary_key }} is null as missing_from_b,
         coalesce(
-            a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }}  or 
-                (a_query.{{ column_to_compare }} is not null and b_query.{{ column_to_compare }} is null) or 
-                (a_query.{{ column_to_compare }} is null and b_query.{{ column_to_compare }} is not null), 
+            a_query.{{ primary_key }} is not null and b_query.{{ primary_key }} is not null and 
+            -- ensure that neither value is missing before considering it a conflict
+            (
+                a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }} or -- two not-null values that do not match
+                (a_query.{{ column_to_compare }} is not null and b_query.{{ column_to_compare }} is null) or -- null in b and not null in a
+                (a_query.{{ column_to_compare }} is null and b_query.{{ column_to_compare }} is not null) -- null in a and not null in b
+            ), 
             false
         ) as conflicting_values
         -- considered a conflict if the values do not match AND at least one of the values is not null.
