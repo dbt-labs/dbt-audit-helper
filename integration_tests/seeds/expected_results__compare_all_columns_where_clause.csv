@@ -11,8 +11,3 @@ primary_key,column_name,perfect_match,null_in_a,null_in_b,missing_from_a,missing
 10,ID,false,false,false,true,false,false
 10,FRUIT,false,false,false,true,false,false
 10,RIPENESS,false,false,true,true,false,false
-
-
-
-
-
