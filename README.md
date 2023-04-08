@@ -243,7 +243,7 @@ Note: For adapters other than BigQuery, Postgres, Redshift, and Snowflake, the o
 
 ## compare_all_columns ([source](macros/compare_all_columns.sql))
 This macro is designed to be added to a dbt test suite as a custom test. A 
-`compare_all_columns` test monitors changes data values when code is changed 
+`compare_all_columns` test monitors changes to data values when code is changed 
 as part of a PR or during development. It sets up a test that will fail 
 if any column values do not match. 
 
@@ -303,6 +303,7 @@ where conflicting_values
   validation.
 * `primary_key`: The primary key of the model. Used to sort unmatched
   results for row-by-row validation.
+* `a_where` and `b_where` (optional): A SQL where clause used to filter the rows that will be returned from the relations for comparison. Example: `where updated_at > '1900-01-01 23:59:59'` 
 
 If you want to create test results that include columns from the model itself 
 for easier inspection, that can be written into the test:

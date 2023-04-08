@@ -1,8 +1,8 @@
-{% macro compare_all_columns( a_relation, b_relation, primary_key,  exclude_columns=[],summarize=true ) -%}
-  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( a_relation, b_relation, primary_key, exclude_columns, summarize )) }}
+{% macro compare_all_columns( a_relation, b_relation, primary_key, a_where, b_where, exclude_columns=[], summarize=true ) -%}
+  {{ return(adapter.dispatch('compare_all_columns', 'audit_helper')( a_relation, b_relation, primary_key, a_where, b_where, exclude_columns, summarize )) }}
 {%- endmacro %}
 
-{% macro default__compare_all_columns( a_relation, b_relation, primary_key, exclude_columns=[], summarize=true ) -%}
+{% macro default__compare_all_columns( a_relation, b_relation, primary_key, a_where, b_where, exclude_columns=[], summarize=true ) -%}
 
   {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
@@ -10,12 +10,14 @@
     select
       *
     from {{ a_relation }}
+    {% if a_where %}{{ a_where }}{% endif %}
   {% endset %}
 
   {% set b_query %}
     select
       *
     from {{ b_relation }}
+    {% if b_where %}{{ b_where }}{% endif %}
   {% endset %}
 
   {% for column_name in column_names %}
