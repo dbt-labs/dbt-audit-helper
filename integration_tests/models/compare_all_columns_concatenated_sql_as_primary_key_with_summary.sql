@@ -1,4 +1,4 @@
-{% set a_relation=ref('data_compare_all_columns__market_of_choice_produce__concatenated_pk')%}
+{% set a_relation=ref('data_compare_all_columns__market_produce__concatenated_pk')%}
 
 {% set b_relation=ref('data_compare_all_columns__albertsons_produce__concatenated_pk') %}
 
