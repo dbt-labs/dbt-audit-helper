@@ -76,7 +76,7 @@ models:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_relation_columns')
 
-  - name: compare_relations_without_summary
+  - name: compare_relations_concatenated_sql_as_primary_key_without_summary
     tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_without_summary')
