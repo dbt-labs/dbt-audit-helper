@@ -3,21 +3,12 @@
 Useful macros when performing data audits
 
 # Contents
-- [dbt-audit-helper](#dbt-audit-helper)
-- [Contents](#contents)
-- [Installation instructions](#installation-instructions)
-- [Macros](#macros)
-  - [compare\_relations (source)](#compare_relations-source)
-  - [compare\_queries (source)](#compare_queries-source)
-  - [compare\_column\_values (source)](#compare_column_values-source)
-    - [Usage:](#usage)
-    - [Advanced usage - dbt Cloud:](#advanced-usage---dbt-cloud)
-  - [compare\_relation\_columns (source)](#compare_relation_columns-source)
-  - [compare\_all\_columns (source)](#compare_all_columns-source)
-    - [Usage:](#usage-1)
-      - [Arguments:](#arguments)
-  - [compare\_column\_values\_verbose (source)](#compare_column_values_verbose-source)
-- [To-do:](#to-do)
+* [compare_relations](#compare_relations-source)
+* [compare_queries](#compare_queries-source)
+* [compare_column_values](#compare_column_values-source)
+* [compare_relation_columns](#compare_relation_columns-source)
+* [compare_all_columns](#compare_all_columns-source)
+* [compare_column_values_verbose](#compare_column_values_verbose-source)
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
