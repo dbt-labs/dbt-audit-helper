@@ -3,12 +3,21 @@
 Useful macros when performing data audits
 
 # Contents
-* [compare_relations](#compare_relations-source)
-* [compare_queries](#compare_queries-source)
-* [compare_column_values](#compare_column_values-source)
-* [compare_relation_columns](#compare_relation_columns-source)
-* [compare_all_columns](#compare_all_columns-source)
-* [compare_column_values_verbose](#compare_column_values_verbose-source)
+- [dbt-audit-helper](#dbt-audit-helper)
+- [Contents](#contents)
+- [Installation instructions](#installation-instructions)
+- [Macros](#macros)
+  - [compare\_relations (source)](#compare_relations-source)
+  - [compare\_queries (source)](#compare_queries-source)
+  - [compare\_column\_values (source)](#compare_column_values-source)
+    - [Usage:](#usage)
+    - [Advanced usage - dbt Cloud:](#advanced-usage---dbt-cloud)
+  - [compare\_relation\_columns (source)](#compare_relation_columns-source)
+  - [compare\_all\_columns (source)](#compare_all_columns-source)
+    - [Usage:](#usage-1)
+      - [Arguments:](#arguments)
+  - [compare\_column\_values\_verbose (source)](#compare_column_values_verbose-source)
+- [To-do:](#to-do)
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
@@ -67,7 +76,7 @@ Arguments:
   you want to compare.
 * `exclude_columns` (optional): Any columns you wish to exclude from the
   validation.
-* `primary_key` (optional): The primary key of the model. Used to sort unmatched
+* `primary_key` (optional): The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched
   results for row-by-row validation.
 * `summarize` (optional): Allows you to switch between a summary or detailed view
   of the compared data. Accepts `true` or `false` values. Defaults to `true`.
@@ -301,7 +310,7 @@ where conflicting_values
   is not recommended when building this macro into a CI cycle.)
 * `exclude_columns` (optional): Any columns you wish to exclude from the
   validation.
-* `primary_key`: The primary key of the model. Used to sort unmatched
+* `primary_key`: The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched
   results for row-by-row validation.
 
 If you want to create test results that include columns from the model itself 
