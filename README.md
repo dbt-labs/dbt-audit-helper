@@ -3,12 +3,27 @@
 Useful macros when performing data audits
 
 # Contents
-* [compare_relations](#compare_relations-source)
-* [compare_queries](#compare_queries-source)
-* [compare_column_values](#compare_column_values-source)
-* [compare_relation_columns](#compare_relation_columns-source)
-* [compare_all_columns](#compare_all_columns-source)
-* [compare_column_values_verbose](#compare_column_values_verbose-source)
+- [dbt-audit-helper](#dbt-audit-helper)
+- [Contents](#contents)
+- [Installation instructions](#installation-instructions)
+- [Macros](#macros)
+  - [compare\_relations (source)](#compare_relations-source)
+  - [compare\_queries (source)](#compare_queries-source)
+  - [compare\_column\_values (source)](#compare_column_values-source)
+    - [Usage:](#usage)
+    - [Advanced usage - dbt Cloud:](#advanced-usage---dbt-cloud)
+  - [compare\_relation\_columns (source)](#compare_relation_columns-source)
+  - [compare\_all\_columns (source)](#compare_all_columns-source)
+    - [Usage:](#usage-1)
+      - [Arguments:](#arguments)
+  - [compare\_column\_values\_verbose (source)](#compare_column_values_verbose-source)
+  - [generate\_audit\_report (source)](#generate_audit_report-source)
+      - [Usage:](#usage-2)
+      - [Arguments:](#arguments-1)
+  - [generate\_audit\_report\_for\_folder (source)](#generate_audit_report_for_folder-source)
+      - [Usage:](#usage-3)
+      - [Arguments:](#arguments-2)
+- [To-do:](#to-do)
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
@@ -360,6 +375,67 @@ dbt test --select stg_customers --store-failures
 This macro will return a query that, when executed, returns the same information as 
 `compare_column_values`, but not summarized. `compare_column_values_verbose` enables `compare_all_columns` to give the user more flexibility around what will result in a test failure.
 
+
+## generate_audit_report ([source](macros/generate_audit_report.sql))
+This macro generates SQL that can be used to create an audit report of a subset of 
+models in your project. By default, this macro will create a report using the 
+`compare_relations` macro. For example:
+
+audit_model | in_a  | in_b  | count | percent_of_total |
+|-----------|-------|-------|------:|-----------------:|
+|  model_a  | True  | True  | 6870  | 99.74            |
+|  model_a  | True  | False | 9     | 0.13             |
+|  model_a  | False | True  | 9     | 0.13             |
+|  model_b  | True  | True  | 3478  | 100              |
+
+#### Usage:
+
+```
+{{ generate_audit_report(
+    model_list = ['model_a', 'model_b'], 
+    compare_database = 'LEGACY_DB', 
+    compare_schema = 'LEGACY_SCHEMA'
+) }}
+```
+
+#### Arguments:
+
+- `model_list`: The list of models you want to generate an audit report for. If you'd prefer to generate a report for a foler of models, use [generate_audit_report_for_folder](#generate_audit_report_for_folder-source).
+- `compare_database`: The database location of the relations you want to compare your dbt models to.
+- `compare_schema`: The schema location of the relations you want to compare your dbt models to.
+- `identifiers` (optional): A dictionary of strings that map each model name to the object name of the relation you want to compare your dbt model to. Example - `{'model_a': 'legacy_table_a', 'model_b': 'legacy_table_b'}`
+- `primary_keys` (optional): A dictionary of strings that map each model name to its unique primary key. Example - `{'model_a': 'a_id', 'model_b': 'id'}`
+- `exclude_columns` (optional): A dictionary of strings to lists that map each model name to the list of column names to exclude. Example - `{'model_a': ['loaded_at', 'batch']}`
+- `audit_helper_macro_name` (optional): The type of audit report you want to generate, corresponds to a macro in the `audit_helper` package. The macros that are current supported are `compare_all_columns`, `compare_relations`, and `compare_relation_columns`. The default is `compare_relations`. Example - `'compare_all_columns'`
+
+Note: This macro inherits the argument requirements of the `audit_helper_macro_name`. For example, if `audit_helper_macro_name` is `compare_all_columns`, `primary_keys` is required. 
+
+## generate_audit_report_for_folder ([source](macros/generate_audit_report_for_folder.sql))
+This macro is identical to [generate_audit_report](#generate_audit_report-source), except that it takes
+the arguement `model_folder_path` instead of `model list` to specify the collection of models
+to generate the audit report for.
+
+#### Usage:
+
+```
+{{ generate_audit_report(
+    model_folder_path = 'marts/finance', 
+    compare_database = 'LEGACY_DB', 
+    compare_schema = 'LEGACY_SCHEMA'
+) }}
+```
+
+#### Arguments:
+
+- `model_folder_path`: The path within your dbt project’s model folder to the models you want to generate the audit report for. If you'd prefer to generate a report for a explicit list of models, use [generate_audit_report](#generate_audit_report-source).
+- `compare_database`: The database location of the relations you want to compare your dbt models to.
+- `compare_schema`: The schema location of the relations you want to compare your dbt models to.
+- `identifiers` (optional): A dictionary of strings that map each model name to the object name of the relation you want to compare your dbt model to. Example - `{'model_a': 'legacy_table_a', 'model_b': 'legacy_table_b'}`
+- `primary_keys` (optional): A dictionary of strings that map each model name to its unique primary key. Example - `{'model_a': 'a_id', 'model_b': 'id'}`
+- `exclude_columns` (optional): A dictionary of strings to lists that map each model name to the list of column names to exclude. Example - `{'model_a': ['loaded_at', 'batch']}`
+- `audit_helper_macro_name` (optional): The type of audit report you want to generate, corresponds to a macro in the `audit_helper` package. The macros that are current supported are `compare_all_columns`, `compare_relations`, and `compare_relation_columns`. The default is `compare_relations`. Example - `'compare_all_columns'`
+
+Note: This macro inherits the argument requirements of the `audit_helper_macro_name`. For example, if `audit_helper_macro_name` is `compare_all_columns`, `primary_keys` is required. 
 
 # To-do:
 * Macro to check if two schemas contain the same relations
