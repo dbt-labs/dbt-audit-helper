@@ -1,4 +1,4 @@
-{% macro generate_audit_report(model_folder_path, compare_database, compare_schema, identifiers = {}, primary_keys = {}, exclude_columns = {}, audit_helper_macro_name = 'compare_relations') %}
+{% macro generate_audit_report(model_list, compare_database, compare_schema, identifiers = {}, primary_keys = {}, exclude_columns = {}, audit_helper_macro_name = 'compare_relations') %}
     
     {% set compatible_audit_helper_macros = ['compare_relations', 'compare_all_columns', 'compare_relation_columns'] %}
     {% if audit_helper_macro_name not in compatible_audit_helper_macros %}
@@ -17,35 +17,28 @@
         {% endif %}
     {% endif %}
 
-    {%- set re = modules.re -%}
+    {%- set model_node_list = [] %}
 
-    {#- *----- Create a list to hold the model nodes -----* -#}
-    {%- set model_list = [] %}
-
-    {#- *-------------------------------------------------
-        * Get the list of models in the resource 
-        * path and add them to the list 
-    ------------------------------------------------------* -#}
     {%- if execute %}
         {%- for node in graph.nodes.values() | selectattr("resource_type", "equalto", "model") %}
-            {% set regex_folder_pattern = 'models/' ~ model_folder_path ~ '/.*' %}
-            {%- if re.match(regex_folder_pattern, node.original_file_path) is not none %}
-                {%- do model_list.append(node) %}
+            
+            {%- if node.name in model_list %}
+                {%- do model_node_list.append(node) %}
             {%- endif %}
+
         {%- endfor %}
     {%- endif %}
 
     with
     
-    {% for current_model in model_list %}
+    {% for current_model in model_node_list %}
     {{ current_model.name }}_results as (
         {#- *---------------------------------------------
             * This is where the audit_helper macro is used!
         --------------------------------------------------* -#}
 
-        {% set model_identifier = identifiers[current_model.name] %}
-        {% if model_identifier is not none %}
-            {% set legacy_model_name = model_identifier %}
+        {% if identifiers[current_model.name] %}
+            {% set legacy_model_name = identifiers[current_model.name] %}
         {% else %}
             {% set legacy_model_name = current_model.name %}
         {% endif %}
@@ -78,7 +71,7 @@
     {% endfor %}
 
     final as (
-        {% for current_model in model_list %}
+        {% for current_model in model_node_list %}
         select 
             '{{ current_model.name }}' as audit_model, 
             * from {{ current_model.name }}_results

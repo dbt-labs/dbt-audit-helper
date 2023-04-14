@@ -1,0 +1,5 @@
+audit_model,column_name,perfect_match,null_in_a,null_in_b,missing_from_a,missing_from_b,conflicting_values
+model_a,COL_A,1,0,0,0,1,0
+model_a,COL_B,1,0,0,0,1,0
+model_b,COL_A,2,0,0,0,0,0
+model_b,COL_B,2,0,0,0,0,0

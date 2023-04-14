@@ -61,3 +61,43 @@ models:
     tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_relation_columns')
+
+  - name: report_compare_all_columns
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__report_compare_all_columns')
+
+  - name: report_compare_relation_columns
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__report_compare_relation_columns')
+
+  - name: report_compare_relations_with_exclude
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__report_compare_relations')
+
+  - name: report_compare_relations_without_identifiers
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__report_compare_relations_without_identifiers')
+
+  - name: report_compare_relations
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__report_compare_relations')
+
+  - name: report_folder_compare_all_columns
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__report_compare_all_columns')
+
+  - name: report_folder_compare_relation_columns
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__report_compare_relation_columns')
+
+  - name: report_folder_compare_relations
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__report_compare_relations')
