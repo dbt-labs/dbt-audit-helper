@@ -61,12 +61,16 @@
 
         {% set model_exclude_columns = exclude_columns[current_model.name] %}
 
-        {% do log('Comparing legacy relation (a) ' ~ legacy_relation ~ ' to dbt relation (b) ' ~ dbt_relation,True) %}
+        {% if execute %}
 
-        {% if audit_helper_macro_name != 'compare_relation_columns' %}
-            {{ audit_helper_macro(a_relation = legacy_relation, b_relation = dbt_relation, primary_key = model_primary_key, exclude_columns = model_exclude_columns) }}
-        {% else %}
-            {{ audit_helper_macro(a_relation = legacy_relation, b_relation = dbt_relation) }}
+            {% do log('Comparing legacy relation (a) ' ~ legacy_relation ~ ' to dbt relation (b) ' ~ dbt_relation,True) %}
+    
+            {% if audit_helper_macro_name != 'compare_relation_columns' %}
+                {{ audit_helper_macro(a_relation = legacy_relation, b_relation = dbt_relation, primary_key = model_primary_key, exclude_columns = model_exclude_columns) }}
+            {% else %}
+                {{ audit_helper_macro(a_relation = legacy_relation, b_relation = dbt_relation) }}
+            {% endif %}
+
         {% endif %}
 
     ),
