@@ -1,3 +1,8 @@
+-- depends_on: {{ ref('model_a') }}
+-- depends_on: {{ ref('data_compare_relations__a_relation') }}
+-- depends_on: {{ ref('model_b') }}
+-- depends_on: {{ ref('data_compare_relations__b_relation') }}
+
 with audit_helper_results as (
     {{ audit_helper.generate_audit_report(
         model_list = ['model_a', 'model_b'],

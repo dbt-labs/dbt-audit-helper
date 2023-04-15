@@ -1,5 +1,5 @@
 {% macro generate_audit_report(model_list, compare_database, compare_schema, identifiers = {}, primary_keys = {}, exclude_columns = {}, audit_helper_macro_name = 'compare_relations') %}
-    
+
     {% set compatible_audit_helper_macros = ['compare_relations', 'compare_all_columns', 'compare_relation_columns'] %}
     {% if audit_helper_macro_name not in compatible_audit_helper_macros %}
         {{ exceptions.raise_compiler_error("Invalid audit_helper_macro input. Acceptable inputs: " ~ compatible_audit_helper_macros) }}
@@ -43,7 +43,7 @@
             {% set legacy_model_name = current_model.name %}
         {% endif %}
 
-        {% set legacy_relation = adapter.get_relation(
+        {% set compare_relation = adapter.get_relation(
             database = compare_database,
             schema = compare_schema,
             identifier = legacy_model_name
@@ -61,14 +61,22 @@
 
         {% set model_exclude_columns = exclude_columns[current_model.name] %}
 
-        {% if execute %}
+        {% if not compare_relation %}
 
-            {% do log('Comparing legacy relation (a) ' ~ legacy_relation ~ ' to dbt relation (b) ' ~ dbt_relation,True) %}
+            {{ exceptions.raise_compiler_error("Compare relation does not exist - confirm you have supplied the correct compare_database, compare_schema, and identifiers.") }} 
+
+        {% elif dbt_relation is none %}
+
+            {{ exceptions.raise_compiler_error("dbt model has not been materialized in the warehouse - try running a dbt build for model " ~ current_model.name) }} 
+        
+        {% else %}
+
+            {% do log("Compare relation (a) " ~ compare_relation ~ " to dbt model (b) " ~ dbt_relation, True) %}
     
             {% if audit_helper_macro_name != 'compare_relation_columns' %}
-                {{ audit_helper_macro(a_relation = legacy_relation, b_relation = dbt_relation, primary_key = model_primary_key, exclude_columns = model_exclude_columns) }}
+                {{ audit_helper_macro(a_relation = compare_relation, b_relation = dbt_relation, primary_key = model_primary_key, exclude_columns = model_exclude_columns) }}
             {% else %}
-                {{ audit_helper_macro(a_relation = legacy_relation, b_relation = dbt_relation) }}
+                {{ audit_helper_macro(a_relation = compare_relation, b_relation = dbt_relation) }}
             {% endif %}
 
         {% endif %}
