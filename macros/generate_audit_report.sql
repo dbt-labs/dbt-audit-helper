@@ -1,5 +1,5 @@
 {% macro generate_audit_report(model_list, compare_database, compare_schema, identifiers = {}, primary_keys = {}, exclude_columns = {}, audit_helper_macro_name = 'compare_relations') %}
-
+    
     {% set compatible_audit_helper_macros = ['compare_relations', 'compare_all_columns', 'compare_relation_columns'] %}
     {% if audit_helper_macro_name not in compatible_audit_helper_macros %}
         {{ exceptions.raise_compiler_error("Invalid audit_helper_macro input. Acceptable inputs: " ~ compatible_audit_helper_macros) }}
@@ -17,30 +17,24 @@
         {% endif %}
     {% endif %}
 
-    {%- set model_node_list = [] %}
-
-    {%- if execute %}
-        {%- for node in graph.nodes.values() | selectattr("resource_type", "equalto", "model") %}
-            
-            {%- if node.name in model_list %}
-                {%- do model_node_list.append(node) %}
-            {%- endif %}
-
-        {%- endfor %}
-    {%- endif %}
-
     with
-    
-    {% for current_model in model_node_list %}
-    {{ current_model.name }}_results as (
+
+    {% if execute %}
+
+    {% for m in model_list %}
+
+        {% set m_id = 'model.' ~ project_name ~ '.' ~ m %}
+        {% set m_details = graph["nodes"][m_id] %}
+
+    {{ m }}_results as (
         {#- *---------------------------------------------
             * This is where the audit_helper macro is used!
         --------------------------------------------------* -#}
 
-        {% if identifiers[current_model.name] %}
-            {% set legacy_model_name = identifiers[current_model.name] %}
+        {% if identifiers[m] %}
+            {% set legacy_model_name = identifiers[m] %}
         {% else %}
-            {% set legacy_model_name = current_model.name %}
+            {% set legacy_model_name = m %}
         {% endif %}
 
         {% set compare_relation = adapter.get_relation(
@@ -50,16 +44,16 @@
         ) -%}
 
         {% set dbt_relation = adapter.get_relation(
-            database = current_model.database,
-            schema = current_model.schema,
-            identifier = current_model.name
+            database = m_details.database,
+            schema = m_details.schema,
+            identifier = m
         ) -%}
 
         {% set audit_helper_macro = audit_helper.get(audit_helper_macro_name) %}
 
-        {% set model_primary_key = primary_keys[current_model.name] %}
+        {% set model_primary_key = primary_keys[m] %}
 
-        {% set model_exclude_columns = exclude_columns[current_model.name] %}
+        {% set model_exclude_columns = exclude_columns[m] %}
 
         {% if not compare_relation %}
 
@@ -67,7 +61,7 @@
 
         {% elif dbt_relation is none %}
 
-            {{ exceptions.raise_compiler_error("dbt model has not been materialized in the warehouse - try running a dbt build for model " ~ current_model.name) }} 
+            {{ exceptions.raise_compiler_error("dbt model has not been materialized in the warehouse - try running a dbt build for model " ~ m) }} 
         
         {% else %}
 
@@ -85,15 +79,17 @@
     {% endfor %}
 
     final as (
-        {% for current_model in model_node_list %}
+        {% for m in model_list %}
         select 
-            '{{ current_model.name }}' as audit_model, 
-            * from {{ current_model.name }}_results
+            '{{ m }}' as audit_model, 
+            * from {{ m }}_results
         {% if not loop.last %}union all{% endif %}
         {% endfor %}
     )
     
     select * from final
     order by audit_model
+
+    {% endif %}
     
 {% endmacro %}
