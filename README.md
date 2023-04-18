@@ -67,7 +67,7 @@ Arguments:
   you want to compare.
 * `exclude_columns` (optional): Any columns you wish to exclude from the
   validation.
-* `primary_key` (optional): The primary key of the model. Used to sort unmatched
+* `primary_key` (optional): The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched
   results for row-by-row validation.
 * `summarize` (optional): Allows you to switch between a summary or detailed view
   of the compared data. Accepts `true` or `false` values. Defaults to `true`.
@@ -301,7 +301,7 @@ where conflicting_values
   is not recommended when building this macro into a CI cycle.)
 * `exclude_columns` (optional): Any columns you wish to exclude from the
   validation.
-* `primary_key`: The primary key of the model. Used to sort unmatched
+* `primary_key`: The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched
   results for row-by-row validation.
 
 If you want to create test results that include columns from the model itself 

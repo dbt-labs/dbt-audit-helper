@@ -6,15 +6,21 @@
 
   {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
+  {# We explictly select the primary_key and rename to support any sql as the primary_key -
+  a column or concatenated columns. this assumes that a_relation and b_relation do not already 
+  have a field named dbt_audit_helper_pk #}
+
   {% set a_query %}      
     select
-      *
+      *,
+      {{ primary_key }} as dbt_audit_helper_pk
     from {{ a_relation }}
   {% endset %}
 
   {% set b_query %}
     select
-      *
+      *,
+      {{ primary_key }} as dbt_audit_helper_pk
     from {{ b_relation }}
   {% endset %}
 
@@ -23,7 +29,7 @@
     {% set audit_query = audit_helper.compare_column_values_verbose(
       a_query=a_query,
       b_query=b_query,
-      primary_key=primary_key,
+      primary_key="dbt_audit_helper_pk",
       column_to_compare=column_name
     ) %}
 

@@ -5,6 +5,11 @@ models:
     tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_relations_without_exclude')
+
+  - name: compare_queries_concat_pk_without_summary
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__compare_without_summary')
           
   - name: compare_queries_with_summary
     tests:
@@ -45,7 +50,16 @@ models:
     tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_all_columns_without_summary')
-  
+
+  - name: compare_all_columns_concat_pk_with_summary
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__compare_all_columns_concat_pk_with_summary')
+
+  - name: compare_all_columns_concat_pk_without_summary
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__compare_all_columns_concat_pk_without_summary')
 
   - name: compare_all_columns_with_summary_and_exclude
     tests:
@@ -61,3 +75,8 @@ models:
     tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_relation_columns')
+
+  - name: compare_relations_concat_pk_without_summary
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__compare_without_summary')
