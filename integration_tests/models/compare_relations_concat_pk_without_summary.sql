@@ -5,6 +5,6 @@
 {{ audit_helper.compare_relations(
     a_relation=a_relation,
     b_relation=b_relation,
-    primary_key="col_a||col_b",
+    primary_key=dbt_utils.generate_surrogate_key(['col_a', 'col_b']),
     summarize=false
 ) }}
