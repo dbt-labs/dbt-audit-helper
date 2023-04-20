@@ -355,11 +355,3 @@ flag.
 ```
 dbt test --select stg_customers --store-failures
 ```
-
-## compare_column_values_verbose ([source](macros/compare_column_values_verbose.sql))
-This macro will return a query that, when executed, returns the same information as 
-`compare_column_values`, but not summarized. `compare_column_values_verbose` enables `compare_all_columns` to give the user more flexibility around what will result in a test failure.
-
-
-# To-do:
-* Macro to check if two schemas contain the same relations
