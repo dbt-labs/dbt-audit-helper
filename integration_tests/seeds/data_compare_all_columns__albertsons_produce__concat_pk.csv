@@ -1,0 +1,11 @@
+produce_category,id,produce,ripeness
+vegetable,1,spinach,wilted
+fruit,1,banana,yellow
+fruit,2,banana,brown
+fruit,3,banana,brown
+fruit,4,orange,green
+fruit,5,orange,orange
+fruit,6,,brown
+fruit,7,orange,orange
+fruit,9,apple,mushy
+fruit,10,apple,

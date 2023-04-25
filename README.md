@@ -2,13 +2,12 @@
 
 Useful macros when performing data audits
 
-# Contents
+# Contents 
 * [compare_relations](#compare_relations-source)
 * [compare_queries](#compare_queries-source)
 * [compare_column_values](#compare_column_values-source)
 * [compare_relation_columns](#compare_relation_columns-source)
 * [compare_all_columns](#compare_all_columns-source)
-* [compare_column_values_verbose](#compare_column_values_verbose-source)
 * [generate_audit_report](#generate_audit_report-source)
 * [generate_audit_report_for_folder](#generate_audit_report_for_folder-source)
 
@@ -69,7 +68,7 @@ Arguments:
   you want to compare.
 * `exclude_columns` (optional): Any columns you wish to exclude from the
   validation.
-* `primary_key` (optional): The primary key of the model. Used to sort unmatched
+* `primary_key` (optional): The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched
   results for row-by-row validation.
 * `summarize` (optional): Allows you to switch between a summary or detailed view
   of the compared data. Accepts `true` or `false` values. Defaults to `true`.
@@ -303,7 +302,7 @@ where conflicting_values
   is not recommended when building this macro into a CI cycle.)
 * `exclude_columns` (optional): Any columns you wish to exclude from the
   validation.
-* `primary_key`: The primary key of the model. Used to sort unmatched
+* `primary_key`: The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched
   results for row-by-row validation.
 
 If you want to create test results that include columns from the model itself 
@@ -357,11 +356,6 @@ flag.
 ```
 dbt test --select stg_customers --store-failures
 ```
-
-## compare_column_values_verbose ([source](macros/compare_column_values_verbose.sql))
-This macro will return a query that, when executed, returns the same information as 
-`compare_column_values`, but not summarized. `compare_column_values_verbose` enables `compare_all_columns` to give the user more flexibility around what will result in a test failure.
-
 
 ## generate_audit_report ([source](macros/generate_audit_report.sql))
 This macro generates SQL that can be used to create an audit report of a subset of 
@@ -423,6 +417,3 @@ to generate the audit report for.
 - `audit_helper_macro_name` (optional): The type of audit report you want to generate, corresponds to a macro in the `audit_helper` package. The macros that are current supported are `compare_all_columns`, `compare_relations`, and `compare_relation_columns`. The default is `compare_relations`. Example - `'compare_all_columns'`
 
 Note: This macro inherits the argument requirements of the `audit_helper_macro_name`. For example, if `audit_helper_macro_name` is `compare_all_columns`, `primary_keys` is required. 
-
-# To-do:
-* Macro to check if two schemas contain the same relations

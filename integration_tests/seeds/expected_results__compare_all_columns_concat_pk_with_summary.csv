@@ -1,0 +1,5 @@
+column_name,perfect_match,null_in_a,null_in_b,missing_from_a,missing_from_b,conflicting_values
+ID,8,0,0,2,1,0
+PRODUCE,7,0,1,2,1,1
+PRODUCE_CATEGORY,8,0,0,2,1,0
+RIPENESS,6,1,1,2,1,2
