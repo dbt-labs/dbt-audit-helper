@@ -391,6 +391,8 @@ audit_model | in_a  | in_b  | count | percent_of_total |
 
 Note: This macro inherits the argument requirements of the `audit_helper_macro_name`. For example, if `audit_helper_macro_name` is `compare_all_columns`, `primary_keys` is required. 
 
+Note: This macro's `model_list` arguement is a list of model names (which are *strings*), this is different from the other macros in this package where you supply *relations*. Because of this, if you want to use this macro in the context of a model in your dbt project and enforce dependencies you will need to add dummy comment(s) `-- depends_on: {{ ref('model_a') }}` to your .sql file.
+
 ## generate_audit_report_for_folder ([source](macros/generate_audit_report_for_folder.sql))
 This macro is identical to [generate_audit_report](#generate_audit_report-source), except that it takes
 the arguement `model_folder_path` instead of `model list` to specify the collection of models
@@ -399,7 +401,7 @@ to generate the audit report for.
 #### Usage:
 
 ```
-{{ generate_audit_report(
+{{ generate_audit_report_for_folder(
     model_folder_path = 'marts/finance', 
     compare_database = 'LEGACY_DB', 
     compare_schema = 'LEGACY_SCHEMA'
@@ -408,7 +410,7 @@ to generate the audit report for.
 
 #### Arguments:
 
-- `model_folder_path`: The path within your dbt project’s model folder to the models you want to generate the audit report for. If you'd prefer to generate a report for a explicit list of models, use [generate_audit_report](#generate_audit_report-source).
+- `model_folder_path`: The regex path within your dbt project’s model folder to the models you want to generate the audit report for. If you'd prefer to generate a report for a explicit list of models, use [generate_audit_report](#generate_audit_report-source).
 - `compare_database`: The database location of the relations you want to compare your dbt models to.
 - `compare_schema`: The schema location of the relations you want to compare your dbt models to.
 - `identifiers` (optional): A dictionary of strings that map each model name to the object name of the relation you want to compare your dbt model to. Example - `{'model_a': 'legacy_table_a', 'model_b': 'legacy_table_b'}`
@@ -417,3 +419,5 @@ to generate the audit report for.
 - `audit_helper_macro_name` (optional): The type of audit report you want to generate, corresponds to a macro in the `audit_helper` package. The macros that are current supported are `compare_all_columns`, `compare_relations`, and `compare_relation_columns`. The default is `compare_relations`. Example - `'compare_all_columns'`
 
 Note: This macro inherits the argument requirements of the `audit_helper_macro_name`. For example, if `audit_helper_macro_name` is `compare_all_columns`, `primary_keys` is required. 
+
+Note: This macro's `model_list` arguement is a list of model names (which are *strings*), this is different from the other macros in this package where you supply *relations*. Because of this, if you want to use this macro in the context of a model in your dbt project and enforce dependencies you will need to add dummy comment(s) `-- depends_on: {{ ref('model_a') }}` to your .sql file.

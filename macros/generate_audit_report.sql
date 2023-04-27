@@ -31,22 +31,20 @@
             * This is where the audit_helper macro is used!
         --------------------------------------------------* -#}
 
-        {% if identifiers[m] %}
-            {% set legacy_model_name = identifiers[m] %}
-        {% else %}
-            {% set legacy_model_name = m %}
-        {% endif %}
+        {% set legacy_relation_name = identifiers[m] if identifiers[m] else m %}
+
+        {% set dbt_relation_name = m_details.alias if m_details.alias else m %}
 
         {% set compare_relation = adapter.get_relation(
             database = compare_database,
             schema = compare_schema,
-            identifier = legacy_model_name
+            identifier = legacy_relation_name
         ) -%}
 
         {% set dbt_relation = adapter.get_relation(
             database = m_details.database,
             schema = m_details.schema,
-            identifier = m
+            identifier = dbt_relation_name
         ) -%}
 
         {% set audit_helper_macro = audit_helper.get(audit_helper_macro_name) %}
