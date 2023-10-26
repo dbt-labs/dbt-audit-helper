@@ -74,7 +74,7 @@ summary_stats as (
 
         in_a,
         in_b,
-        count(*) as row_count
+        count(*) as {{ adapter.quote('count') }}
 
     from all_records
     group by 1, 2
@@ -86,7 +86,7 @@ final as (
     select
 
         *,
-        round(100.0 * row_count / sum(row_count) over (), 2) as percent_of_total
+        round(100.0 * {{ adapter.quote('count') }} / sum({{ adapter.quote('count') }}) over (), 2) as percent_of_total
 
     from summary_stats
     order by in_a desc, in_b desc
