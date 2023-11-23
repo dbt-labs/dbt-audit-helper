@@ -50,7 +50,7 @@ aggregated as (
         count(*) as count_records
     from joined
 
-    group by '{{ column_to_compare }}', match_status, match_order
+    group by match_status, match_order
 )
 
 select
