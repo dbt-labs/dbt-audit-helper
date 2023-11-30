@@ -48,7 +48,7 @@
 
     /*  There will be one audit_query subquery for each column
     */
-    select * from ( {{ audit_query }} )
+    select * from ( {{ audit_query }} ) AS x
 
     {% if not loop.last %}
 
