@@ -1,8 +1,8 @@
-{% macro compare_column_values(a_query, b_query, primary_key, column_to_compare) -%}
-  {{ return(adapter.dispatch('compare_column_values', 'audit_helper')(a_query, b_query, primary_key, column_to_compare)) }}
+{% macro compare_column_values(a_query, b_query, primary_key, column_to_compare, emojis=True) -%}
+  {{ return(adapter.dispatch('compare_column_values', 'audit_helper')(a_query, b_query, primary_key, column_to_compare, emojis)) }}
 {%- endmacro %}
 
-{% macro default__compare_column_values(a_query, b_query, primary_key, column_to_compare) -%}
+{% macro default__compare_column_values(a_query, b_query, primary_key, column_to_compare, emojis=True) -%}
 with a_query as (
     {{ a_query }}
 ),
@@ -17,13 +17,13 @@ joined as (
         a_query.{{ column_to_compare }} as a_query_value,
         b_query.{{ column_to_compare }} as b_query_value,
         case
-            when a_query.{{ column_to_compare }} = b_query.{{ column_to_compare }} then '✅: perfect match'
-            when a_query.{{ column_to_compare }} is null and b_query.{{ column_to_compare }} is null then '✅: both are null'
-            when a_query.{{ primary_key }} is null then '🤷: ‍missing from a'
-            when b_query.{{ primary_key }} is null then '🤷: missing from b'
-            when a_query.{{ column_to_compare }} is null then '🤷: value is null in a only'
-            when b_query.{{ column_to_compare }} is null then '🤷: value is null in b only'
-            when a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }} then '🙅: ‍values do not match'
+            when a_query.{{ column_to_compare }} = b_query.{{ column_to_compare }} then '{% if emojis %}✅: {% endif %}perfect match'
+            when a_query.{{ column_to_compare }} is null and b_query.{{ column_to_compare }} is null then '{% if emojis %}✅: {% endif %}both are null'
+            when a_query.{{ primary_key }} is null then '{% if emojis %}🤷: {% endif %}missing from a'
+            when b_query.{{ primary_key }} is null then '{% if emojis %}🤷: {% endif %}missing from b'
+            when a_query.{{ column_to_compare }} is null then '{% if emojis %}🤷: {% endif %}value is null in a only'
+            when b_query.{{ column_to_compare }} is null then '{% if emojis %}🤷: {% endif %}value is null in b only'
+            when a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }} then '{% if emojis %}🙅: {% endif %}‍values do not match'
             else 'unknown' -- this should never happen
         end as match_status,
         case
