@@ -106,5 +106,9 @@ final as (
 {%- endif %}
 
 select * from final
+{%- if not summarize %}
+limit 20
+{%- endif %}
+
 
 {% endmacro %}
