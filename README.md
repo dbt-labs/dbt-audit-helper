@@ -3,12 +3,19 @@
 Useful macros when performing data audits
 
 # Contents
-* [compare_relations](#compare_relations-source)
-* [compare_queries](#compare_queries-source)
-* [compare_column_values](#compare_column_values-source)
-* [compare_relation_columns](#compare_relation_columns-source)
-* [compare_all_columns](#compare_all_columns-source)
-* [compare_column_values_verbose](#compare_column_values_verbose-source)
+- [dbt-audit-helper](#dbt-audit-helper)
+- [Contents](#contents)
+- [Installation instructions](#installation-instructions)
+- [Macros](#macros)
+  - [compare\_relations (source)](#compare_relations-source)
+  - [compare\_queries (source)](#compare_queries-source)
+  - [compare\_column\_values (source)](#compare_column_values-source)
+    - [Usage:](#usage)
+    - [Advanced usage - dbt Cloud:](#advanced-usage---dbt-cloud)
+  - [compare\_relation\_columns (source)](#compare_relation_columns-source)
+  - [compare\_all\_columns (source)](#compare_all_columns-source)
+    - [Usage:](#usage-1)
+      - [Arguments:](#arguments)
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
@@ -71,6 +78,7 @@ Arguments:
   results for row-by-row validation.
 * `summarize` (optional): Allows you to switch between a summary or detailed view
   of the compared data. Accepts `true` or `false` values. Defaults to `true`.
+* `limit` (optional): Allows you to limit the number of rows returned when summarize=False. Defaults to `null` (no limit).
 
 ## compare_queries ([source](macros/compare_queries.sql))
 Super similar to `compare_relations`, except it takes two select statements. This macro is useful when:
@@ -107,8 +115,13 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 ```
 
 Arguments:
-* `summarize` (optional): Allows you to switch between a summary or detaied view
-  of the compared data. Accepts `true` or `false` vaules. Defaults to `true`.
+
+* `a_query` and `b_query`: The queries you want to compare.
+* `exclude_columns` (optional): Any columns you wish to exclude from the
+  validation.
+* `summarize` (optional): Allows you to switch between a summary or detailed view
+  of the compared data. Accepts `true` or `false` values. Defaults to `true`.
+* `limit` (optional): Allows you to limit the number of rows returned when summarize=False. Defaults to `null` (no limit).
 
 ## compare_column_values ([source](macros/compare_column_values.sql))
 This macro will return a query, that, when executed, compares a column across
@@ -159,6 +172,7 @@ number of your records don't match.
 **Usage notes:**
 * `primary_key` must be a unique key in both tables, otherwise the join won't
 work as expected.
+* `emojis` is a boolean argument that defaults to `true`. If you don't want to include emojis in the output, set it to `false`.
 
 
 ### Advanced usage - dbt Cloud:
@@ -202,19 +216,18 @@ The ``.print_table()`` function is not compatible with dbt Cloud so an adjustmen
 This macro will return a query, that, when executed, compares the ordinal_position
 and data_types of columns in two [Relations](https://docs.getdbt.com/docs/api-variable#section-relation).
 
-| column_name | a_ordinal_position | b_ordinal_position | a_data_type       | b_data_type       |
-|-------------|--------------------|--------------------|-------------------|-------------------|
-| order_id    | 1                  | 1                  | integer           | integer           |
-| customer_id | 2                  | 2                  | integer           | integer           |
-| order_date  | 3                  | 3                  | timestamp         | date              |
-| status      | 4                  | 5                  | character varying | character varying |
-| amount      | 5                  | 4                  | bigint            | bigint            |
-
+| column_name | a_ordinal_position | b_ordinal_position | a_data_type       | b_data_type       | has_ordinal_position_match | has_data_type_match | in_a_only | in_b_only | in_both |
+|-------------|--------------------|--------------------|-------------------|-------------------| -------------------------- | ------------------- | --------- | --------- | ------- |
+| order_id    | 1                  | 1                  | integer           | integer           |                       True |                True |     False |     False |    True |
+| customer_id | 2                  | 2                  | integer           | integer           |                       True |                True |     False |     False |    True |
+| order_date  | 3                  | 3                  | timestamp         | date              |                       True |               False |     False |     False |    True |
+| status      | 4                  | 5                  | character varying | character varying |                      False |                True |     False |     False |    True |
+| amount      | 5                  | 4                  | bigint            | bigint            |                      False |                True |     False |     False |    True |
 
 This is especially useful in two situations:
 1. Comparing a new version of a relation with an old one, to make sure that the
 structure is the same
-2. Helping figure out why a `union` of two relations won't work (often because
+1. Helping figure out why a `union` of two relations won't work (often because
 the data types are different)
 
 For example, in the above result set, we can see that `status` and `amount` have
