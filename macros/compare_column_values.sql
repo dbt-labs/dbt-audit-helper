@@ -23,7 +23,7 @@ joined as (
             when b_query.{{ primary_key }} is null then '{% if emojis %}🤷: {% endif %}missing from {{ b_relation_name }}'
             when a_query.{{ column_to_compare }} is null then '{% if emojis %}🤷: {% endif %}value is null in {{ a_relation_name }} only'
             when b_query.{{ column_to_compare }} is null then '{% if emojis %}🤷: {% endif %}value is null in {{ b_relation_name }} only'
-            when a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }} then '{% if emojis %}🙅: {% endif %}‍values do not match'
+            when a_query.{{ column_to_compare }} != b_query.{{ column_to_compare }} then '{% if emojis %}❌: {% endif %}‍values do not match'
             else 'unknown' -- this should never happen
         end as match_status,
         case

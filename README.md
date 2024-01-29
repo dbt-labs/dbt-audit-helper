@@ -78,7 +78,7 @@ Arguments:
   results for row-by-row validation.
 * `summarize` (optional): Allows you to switch between a summary or detailed view
   of the compared data. Accepts `true` or `false` values. Defaults to `true`.
-* `limit` (optional): Allows you to limit the number of rows returned when summarize=False. Defaults to `null` (no limit).
+* `limit` (optional): Allows you to limit the number of rows returned when summarize=False. Defaults to `None` (no limit).
 
 ## compare_queries ([source](macros/compare_queries.sql))
 Super similar to `compare_relations`, except it takes two select statements. This macro is useful when:
@@ -172,7 +172,7 @@ number of your records don't match.
 **Usage notes:**
 * `primary_key` must be a unique key in both tables, otherwise the join won't
 work as expected.
-* `emojis` is a boolean argument that defaults to `true`. If you don't want to include emojis in the output, set it to `false`.
+* `emojis` is a boolean argument that defaults to `true` and displays ✅, 🤷 and ❌ for easier visual scanning. If you don't want to include emojis in the output, set it to `false`.
 
 
 ### Advanced usage - dbt Cloud:

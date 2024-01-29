@@ -106,7 +106,7 @@ final as (
 {%- endif %}
 
 select * from final
-{%- if not summarize and limit %}
+{%- if limit and not summarize %}
 limit {{ limit }}
 {%- endif %}
 
