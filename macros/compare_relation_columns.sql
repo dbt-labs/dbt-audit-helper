@@ -19,7 +19,10 @@ select
     a_cols.data_type as a_data_type,
     b_cols.data_type as b_data_type,
     coalesce(a_cols.ordinal_position = b_cols.ordinal_position, false) as has_ordinal_position_match,
-    coalesce(a_cols.data_type = b_cols.data_type, false) as has_data_type_match
+    coalesce(a_cols.data_type = b_cols.data_type, false) as has_data_type_match,
+    a_cols.data_type is not null and b_cols.data_type is null as in_a_only,
+    b_cols.data_type is not null and a_cols.data_type is null as in_b_only,
+    b_cols.data_type is not null and a_cols.data_type is not null as in_both
 from a_cols
 full outer join b_cols using (column_name)
 order by coalesce(a_cols.ordinal_position, b_cols.ordinal_position)
