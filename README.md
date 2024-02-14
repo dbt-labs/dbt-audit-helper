@@ -142,6 +142,8 @@ This macro is useful when:
 number of your records don't match.
 * So now you want to find which column is causing most of these discrepancies.
 
+
+
 ### Usage:
 ```
 {# in dbt Develop #}
@@ -169,10 +171,14 @@ number of your records don't match.
 {% endif %}
 ```
 
-**Usage notes:**
-* `primary_key` must be a unique key in both tables, otherwise the join won't
-work as expected.
-* `emojis` is a boolean argument that defaults to `true` and displays ✅, 🤷 and ❌ for easier visual scanning. If you don't want to include emojis in the output, set it to `false`.
+Arguments:
+
+* `a_query` and `b_query`: The queries you want to compare.
+* `primary_key`: Primary key to join the datasets. This is required to match values across the two queries.
+* `column_to_compare`: Column to compare.
+* `emomjis` (optional):  Boolean flag to control emojis in the macro output. Defaults to `True`.
+* `a_relation_name` (optional): Name of the relation/query you're comparing to include in output. Defaults to "a"
+* `b_relation_name` (optional): Name of the relation/query you're comparing to include in output. Defaults to "b"
 
 
 ### Advanced usage - dbt Cloud:
