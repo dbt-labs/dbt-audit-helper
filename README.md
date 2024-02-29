@@ -411,6 +411,6 @@ Results:
 Arguments:
 * `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
   you want to compare.
-* `primary_key` (required): The primary key of the model Used to join between the relations to ensure that the same rows are being compared.
+* `primary_key` (required): The primary key of the model used to join the relations to ensure that the same rows are being compared.
 * `exclude_columns` (optional): Any columns you wish to exclude from the
   validation.
