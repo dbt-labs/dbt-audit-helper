@@ -1,0 +1,5 @@
+id,value_changes,becomes_null,becomes_not_null,does_not_change
+1,pink,22,a,dave
+2,blue,33,,dave
+3,green,44,c,dave
+4,yellow,55,d,dave

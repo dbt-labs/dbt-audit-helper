@@ -1,0 +1,5 @@
+column_name,is_changed
+id,false
+value_changes,true
+becomes_not_null,true
+does_not_change,false

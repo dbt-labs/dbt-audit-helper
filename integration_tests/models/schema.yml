@@ -80,3 +80,13 @@ models:
     tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_without_summary')
+
+  - name: detect_column_changes
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__detect_column_changes')
+
+  - name: detect_column_changes_exclude_cols
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__detect_column_changes_exclude_cols')
