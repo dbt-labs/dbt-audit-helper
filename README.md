@@ -70,7 +70,7 @@ The query is best used in dbt Develop so you can interactively check results
 
 ```
 Arguments:
-* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation)
   you want to compare.
 * `exclude_columns` (optional): Any columns you wish to exclude from the
   validation.
@@ -306,7 +306,7 @@ where conflicting_values
 
 #### Arguments:
 
-* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation)
   you want to compare. Any two relations that have the same columns can be used. In the 
   example above, two different approaches to writing relations, using `ref` and 
   using `api.Relation.create`, are demonstrated. (When writing one-off code, it might make sense to
