@@ -15,4 +15,4 @@ from (
         exclude_columns=["becomes_null"]
     ) }}
 
-)
+) as macro_output

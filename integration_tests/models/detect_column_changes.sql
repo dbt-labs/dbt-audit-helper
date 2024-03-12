@@ -14,4 +14,4 @@ from (
         b_relation=b_relation,
         primary_key="id"
     ) }}
-)
+) as macro_output
