@@ -7,10 +7,11 @@ with bool_or as (
     select 
         true as anchor
         {% for column in column_names %}
+            {% set column_name = adapter.quote(column) %}
             {% set compare_statement %}
-                (a.{{ column | lower }} != b.{{ column | lower }}
-                or a.{{ column | lower }} is null and b.{{ column | lower }} is not null
-                or a.{{ column | lower }} is not null and b.{{ column | lower }} is null)
+                (a.{{ column_name }} != b.{{ column_name }}
+                or a.{{ column_name }} is null and b.{{ column_name }} is not null
+                or a.{{ column_name }} is not null and b.{{ column_name }} is null)
             {% endset %}
         
         , {{ dbt.bool_or(compare_statement) }} as {{ column | lower }}_is_changed
@@ -23,9 +24,9 @@ with bool_or as (
 )
 
 {% for column in column_names %}
-
+    
     select 
-        '{{ column | lower }}' as column_name, 
+        '{{ column }}' as column_name, 
         {{ column | lower }}_is_changed as is_changed 
     
     from bool_or
