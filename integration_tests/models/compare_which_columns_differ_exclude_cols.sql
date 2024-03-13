@@ -1,14 +1,14 @@
-{% set a_relation=ref('data_detect_column_changes_a')%}
+{% set a_relation=ref('data_compare_which_columns_differ_a')%}
 
-{% set b_relation=ref('data_detect_column_changes_b') %}
+{% set b_relation=ref('data_compare_which_columns_differ_b') %}
 
 
 select 
     lower(column_name) as column_name,
-    is_changed
+    has_differences
 from (
 
-    {{ audit_helper.detect_column_changes(
+    {{ audit_helper.compare_which_columns_differ(
         a_relation=a_relation,
         b_relation=b_relation,
         primary_key="id",

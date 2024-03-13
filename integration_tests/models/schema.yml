@@ -81,12 +81,12 @@ models:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_without_summary')
 
-  - name: detect_column_changes
+  - name: compare_which_columns_differ
     tests:
       - dbt_utils.equality:
-          compare_model: ref('expected_results__detect_column_changes')
+          compare_model: ref('expected_results__compare_which_columns_differ')
 
-  - name: detect_column_changes_exclude_cols
+  - name: compare_which_columns_differ_exclude_cols
     tests:
       - dbt_utils.equality:
-          compare_model: ref('expected_results__detect_column_changes_exclude_cols')
+          compare_model: ref('expected_results__compare_which_columns_differ_exclude_cols')

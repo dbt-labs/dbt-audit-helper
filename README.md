@@ -16,7 +16,7 @@ Useful macros when performing data audits
   - [compare\_all\_columns (source)](#compare_all_columns-source)
     - [Usage:](#usage-1)
       - [Arguments:](#arguments)
-  - [detect\_column\_changes (source)](#detect_column_changes-source)
+  - [compare\_which\_columns\_differ (source)](#compare_which_columns_differ-source)
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
@@ -370,9 +370,9 @@ flag.
 dbt test --select stg_customers --store-failures
 ```
 
-## detect_column_changes ([source](macros/detect_column_changes.sql))
-This macro generates SQL that can be used to detect whether or not the common columns in two relations 
-have any value level changes. It does not return the magnitude of the change, only whether or not a change has occurred.
+## compare_which_columns_differ ([source](macros/compare_which_columns_differ.sql))
+This macro generates SQL that can be used to detect which common columns between two relations
+contain any value level changes. It does not return the magnitude of the change, only whether or not a difference has occurred.
 This can be useful when comparing two versions of a model between development and production environments.
 
 
@@ -386,7 +386,7 @@ This can be useful when comparing two versions of a model between development an
 
 {% set dev_relation=ref('fct_orders') %}
 
-{{ audit_helper.detect_column_changes(
+{{ audit_helper.compare_which_columns_differ(
     a_relation=prod_relation,
     b_relation=dev_relation,
     primary_key="order_id",

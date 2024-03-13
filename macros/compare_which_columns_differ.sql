@@ -1,4 +1,4 @@
-{% macro detect_column_changes(a_relation, b_relation, primary_key, exclude_columns=[]) %}
+{% macro compare_which_columns_differ(a_relation, b_relation, primary_key, exclude_columns=[]) %}
 
 {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
@@ -14,7 +14,7 @@ with bool_or as (
                 or a.{{ column_name }} is not null and b.{{ column_name }} is null)
             {% endset %}
         
-        , {{ dbt.bool_or(compare_statement) }} as {{ column | lower }}_is_changed
+        , {{ dbt.bool_or(compare_statement) }} as {{ column | lower }}_has_differences
     
         {% endfor %}
     from {{ a_relation }} as a
@@ -27,7 +27,7 @@ with bool_or as (
     
     select 
         '{{ column }}' as column_name, 
-        {{ column | lower }}_is_changed as is_changed 
+        {{ column | lower }}_has_differences as has_differences 
     
     from bool_or
 
