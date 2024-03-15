@@ -1,4 +1,4 @@
-column_name,has_differences
+column_name,has_difference
 id,false
 value_changes,true
 becomes_null,true
