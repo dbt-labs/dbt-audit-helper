@@ -6,7 +6,7 @@
 
 select 
     lower(column_name) as column_name,
-    has_differences
+    has_difference
 from (
 
     {{ audit_helper.compare_which_columns_differ(

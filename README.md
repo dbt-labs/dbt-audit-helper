@@ -397,13 +397,13 @@ This can be useful when comparing two versions of a model between development an
 Results:
 
 
-| column_name | has_changed |
-|-------------|-------------|
-| order_id    | False       |
-| customer_id | False       |
-| order_date  | True        |
-| status      | False       |
-| amount      | True        |
+| column_name | has_difference |
+|-------------|----------------|
+| order_id    | False          |
+| customer_id | False          |
+| order_date  | True           |
+| status      | False          |
+| amount      | True           |
 
 
 

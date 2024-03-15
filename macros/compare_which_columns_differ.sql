@@ -14,7 +14,7 @@ with bool_or as (
                 or a.{{ column_name }} is not null and b.{{ column_name }} is null)
             {% endset %}
         
-        , {{ dbt.bool_or(compare_statement) }} as {{ column | lower }}_has_differences
+        , {{ dbt.bool_or(compare_statement) }} as {{ column | lower }}_has_difference
     
         {% endfor %}
     from {{ a_relation }} as a
@@ -27,7 +27,7 @@ with bool_or as (
     
     select 
         '{{ column }}' as column_name, 
-        {{ column | lower }}_has_differences as has_differences 
+        {{ column | lower }}_has_difference as has_difference
     
     from bool_or
 
