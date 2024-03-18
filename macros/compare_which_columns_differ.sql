@@ -1,4 +1,8 @@
 {% macro compare_which_columns_differ(a_relation, b_relation, primary_key, exclude_columns=[]) %}
+    {{ return(adapter.dispatch('compare_which_columns_differ', 'audit_helper')(a_relation, b_relation, primary_key, exclude_columns)) }}
+{% endmacro %}
+
+{% macro default__compare_which_columns_differ(a_relation, b_relation, primary_key, exclude_columns=[]) %}  
 
 {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=a_relation, except=exclude_columns) %}
 
