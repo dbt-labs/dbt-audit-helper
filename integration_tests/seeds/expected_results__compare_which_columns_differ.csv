@@ -1,0 +1,6 @@
+column_name,has_difference
+id,false
+value_changes,true
+becomes_null,true
+becomes_not_null,true
+does_not_change,false

@@ -16,6 +16,7 @@ Useful macros when performing data audits
   - [compare\_all\_columns (source)](#compare_all_columns-source)
     - [Usage:](#usage-1)
       - [Arguments:](#arguments)
+  - [compare\_which\_columns\_differ (source)](#compare_which_columns_differ-source)
   - [## compare\_row\_counts (source)](#-compare_row_counts-source)
     - [Usage:](#usage-2)
     - [Arguments:](#arguments-1)
@@ -372,6 +373,49 @@ flag.
 dbt test --select stg_customers --store-failures
 ```
 
+## compare_which_columns_differ ([source](macros/compare_which_columns_differ.sql))
+This macro generates SQL that can be used to detect which common columns between two relations
+contain any value level changes. It does not return the magnitude of the change, only whether or not a difference has occurred.
+This can be useful when comparing two versions of a model between development and production environments.
+
+
+```sql
+
+{% set prod_relation=adapter.get_relation(
+      database=target.database,
+      schema="prod_schema",
+      identifier="fct_orders"
+) -%}
+
+{% set dev_relation=ref('fct_orders') %}
+
+{{ audit_helper.compare_which_columns_differ(
+    a_relation=prod_relation,
+    b_relation=dev_relation,
+    primary_key="order_id",
+    exclude_columns=["tax_amount"]
+) }}
+
+
+Results:
+
+
+| column_name | has_difference |
+|-------------|----------------|
+| order_id    | False          |
+| customer_id | False          |
+| order_date  | True           |
+| status      | False          |
+| amount      | True           |
+
+
+
+```
+Arguments:
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
+  you want to compare.
+* `primary_key` (required): The primary key of the model used to join the relations to ensure that the same rows are being compared.
+* `exclude_columns` (optional): Any columns you wish to exclude from the validation.
 ## ## compare_row_counts ([source](macros/compare_row_counts.sql))
 This macro does a simple comparison of the row counts in two relations. 
 
