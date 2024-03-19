@@ -13,9 +13,9 @@ with bool_or as (
         {% for column in column_names %}
             {% set column_name = adapter.quote(column) %}
             {% set compare_statement %}
-                (a.{{ column_name }} != b.{{ column_name }}
-                or a.{{ column_name }} is null and b.{{ column_name }} is not null
-                or a.{{ column_name }} is not null and b.{{ column_name }} is null)
+                ((a.{{ column_name }} != b.{{ column_name }})
+                or (a.{{ column_name }} is null and b.{{ column_name }} is not null)
+                or (a.{{ column_name }} is not null and b.{{ column_name }} is null))
             {% endset %}
         
         , {{ dbt.bool_or(compare_statement) }} as {{ column | lower }}_has_difference
