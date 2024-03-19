@@ -16,6 +16,9 @@ Useful macros when performing data audits
   - [compare\_all\_columns (source)](#compare_all_columns-source)
     - [Usage:](#usage-1)
       - [Arguments:](#arguments)
+  - [## compare\_row\_counts (source)](#-compare_row_counts-source)
+    - [Usage:](#usage-2)
+    - [Arguments:](#arguments-1)
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
@@ -368,3 +371,35 @@ flag.
 ```
 dbt test --select stg_customers --store-failures
 ```
+
+## ## compare_row_counts ([source](macros/compare_row_counts.sql))
+This macro does a simple comparison of the row counts in two relations. 
+
+### Usage:
+
+Calling this macro on two different relations will return a very simple table comparing the row counts in each relation. 
+
+```sql
+{% set a_relation=ref('my_a_relation')%}
+
+{% set b_relation=ref('my_b_relation') %}
+
+
+{{ audit_helper.compare_row_counts(
+    a_relation=a_relation,
+    b_relation=b_relation
+) }}
+
+```
+
+returns:
+
+| relation_name                                | total_records  |
+|----------------------------------------------|---------------:|
+| target_database.target_schema.my_a_relation  |     34,231     |
+| target_database.target_schema.my_b_relation  |     24,789     |
+
+### Arguments:
+
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation)
+  you want to compare. Any two relations can be used.
