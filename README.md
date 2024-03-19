@@ -17,6 +17,9 @@ Useful macros when performing data audits
     - [Usage:](#usage-1)
       - [Arguments:](#arguments)
   - [compare\_which\_columns\_differ (source)](#compare_which_columns_differ-source)
+  - [## compare\_row\_counts (source)](#-compare_row_counts-source)
+    - [Usage:](#usage-2)
+    - [Arguments:](#arguments-1)
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
@@ -71,7 +74,7 @@ The query is best used in dbt Develop so you can interactively check results
 
 ```
 Arguments:
-* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation)
   you want to compare.
 * `exclude_columns` (optional): Any columns you wish to exclude from the
   validation.
@@ -307,7 +310,7 @@ where conflicting_values
 
 #### Arguments:
 
-* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation)
   you want to compare. Any two relations that have the same columns can be used. In the 
   example above, two different approaches to writing relations, using `ref` and 
   using `api.Relation.create`, are demonstrated. (When writing one-off code, it might make sense to
@@ -413,3 +416,34 @@ Arguments:
   you want to compare.
 * `primary_key` (required): The primary key of the model used to join the relations to ensure that the same rows are being compared.
 * `exclude_columns` (optional): Any columns you wish to exclude from the validation.
+## ## compare_row_counts ([source](macros/compare_row_counts.sql))
+This macro does a simple comparison of the row counts in two relations. 
+
+### Usage:
+
+Calling this macro on two different relations will return a very simple table comparing the row counts in each relation. 
+
+```sql
+{% set a_relation=ref('my_a_relation')%}
+
+{% set b_relation=ref('my_b_relation') %}
+
+
+{{ audit_helper.compare_row_counts(
+    a_relation=a_relation,
+    b_relation=b_relation
+) }}
+
+```
+
+returns:
+
+| relation_name                                | total_records  |
+|----------------------------------------------|---------------:|
+| target_database.target_schema.my_a_relation  |     34,231     |
+| target_database.target_schema.my_b_relation  |     24,789     |
+
+### Arguments:
+
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation)
+  you want to compare. Any two relations can be used.

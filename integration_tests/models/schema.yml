@@ -90,3 +90,8 @@ models:
     tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_which_columns_differ_exclude_cols')
+          
+  - name: compare_row_counts
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_results__compare_row_counts')
