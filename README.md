@@ -447,5 +447,4 @@ Returns:
 
 ### Arguments:
 
-* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation)
-  you want to compare. Any two relations can be used.
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation) you want to compare. Any two relations can be used.
