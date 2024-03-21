@@ -10,16 +10,10 @@ Useful macros when performing data audits
   - [compare\_relations (source)](#compare_relations-source)
   - [compare\_queries (source)](#compare_queries-source)
   - [compare\_column\_values (source)](#compare_column_values-source)
-    - [Usage:](#usage)
-    - [Advanced usage - dbt Cloud:](#advanced-usage---dbt-cloud)
   - [compare\_relation\_columns (source)](#compare_relation_columns-source)
   - [compare\_all\_columns (source)](#compare_all_columns-source)
-    - [Usage:](#usage-1)
-      - [Arguments:](#arguments)
   - [compare\_which\_columns\_differ (source)](#compare_which_columns_differ-source)
   - [compare\_row\_counts (source)](#-compare_row_counts-source)
-    - [Usage:](#usage-2)
-    - [Arguments:](#arguments-1)
 
 # Installation instructions
 New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
@@ -52,8 +46,10 @@ Setting the `summarize` argument to `false` lets you check which rows do not mat
 This query is particularly useful when you want to check that a refactored model,
 or a model that you are moving over from a legacy system, match up.
 
-Usage:
-The query is best used in dbt Develop so you can interactively check results
+### Usage:
+
+The query is best used in dbt Develop so you can interactively check results.
+
 ```sql
 {# in dbt Develop #}
 
@@ -73,7 +69,8 @@ The query is best used in dbt Develop so you can interactively check results
 ) }}
 
 ```
-Arguments:
+
+### Arguments:
 * `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation)
   you want to compare.
 * `exclude_columns` (optional): Any columns you wish to exclude from the
@@ -89,6 +86,8 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 * You need to filter out records from one of the relations.
 * You need to rename or recast some columns to get them to match up.
 * You only want to compare a small number of columns, so it's easier write the columns you want to compare, rather than the columns you want to exclude.
+
+### Usage:
 
 ```sql
 {# in dbt Develop #}
@@ -118,7 +117,7 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 
 ```
 
-Arguments:
+### Arguments:
 
 * `a_query` and `b_query`: The queries you want to compare.
 * `exclude_columns` (optional): Any columns you wish to exclude from the
@@ -240,6 +239,8 @@ it is a date in our "b" relation.
 
 Note: For adapters other than BigQuery, Postgres, Redshift, and Snowflake, the ordinal_position is inferred based on the response from dbt Core's `adapter.get_columns_in_relation()`, as opposed to being loaded from the information schema.
 
+### Usage:
+
 ```sql
 {#- in dbt Develop -#}
 
@@ -308,7 +309,7 @@ If you'd like the test to only fail when there are conflicting values, you could
 where conflicting_values
 ```
 
-#### Arguments:
+### Arguments:
 
 * `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation)
   you want to compare. Any two relations that have the same columns can be used. In the 
@@ -374,10 +375,11 @@ dbt test --select stg_customers --store-failures
 ```
 
 ## compare_which_columns_differ ([source](macros/compare_which_columns_differ.sql))
-This macro generates SQL that can be used to detect which common columns between two relations
-contain any value level changes. It does not return the magnitude of the change, only whether or not a difference has occurred.
+This macro generates SQL that can be used to detect which common columns between two relations contain any value level changes. It does not return the magnitude of the change, only whether or not a difference has occurred.
+
 This can be useful when comparing two versions of a model between development and production environments.
 
+### Usage:
 
 ```sql
 
@@ -396,9 +398,9 @@ This can be useful when comparing two versions of a model between development an
     exclude_columns=["tax_amount"]
 ) }}
 
+```
 
 Results:
-
 
 | column_name | has_difference |
 |-------------|----------------|
@@ -409,13 +411,13 @@ Results:
 | amount      | True           |
 
 
+### Arguments:
 
-```
-Arguments:
 * `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation)
   you want to compare.
 * `primary_key` (required): The primary key of the model used to join the relations to ensure that the same rows are being compared.
 * `exclude_columns` (optional): Any columns you wish to exclude from the validation.
+
 ## compare_row_counts ([source](macros/compare_row_counts.sql))
 This macro does a simple comparison of the row counts in two relations. 
 
@@ -436,7 +438,7 @@ Calling this macro on two different relations will return a very simple table co
 
 ```
 
-returns:
+Returns:
 
 | relation_name                                | total_records  |
 |----------------------------------------------|---------------:|
