@@ -17,7 +17,7 @@ Useful macros when performing data audits
     - [Usage:](#usage-1)
       - [Arguments:](#arguments)
   - [compare\_which\_columns\_differ (source)](#compare_which_columns_differ-source)
-  - [## compare\_row\_counts (source)](#-compare_row_counts-source)
+  - [compare\_row\_counts (source)](#-compare_row_counts-source)
     - [Usage:](#usage-2)
     - [Arguments:](#arguments-1)
 
@@ -416,7 +416,7 @@ Arguments:
   you want to compare.
 * `primary_key` (required): The primary key of the model used to join the relations to ensure that the same rows are being compared.
 * `exclude_columns` (optional): Any columns you wish to exclude from the validation.
-## ## compare_row_counts ([source](macros/compare_row_counts.sql))
+## compare_row_counts ([source](macros/compare_row_counts.sql))
 This macro does a simple comparison of the row counts in two relations. 
 
 ### Usage:
