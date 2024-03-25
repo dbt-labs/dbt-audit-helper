@@ -121,8 +121,8 @@ Super similar to `compare_relations`, except it takes two select statements. Thi
 Arguments:
 
 * `a_query` and `b_query`: The queries you want to compare.
-* `exclude_columns` (optional): Any columns you wish to exclude from the
-  validation.
+* `primary_key` (optional): The primary key of the queries. Used to sort unmatched
+  results for row-by-row validation.
 * `summarize` (optional): Allows you to switch between a summary or detailed view
   of the compared data. Accepts `true` or `false` values. Defaults to `true`.
 * `limit` (optional): Allows you to limit the number of rows returned when summarize=False. Defaults to `null` (no limit).
