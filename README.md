@@ -205,7 +205,7 @@ The generated query returns whether or not each column has any differecnes:
 ```
 
 ## compare_column_values ([source](macros/compare_column_values.sql))
-This macro generates SQL that can be used to compare a column's values across two queries. This macro is useful when you've used the `compare_which_columns_differ` macro to identiy a column with differing values and want to understand how many discrepancies are caused by that column.
+This macro generates SQL that can be used to compare a column's values across two queries. This macro is useful when you've used the `compare_which_columns_differ` macro to identify a column with differing values and want to understand how many discrepancies are caused by that column.
 
 ### Output:
 The generated query returns a summary of the count of rows where the column's values:
