@@ -141,6 +141,9 @@ Calling this macro on two different relations will return a very simple table co
 | target_database.target_schema.my_a_relation  |     34,231     |
 | target_database.target_schema.my_b_relation  |     24,789     |
 
+### Arguments:
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation) you want to compare.
+
 ### Usage:
 ```sql
 
@@ -157,14 +160,52 @@ Calling this macro on two different relations will return a very simple table co
     b_relation = dbt_relation
 ) }}
 
-```
-
-### Arguments:
-* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation) you want to compare. 
+``` 
 
 # Compare Columns 
+## compare_which_columns_differ ([source](macros/compare_which_columns_differ.sql))
+This macro generates SQL that can be used to detect which common columns between two relations contain _any_ value level changes. It does not return the magnitude of the change, only whether or not a difference has occurred.
+
+This can be useful when comparing two versions of a model between development and production environments.
+
+### Output:
+The generated query returns whether or not each column has any differecnes:
+
+| column_name | has_difference |
+|-------------|----------------|
+| order_id    | False          |
+| customer_id | False          |
+| order_date  | True           |
+| status      | False          |
+| amount      | True           |
+
+### Arguments:
+* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation) you want to compare.
+* `primary_key` (required): The primary key of the model used to join the relations to ensure that the same rows are being compared.
+* `exclude_columns` (optional): Any columns you wish to exclude from the validation.
+
+### Usage:
+```sql
+
+{% set old_relation = adapter.get_relation(
+      database = "old_database",
+      schema = "old_schema",
+      identifier = "fct_orders"
+) -%}
+
+{% set dbt_relation = ref('fct_orders') %}
+
+{{ audit_helper.compare_which_columns_differ(
+    a_relation = old_relation,
+    b_relation = dbt_relation,
+    exclude_columns = ["loaded_at"],
+    primary_key = "order_id"
+) }}
+
+```
+
 ## compare_column_values ([source](macros/compare_column_values.sql))
-This macro generates SQL that can be used to compare a column's values across two queries. This macro is useful when you've used the `compare_queries` macro (above) and found that a significant number of your records don't match and want to understand how many discrepancies are caused by a single column.
+This macro generates SQL that can be used to compare a column's values across two queries. This macro is useful when you've used the `compare_which_columns_differ` macro to identiy a column with differing values and want to understand how many discrepancies are caused by that column.
 
 ### Output:
 The generated query returns a summary of the count of rows where the column's values:
@@ -212,7 +253,7 @@ The generated query returns a summary of the count of rows where the column's va
 ```
 
 ## compare_all_columns ([source](macros/compare_all_columns.sql))
-Similar to `compare_column_values`, except it can be used to compare _all_ columns' values across two _relations_. 
+Similar to `compare_column_values`, except it can be used to compare _all_ columns' values across two _relations_. This macro is useful when you've used the `compare_queries` macro and found that a significant number of your records don't match and want to understand how many discrepancies are caused by each column. 
 
 ### Output:
 By default, the generated query returns a summary of the count of rows where the each column's values:
@@ -256,47 +297,6 @@ Setting the `summarize` argument to `false` lets you check the match status of a
 {{ audit_helper.compare_all_columns(
     a_relation = old_relation,
     b_relation = dbt_relation,
-    primary_key = "order_id"
-) }}
-
-```
-
-## compare_which_columns_differ ([source](macros/compare_which_columns_differ.sql))
-This macro generates SQL that can be used to detect which common columns between two relations contain _any_ value level changes. It does not return the magnitude of the change, only whether or not a difference has occurred.
-
-This can be useful when comparing two versions of a model between development and production environments.
-
-### Output:
-The generated query returns whether or not each column has any differecnes:
-
-| column_name | has_difference |
-|-------------|----------------|
-| order_id    | False          |
-| customer_id | False          |
-| order_date  | True           |
-| status      | False          |
-| amount      | True           |
-
-### Arguments:
-* `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation) you want to compare.
-* `primary_key` (required): The primary key of the model used to join the relations to ensure that the same rows are being compared.
-* `exclude_columns` (optional): Any columns you wish to exclude from the validation.
-
-### Usage:
-```sql
-
-{% set old_relation = adapter.get_relation(
-      database = "old_database",
-      schema = "old_schema",
-      identifier = "fct_orders"
-) -%}
-
-{% set dbt_relation = ref('fct_orders') %}
-
-{{ audit_helper.compare_which_columns_differ(
-    a_relation = old_relation,
-    b_relation = dbt_relation,
-    exclude_columns = ["loaded_at"],
     primary_key = "order_id"
 ) }}
 
