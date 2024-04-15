@@ -23,7 +23,9 @@ New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/bu
 
 # Compare Data Outputs
 ## compare_relations ([source](macros/compare_relations.sql))
-This macro generates SQL that can be used to do a row-by-row comparison of two relations. This macro is particularly useful when you want to check that a refactored model, or a model that you are moving over from a legacy system, match up.
+This macro generates SQL that can be used to do a row-by-row comparison of two relations. This macro is particularly useful when you want to check that a refactored model (or a model that you are moving over from a legacy system) are identical.
+
+Each relation must have the same columns with the same names, but they do not have to be in the same order. Use `exclude_columns` if some columns only exist in one relation. 
 
 ### Output:
 By default, the generated query returns a summary of the count of rows that are unique to `a`, unique to `b`, and identical:
@@ -161,7 +163,7 @@ Calling this macro on two different relations will return a very simple table co
 
 # Compare Columns 
 ## compare_column_values ([source](macros/compare_column_values.sql))
-This macro generates SQL that can be used to compare a column's values across two queries. This macro is useful when you've used the `compare_queries` macro (above) and found that a significant number of your records don't match; So now you want to find the discrepancies of 1 specific column.
+This macro generates SQL that can be used to compare a column's values across two queries. This macro is useful when you've used the `compare_queries` macro (above) and found that a significant number of your records don't match and want to understand how many discrepancies are caused by a single column.
 
 ### Output:
 The generated query returns a summary of the count of rows where the column's values:
@@ -178,7 +180,7 @@ The generated query returns a summary of the count of rows where the column's va
 | 🤷: missing from b          | 20     | 0.04             |
 | 🤷: value is null in a only | 59     | 0.12             |
 | 🤷: value is null in b only | 73     | 0.15             |
-| 🙅: ‍values do not match    | 4,064  | 8.51             |
+| ❌: ‍values do not match    | 4,064  | 8.51             |
 
 ### Arguments:
 * `a_query` and `b_query`: The queries you want to compare.
@@ -227,7 +229,7 @@ By default, the generated query returns a summary of the count of rows where the
 Setting the `summarize` argument to `false` lets you check the match status of a specific column value of a specifc row:
 
 | primary_key | column_name | perfect_match  | null_in_a | null_in_b | missing_from_a | missing_from_b | conflicting_values |
-|-------||-------|-------:|------:|-----------------:|------:|------:|------:|
+|-------|-------|-------:|------:|-----------------:|------:|------:|------:|
 | 1 | order_id | true | false | false | false | false | false |
 | 1 | order_date | false | false | false | false | false | true |
 | 1 | order_status | false | true | true | false | false | false |
