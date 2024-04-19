@@ -17,3 +17,8 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 seeds:
   +quote_columns: false
+
+vars:
+  compare_queries_summarize: true
+  reworked_compare__columns: []
+  reworked_compare__event_time:

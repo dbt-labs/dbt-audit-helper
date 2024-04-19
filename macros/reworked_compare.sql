@@ -1,0 +1,112 @@
+{% macro reworked_compare(a_relation, b_relation, primary_key=[], columns=[], event_time=None, sample_limit=20) %}
+
+    {% set joined_cols = columns | join(", ") %}
+
+    {% if event_time %}
+        {% set min_max_event_time_results = audit_helper.get_comparison_bounds(a_relation, b_relation, event_time) %}
+        {% set min_event_time = min_max_event_time_results["min_event_time"] %}
+        {% set max_event_time = min_max_event_time_results["max_event_time"] %}
+    {% endif %}
+
+    with a as (
+        select 
+            *,
+            hash({{ joined_cols }}) as dbt_compare_row_hash
+        from {{ a_relation }}
+        {% if min_event_time and max_event_time %}
+            where {{ event_time }} >= '{{ min_event_time }}'
+            and {{ event_time }} <= '{{ max_event_time }}'
+        {% endif %}
+    ),
+
+    b as (
+        select 
+            *,
+            hash({{ joined_cols }}) as dbt_compare_row_hash
+        from {{ b_relation }}
+        {% if min_event_time and max_event_time %}
+            where {{ event_time }} >= '{{ min_event_time }}'
+            and {{ event_time }} <= '{{ max_event_time }}'
+        {% endif %}
+    ),
+
+    a_intersect_b as (
+
+        select * from a
+        where a.dbt_compare_row_hash in (select b.dbt_compare_row_hash from b)
+
+    ),
+
+    a_except_b as (
+
+        select * from a
+        where a.dbt_compare_row_hash not in (select b.dbt_compare_row_hash from b)
+
+    ),
+
+    b_except_a as (
+
+        select * from b
+        where b.dbt_compare_row_hash not in (select a.dbt_compare_row_hash from a)
+
+    ),
+
+    all_records as (
+
+        select
+            *,
+            true as in_a,
+            true as in_b,
+        from a_intersect_b
+
+        union all
+
+        select
+            *,
+            true as in_a,
+            false as in_b
+        from a_except_b
+
+        union all
+
+        select
+            *,
+            false as in_a,
+            true as in_b
+        from b_except_a
+
+    ),
+
+
+    classified as (
+        
+        select 
+            *,
+            case 
+                when in_a and in_b then 'identical'
+                when {{ dbt.bool_or('in_a') }} over (partition by {{ primary_key }}) 
+                    and {{ dbt.bool_or('in_b') }} over (partition by {{ primary_key }})
+                then 'modified'
+                when in_a then 'removed'
+                when in_b then 'added'
+            end as status
+        from all_records
+        order by {{ primary_key ~ ", " if primary_key is not none }} in_a desc, in_b desc
+
+    ),
+
+    final as (
+        select 
+            *,
+            count(distinct {{ primary_key }}) over (partition by status) as num_in_status,
+            dense_rank() over (partition by status order by {{ primary_key }}) as sample_number
+        from classified
+    )
+
+    select * from final
+    {% if sample_limit %}
+        where sample_number <= {{ sample_limit }}
+    {% endif %}
+    order by status, sample_number
+
+{% endmacro %}

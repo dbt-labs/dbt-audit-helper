@@ -1,0 +1,124 @@
+version: 2
+
+unit_tests:
+  - name: identical_records_compare_queries
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+        
+    expect:
+      rows:
+        - {"in_a": true, "in_b": true}
+
+    model: unit_compare_queries
+    description: The world's most basic unit test. 
+    overrides:
+      vars:
+        compare_queries_summarize: true
+
+  - name: identical_records_compare_queries_no_summarize
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+        
+    expect:
+      rows: []
+
+    model: unit_compare_queries
+    description: The world's second most basic unit test.
+    overrides:
+      vars:
+        compare_queries_summarize: false
+
+  - name: reworked_compare_identical_tables
+    model: unit_reworked_compare
+    overrides:
+      vars:
+        reworked_compare__columns: ['id', 'col1', 'col2']
+        reworked_compare__event_time:
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+        
+    expect:
+      rows:
+        - {"status": 'identical', 'id': 1, num_in_status: 3}
+        - {"status": 'identical', 'id': 2, num_in_status: 3}
+        - {"status": 'identical', 'id': 3, num_in_status: 3}
+
+  - name: reworked_compare_identical_tables_event_time_filter
+    model: unit_reworked_compare
+    overrides:
+      vars:
+        reworked_compare__columns: ['id', 'col1', 'col2', 'created_at']
+        reworked_compare__event_time: 'created_at'
+      macros: 
+        audit_helper.get_comparison_bounds:
+          "min_event_time": "2024-01-02"
+          "max_event_time": "2024-01-03"
+      
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def", "created_at": '2024-01-01' }
+          - { "id": 2, "col1": "hij", "col2": "klm", "created_at": '2024-01-02' }
+          - { "id": 3, "col1": "nop", "col2": "qrs", "created_at": '2024-01-03' }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 2, "col1": "hij", "col2": "klm", "created_at": '2024-01-02' }
+          - { "id": 3, "col1": "nop", "col2": "qrs", "created_at": '2024-01-03' }
+        
+    expect:
+      rows:
+        - {"status": 'identical', 'id': 2, num_in_status: 2}
+        - {"status": 'identical', 'id': 3, num_in_status: 2}
+
+  - name: reworked_compare_all_statuses
+    model: unit_reworked_compare
+    overrides:
+      vars:
+        reworked_compare__columns: ['id', 'col1', 'col2']
+        reworked_compare__event_time:
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "changed", "col2": "values" }
+          - { "id": 4, "col1": "nop", "col2": "qrs" }
+        
+    expect:
+      rows:
+        - {"status": 'identical', 'id': 1, num_in_status: 1}
+        - {"status": 'modified', 'id': 2, num_in_status: 1}
+        - {"status": 'modified', 'id': 2, num_in_status: 1}
+        - {"status": 'removed', 'id': 3, num_in_status: 1}
+        - {"status": 'added', 'id': 4, num_in_status: 1}
