@@ -6,50 +6,18 @@
         {% set min_max_event_time_results = audit_helper.get_comparison_bounds(a_relation, b_relation, event_time) %}
         {% set min_event_time = min_max_event_time_results["min_event_time"] %}
         {% set max_event_time = min_max_event_time_results["max_event_time"] %}
+        {% set event_time_props = {
+            "event_time": event_time,
+            "min_event_time": min_event_time,
+            "max_event_time": max_event_time
+        } %}
     {% endif %}
 
-    with a as (
-        select 
-            *,
-            hash({{ joined_cols }}) as dbt_compare_row_hash
-        from {{ a_relation }}
-        {% if min_event_time and max_event_time %}
-            where {{ event_time }} >= '{{ min_event_time }}'
-            and {{ event_time }} <= '{{ max_event_time }}'
-        {% endif %}
-    ),
+    with 
 
-    b as (
-        select 
-            *,
-            hash({{ joined_cols }}) as dbt_compare_row_hash
-        from {{ b_relation }}
-        {% if min_event_time and max_event_time %}
-            where {{ event_time }} >= '{{ min_event_time }}'
-            and {{ event_time }} <= '{{ max_event_time }}'
-        {% endif %}
-    ),
-
-    a_intersect_b as (
-
-        select * from a
-        where a.dbt_compare_row_hash in (select b.dbt_compare_row_hash from b)
-
-    ),
-
-    a_except_b as (
-
-        select * from a
-        where a.dbt_compare_row_hash not in (select b.dbt_compare_row_hash from b)
-
-    ),
-
-    b_except_a as (
-
-        select * from b
-        where b.dbt_compare_row_hash not in (select a.dbt_compare_row_hash from a)
-
-    ),
+    {{ generate_set_results(a_relation, b_relation, columns, event_time_props)}}
+    
+    ,
 
     all_records as (
 
@@ -109,4 +77,99 @@
     {% endif %}
     order by status, sample_number
 
+{% endmacro %}
+
+{% macro generate_set_results(a_relation, b_relation, columns, event_time_props=None) %}
+  {{ return(adapter.dispatch('generate_set_results', 'audit_helper')(a_relation, b_relation, columns, event_time_props)) }}
+{% endmacro %}
+
+{% macro default__generate_set_results(a_relation, b_relation, columns, event_time_props) %}
+{% set columns_joined = columns | join(", ") %}
+
+    a as (
+        select {{ columns_joined }}
+        from {{ a_relation }}
+        {% if event_time_props %}
+            where {{ event_time }} >= '{{ event_time_props["min_event_time"] }}'
+            and {{ event_time }} <= '{{ event_time_props["max_event_time"] }}'
+        {% endif %}
+    ),
+
+    b as (
+        select {{ columns_joined }}
+        from {{ b_relation }}
+        {% if event_time_props %}
+            where {{ event_time }} >= '{{ event_time_props["min_event_time"] }}'
+            and {{ event_time }} <= '{{ event_time_props["max_event_time"] }}'
+        {% endif %}
+    ),
+
+    a_intersect_b as (
+
+        select * from a
+        {{ dbt.intersect() }}
+        select * from b
+
+    ),
+
+    a_except_b as (
+
+        select * from a
+        {{ dbt.except() }}
+        select * from b
+
+    ),
+
+    b_except_a as (
+
+        select * from b
+        {{ dbt.except() }}
+        select * from a
+
+    )
+{% endmacro %}
+
+{% macro snowflake__generate_set_results(a_relation, b_relation, columns, event_time_props) %}
+    a as (
+        select 
+            *,
+            hash({{ joined_cols }}) as dbt_compare_row_hash
+        from {{ a_relation }}
+        {% if event_time_props %}
+            where {{ event_time }} >= '{{ event_time_props["min_event_time"] }}'
+            and {{ event_time }} <= '{{ event_time_props["max_event_time"] }}'
+        {% endif %}
+    ),
+
+    b as (
+        select 
+            *,
+            hash({{ joined_cols }}) as dbt_compare_row_hash
+        from {{ b_relation }}
+        {% if event_time_props %}
+            where {{ event_time }} >= '{{ event_time_props["min_event_time"] }}'
+            and {{ event_time }} <= '{{ event_time_props["max_event_time"] }}'
+        {% endif %}
+    ),
+
+    a_intersect_b as (
+
+        select * from a
+        where a.dbt_compare_row_hash in (select b.dbt_compare_row_hash from b)
+
+    ),
+
+    a_except_b as (
+
+        select * from a
+        where a.dbt_compare_row_hash not in (select b.dbt_compare_row_hash from b)
+
+    ),
+
+    b_except_a as (
+
+        select * from b
+        where b.dbt_compare_row_hash not in (select a.dbt_compare_row_hash from a)
+
+    )
 {% endmacro %}

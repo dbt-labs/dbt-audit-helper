@@ -7,7 +7,7 @@
             select min({{ event_time }}) as min_event_time, max({{ event_time }}) as max_event_time
             from {{ b_relation }}
         )
-        select max(min_event_time) as "min_event_time", min(max_event_time) as "max_event_time"
+        select max(min_event_time) as min_event_time, min(max_event_time) as max_event_time
         from min_maxes
     {% endset %}
 
@@ -15,7 +15,7 @@
     
     {% set min_max_event_time_results = {} %}
     {% for k in query_response.keys() %}
-        {% do min_max_event_time_results.update({k: query_response[k][0]}) %}
+        {% do min_max_event_time_results.update({k | lower: query_response[k][0]}) %}
     {% endfor %}
     
     {% do return(min_max_event_time_results) %}
