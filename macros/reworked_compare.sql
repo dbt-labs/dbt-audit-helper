@@ -15,7 +15,7 @@
 
     with 
 
-    {{ generate_set_results(a_relation, b_relation, columns, event_time_props)}}
+    {{ audit_helper.generate_set_results(a_relation, b_relation, columns, event_time_props)}}
     
     ,
 
@@ -84,23 +84,23 @@
 {% endmacro %}
 
 {% macro default__generate_set_results(a_relation, b_relation, columns, event_time_props) %}
-{% set columns_joined = columns | join(", ") %}
+    {% set joined_cols = columns | join(", ") %}
 
     a as (
-        select {{ columns_joined }}
+        select {{ joined_cols }}
         from {{ a_relation }}
         {% if event_time_props %}
-            where {{ event_time }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time }} <= '{{ event_time_props["max_event_time"] }}'
+            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
+            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
         {% endif %}
     ),
 
     b as (
-        select {{ columns_joined }}
+        select {{ joined_cols }}
         from {{ b_relation }}
         {% if event_time_props %}
-            where {{ event_time }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time }} <= '{{ event_time_props["max_event_time"] }}'
+            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
+            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
         {% endif %}
     ),
 
@@ -130,14 +130,15 @@
 {% endmacro %}
 
 {% macro snowflake__generate_set_results(a_relation, b_relation, columns, event_time_props) %}
+    {% set joined_cols = columns | join(", ") %}
     a as (
         select 
             *,
             hash({{ joined_cols }}) as dbt_compare_row_hash
         from {{ a_relation }}
         {% if event_time_props %}
-            where {{ event_time }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time }} <= '{{ event_time_props["max_event_time"] }}'
+            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
+            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
         {% endif %}
     ),
 
@@ -147,8 +148,8 @@
             hash({{ joined_cols }}) as dbt_compare_row_hash
         from {{ b_relation }}
         {% if event_time_props %}
-            where {{ event_time }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time }} <= '{{ event_time_props["max_event_time"] }}'
+            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
+            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
         {% endif %}
     ),
 
