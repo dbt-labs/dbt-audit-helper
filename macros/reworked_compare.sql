@@ -133,7 +133,7 @@
     {% set joined_cols = columns | join(", ") %}
     a as (
         select 
-            *,
+            {{ joined_cols }},
             hash({{ joined_cols }}) as dbt_compare_row_hash
         from {{ a_relation }}
         {% if event_time_props %}
@@ -144,7 +144,7 @@
 
     b as (
         select 
-            *,
+            {{ joined_cols }},
             hash({{ joined_cols }}) as dbt_compare_row_hash
         from {{ b_relation }}
         {% if event_time_props %}

@@ -1,0 +1,1 @@
+select 1 as id, 'xyz' as col1, 'tuv' as col2, 123 as col3, getdate() as created_at, 'pineapple' as pizza
