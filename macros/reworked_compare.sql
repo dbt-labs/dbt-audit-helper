@@ -1,6 +1,7 @@
-{% macro reworked_compare(a_query, b_query, primary_key=[], columns=[], event_time=None, sample_limit=20) %}
-
+{% macro reworked_compare(a_query, b_query, primary_key_columns=[], columns=[], event_time=None, sample_limit=20) %}
+    
     {% set joined_cols = columns | join(", ") %}
+    {% set primary_key = primary_key_columns | join(", ") }
 
     {% if event_time %}
         {% set min_max_event_time_results = audit_helper.get_comparison_bounds(a_query, b_query, event_time) %}
@@ -59,7 +60,7 @@
                 when in_b then 'added'
             end as status
         from all_records
-        order by {{ primary_key ~ ", " if primary_key is not none }} in_a desc, in_b desc
+        order by {{ primary_key }}, in_a desc, in_b desc
 
     ),
 
