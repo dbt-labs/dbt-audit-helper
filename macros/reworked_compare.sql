@@ -88,7 +88,7 @@
 
     a as (
         select {{ joined_cols }}
-        from {{ a_query }}
+        from ( {{-  a_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
@@ -97,7 +97,7 @@
 
     b as (
         select {{ joined_cols }}
-        from {{ b_query }}
+        from ( {{-  b_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
@@ -135,7 +135,7 @@
         select 
             {{ joined_cols }},
             hash({{ joined_cols }}) as dbt_compare_row_hash
-        from {{ a_query }}
+        from ( {{-  a_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
@@ -146,7 +146,7 @@
         select 
             {{ joined_cols }},
             hash({{ joined_cols }}) as dbt_compare_row_hash
-        from {{ b_query }}
+        from ( {{-  b_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
