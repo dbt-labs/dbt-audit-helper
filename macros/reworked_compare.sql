@@ -1,9 +1,9 @@
-{% macro reworked_compare(a_relation, b_relation, primary_key=[], columns=[], event_time=None, sample_limit=20) %}
+{% macro reworked_compare(a_query, b_query, primary_key=[], columns=[], event_time=None, sample_limit=20) %}
 
     {% set joined_cols = columns | join(", ") %}
 
     {% if event_time %}
-        {% set min_max_event_time_results = audit_helper.get_comparison_bounds(a_relation, b_relation, event_time) %}
+        {% set min_max_event_time_results = audit_helper.get_comparison_bounds(a_query, b_query, event_time) %}
         {% set min_event_time = min_max_event_time_results["min_event_time"] %}
         {% set max_event_time = min_max_event_time_results["max_event_time"] %}
         {% set event_time_props = {
@@ -15,7 +15,7 @@
 
     with 
 
-    {{ audit_helper.generate_set_results(a_relation, b_relation, columns, event_time_props)}}
+    {{ audit_helper.generate_set_results(a_query, b_query, columns, event_time_props)}}
     
     ,
 
@@ -79,16 +79,16 @@
 
 {% endmacro %}
 
-{% macro generate_set_results(a_relation, b_relation, columns, event_time_props=None) %}
-  {{ return(adapter.dispatch('generate_set_results', 'audit_helper')(a_relation, b_relation, columns, event_time_props)) }}
+{% macro generate_set_results(a_query, b_query, columns, event_time_props=None) %}
+  {{ return(adapter.dispatch('generate_set_results', 'audit_helper')(a_query, b_query, columns, event_time_props)) }}
 {% endmacro %}
 
-{% macro default__generate_set_results(a_relation, b_relation, columns, event_time_props) %}
+{% macro default__generate_set_results(a_query, b_query, columns, event_time_props) %}
     {% set joined_cols = columns | join(", ") %}
 
     a as (
         select {{ joined_cols }}
-        from {{ a_relation }}
+        from {{ a_query }}
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
@@ -97,7 +97,7 @@
 
     b as (
         select {{ joined_cols }}
-        from {{ b_relation }}
+        from {{ b_query }}
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
@@ -129,13 +129,13 @@
     )
 {% endmacro %}
 
-{% macro snowflake__generate_set_results(a_relation, b_relation, columns, event_time_props) %}
+{% macro snowflake__generate_set_results(a_query, b_query, columns, event_time_props) %}
     {% set joined_cols = columns | join(", ") %}
     a as (
         select 
             {{ joined_cols }},
             hash({{ joined_cols }}) as dbt_compare_row_hash
-        from {{ a_relation }}
+        from {{ a_query }}
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
@@ -146,7 +146,7 @@
         select 
             {{ joined_cols }},
             hash({{ joined_cols }}) as dbt_compare_row_hash
-        from {{ b_relation }}
+        from {{ b_query }}
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'

@@ -1,7 +1,7 @@
 {{ 
     audit_helper.reworked_compare(
-        ref('unit_test_model_a'),
-        ref('unit_test_model_b_more_cols'),
+        "select * from " ~ ref('unit_test_model_a'),
+        "select * from " ~ ref('unit_test_model_b_more_cols'),
         primary_key='id',
         columns=var('reworked_compare__columns'),
         event_time=var('reworked_compare__event_time')
