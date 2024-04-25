@@ -1,17 +1,10 @@
 {% macro reworked_compare(a_query, b_query, primary_key_columns=[], columns=[], event_time=None, sample_limit=20) %}
     
     {% set joined_cols = columns | join(", ") %}
-    {% set primary_key = primary_key_columns | join(", ") }
+    {% set primary_key = primary_key_columns | join(", ") %}
 
     {% if event_time %}
-        {% set min_max_event_time_results = audit_helper.get_comparison_bounds(a_query, b_query, event_time) %}
-        {% set min_event_time = min_max_event_time_results["min_event_time"] %}
-        {% set max_event_time = min_max_event_time_results["max_event_time"] %}
-        {% set event_time_props = {
-            "event_time": event_time,
-            "min_event_time": min_event_time,
-            "max_event_time": max_event_time
-        } %}
+        {% set event_time_props = audit_helper.get_comparison_bounds(a_query, b_query, event_time) %}
     {% endif %}
 
     with 

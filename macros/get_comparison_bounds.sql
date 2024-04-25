@@ -13,10 +13,10 @@
 
     {% set query_response = dbt_utils.get_query_results_as_dict(min_max_queries) %}
     
-    {% set min_max_event_time_results = {} %}
+    {% set event_time_props = {"event_time": event_time} %}
     {% for k in query_response.keys() %}
-        {% do min_max_event_time_results.update({k | lower: query_response[k][0]}) %}
+        {% do event_time_props.update({k | lower: query_response[k][0]}) %}
     {% endfor %}
     
-    {% do return(min_max_event_time_results) %}
+    {% do return(event_time_props) %}
 {% endmacro %}
