@@ -1,0 +1,26 @@
+unit_tests:
+  - name: reworked_compare_all_statuses_different_columns
+    model: unit_reworked_compare_column_details_mismatch
+    overrides:
+      vars:
+        reworked_compare__columns: ['id', 'col1']
+        reworked_compare__event_time:
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b_more_cols')
+        rows:
+          - { "id": 1, "col1": "abc" }
+          - { "id": 2, "col1": "changed" }
+          - { "id": 4, "col1": "nop" }
+        
+    expect:
+      rows:
+        - {"status": 'identical', 'id': 1, num_in_status: 1}
+        - {"status": 'modified', 'id': 2, num_in_status: 1}
+        - {"status": 'modified', 'id': 2, num_in_status: 1}
+        - {"status": 'removed', 'id': 3, num_in_status: 1}
+        - {"status": 'added', 'id': 4, num_in_status: 1}
