@@ -24,6 +24,7 @@ unit_tests:
       vars:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
+        reworked_compare__primary_key_columns: ['id']
 
   - name: reworked_compare_identical_tables_event_time_filter
     model: unit_reworked_compare
@@ -31,6 +32,7 @@ unit_tests:
       vars:
         reworked_compare__columns: ['id', 'col1', 'col2', 'created_at']
         reworked_compare__event_time: 'created_at'
+        reworked_compare__primary_key_columns: ['id']
       macros: 
         audit_helper.get_comparison_bounds:
           "min_event_time": "2024-01-02"
@@ -58,6 +60,7 @@ unit_tests:
       vars:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
+        reworked_compare__primary_key_columns: ['id']
     given:
       - input: ref('unit_test_model_a')
         rows:
@@ -77,3 +80,27 @@ unit_tests:
         - {"status": 'modified', 'id': 2, num_in_status: 1}
         - {"status": 'removed', 'id': 3, num_in_status: 1}
         - {"status": 'added', 'id': 4, num_in_status: 1}
+
+  - name: reworked_compare_all_statuses_multiple_pk_cols
+    model: unit_reworked_compare
+    overrides:
+      vars:
+        reworked_compare__columns: ['id', 'id_2', 'col1', 'col2']
+        reworked_compare__event_time:
+        reworked_compare__primary_key_columns: ['id', 'id_2']
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 12, "id_2": 3, "col1": "abc", "col2": "def" }
+          - { "id": 1, "id_2": 23, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "id_2": 4, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 12, "id_2": 3, "col1": "abc", "col2": "def" }
+          - { "id": 1, "id_2": 23, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "id_2": 4, "col1": "nop", "col2": "qrs" }        
+    expect:
+      rows:
+        - {"status": 'identical', 'id': 12, "id_2": 3, "num_in_status": 3}
+        - {"status": 'identical', 'id': 1, "id_2": 23, "num_in_status": 3}
+        - {"status": 'identical', 'id': 3, "id_2": 4, "num_in_status": 3}

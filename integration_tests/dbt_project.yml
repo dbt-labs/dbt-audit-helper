@@ -20,5 +20,7 @@ seeds:
 
 vars:
   compare_queries_summarize: true
+  reworked_compare__primary_key_columns: []
   reworked_compare__columns: []
   reworked_compare__event_time:
+  quick_are_queries_identical_cols: []
