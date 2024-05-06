@@ -1,6 +1,6 @@
 unit_tests:
   - name: quick_are_queries_identical_identical_tables
-    model: quick_are_queries_identical
+    model: unit_quick_are_queries_identical
     
     given:
       - input: ref('unit_test_model_a')
@@ -24,7 +24,7 @@ unit_tests:
         quick_are_queries_identical_event_time:
 
   - name: quick_are_queries_identical_identical_tables_event_time_filter
-    model: quick_are_queries_identical
+    model: unit_quick_are_queries_identical
     overrides:
       vars:
         quick_are_queries_identical_cols: ['id', 'col1', 'col2', 'created_at']
@@ -50,7 +50,7 @@ unit_tests:
         - {"are_tables_identical": true}
 
   - name: quick_are_queries_identical_differences
-    model: unit_reworked_compare
+    model: unit_quick_are_queries_identical
     overrides:
       vars:
         quick_are_queries_identical_cols: ['id', 'col1', 'col2']
