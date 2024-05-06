@@ -33,6 +33,7 @@ unit_tests:
         audit_helper.get_comparison_bounds:
           "min_event_time": "2024-01-02"
           "max_event_time": "2024-01-03"
+          "event_time": 'created_at'
       
     given:
       - input: ref('unit_test_model_a')
