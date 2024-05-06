@@ -24,3 +24,4 @@ vars:
   reworked_compare__columns: []
   reworked_compare__event_time:
   quick_are_queries_identical_cols: []
+  quick_are_queries_identical_event_time:

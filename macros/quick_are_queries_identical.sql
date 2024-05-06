@@ -10,7 +10,7 @@
 
     select count(hash_result) = 1 as are_tables_identical
     from (
-        select hash_agg(joined_cols) as hash_result
+        select hash_agg({{ joined_cols }}) as hash_result
         from ({{ query_a }})
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
@@ -19,8 +19,8 @@
 
         union 
         
-        select hash_agg(joined_cols) as hash_result
-        from analytics_dev.dbt_jlabes.fct_dbt_invocations
+        select hash_agg({{ joined_cols }}) as hash_result
+        from ({{ query_b }})
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
