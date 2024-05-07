@@ -51,7 +51,7 @@
                 then 'modified'
                 when in_a then 'removed'
                 when in_b then 'added'
-            end as status
+            end as dbt_audit_row_status
         from all_records
         order by {{ primary_key }}, in_a desc, in_b desc
 
@@ -60,16 +60,16 @@
     final as (
         select 
             *,
-            count(distinct {{ primary_key }}, dbt_audit_pk_row_num) over (partition by status) as num_in_status,
-            dense_rank() over (partition by status order by {{ primary_key }}, dbt_audit_pk_row_num) as sample_number
+            count(distinct {{ primary_key }}, dbt_audit_pk_row_num) over (partition by dbt_audit_row_status) as dbt_audit_num_rows_in_status,
+            dense_rank() over (partition by dbt_audit_row_status order by {{ primary_key }}, dbt_audit_pk_row_num) as dbt_audit_sample_number
         from classified
     )
 
     select * from final
     {% if sample_limit %}
-        where sample_number <= {{ sample_limit }}
+        where dbt_audit_sample_number <= {{ sample_limit }}
     {% endif %}
-    order by status, sample_number
+    order by dbt_audit_row_status, dbt_audit_sample_number
 
 {% endmacro %}
 
@@ -83,7 +83,8 @@
     a as (
         select 
             {{ joined_cols }}, 
-            row_number() over (partition by {{ primary_key }} order by {{ primary_key}} ) as dbt_audit_pk_row_num
+            row_number() over (partition by {{ primary_key }} order by {{ primary_key}} ) as dbt_audit_pk_row_num,
+            audit_helper.generate_surrogate_key(primary_keys + )
         from ( {{-  a_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'

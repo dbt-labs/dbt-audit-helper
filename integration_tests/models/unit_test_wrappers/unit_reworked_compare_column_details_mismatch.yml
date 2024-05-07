@@ -19,8 +19,8 @@ unit_tests:
         
     expect:
       rows:
-        - {"status": 'identical', 'id': 1, num_in_status: 1}
-        - {"status": 'modified', 'id': 2, num_in_status: 1}
-        - {"status": 'modified', 'id': 2, num_in_status: 1}
-        - {"status": 'removed', 'id': 3, num_in_status: 1}
-        - {"status": 'added', 'id': 4, num_in_status: 1}
+        - {"dbt_audit_row_status": 'identical', 'id': 1, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'removed', 'id': 3, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'added', 'id': 4, dbt_audit_num_rows_in_status: 1}
