@@ -9,7 +9,7 @@
 
     with 
 
-    {{ audit_helper.generate_set_results(a_query, b_query, columns, event_time_props)}}
+    {{ audit_helper.generate_set_results(a_query, b_query, primary_key, columns, event_time_props)}}
     
     ,
 
@@ -46,8 +46,8 @@
             *,
             case 
                 when in_a and in_b then 'identical'
-                when {{ dbt.bool_or('in_a') }} over (partition by {{ primary_key }}) 
-                    and {{ dbt.bool_or('in_b') }} over (partition by {{ primary_key }})
+                when {{ dbt.bool_or('in_a') }} over (partition by {{ primary_key }}, dbt_audit_pk_row_num) 
+                    and {{ dbt.bool_or('in_b') }} over (partition by {{ primary_key }}, dbt_audit_pk_row_num)
                 then 'modified'
                 when in_a then 'removed'
                 when in_b then 'added'
@@ -60,8 +60,8 @@
     final as (
         select 
             *,
-            count(distinct {{ primary_key }}) over (partition by status) as num_in_status,
-            dense_rank() over (partition by status order by {{ primary_key }}) as sample_number
+            count(distinct {{ primary_key }}, dbt_audit_pk_row_num) over (partition by status) as num_in_status,
+            dense_rank() over (partition by status order by {{ primary_key }}, dbt_audit_pk_row_num) as sample_number
         from classified
     )
 
@@ -73,15 +73,17 @@
 
 {% endmacro %}
 
-{% macro generate_set_results(a_query, b_query, columns, event_time_props=None) %}
-  {{ return(adapter.dispatch('generate_set_results', 'audit_helper')(a_query, b_query, columns, event_time_props)) }}
+{% macro generate_set_results(a_query, b_query, primary_key, columns, event_time_props=None) %}
+  {{ return(adapter.dispatch('generate_set_results', 'audit_helper')(a_query, b_query, primary_key, columns, event_time_props)) }}
 {% endmacro %}
 
-{% macro default__generate_set_results(a_query, b_query, columns, event_time_props) %}
+{% macro default__generate_set_results(a_query, b_query, primary_key, columns, event_time_props) %}
     {% set joined_cols = columns | join(", ") %}
 
     a as (
-        select {{ joined_cols }}
+        select 
+            {{ joined_cols }}, 
+            row_number() over (partition by {{ primary_key }} order by {{ primary_key}} ) as dbt_audit_pk_row_num
         from ( {{-  a_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
@@ -90,7 +92,9 @@
     ),
 
     b as (
-        select {{ joined_cols }}
+        select 
+            {{ joined_cols }}, 
+            row_number() over (partition by {{ primary_key }} order by {{ primary_key}} ) as dbt_audit_pk_row_num
         from ( {{-  b_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
@@ -123,12 +127,13 @@
     )
 {% endmacro %}
 
-{% macro snowflake__generate_set_results(a_query, b_query, columns, event_time_props) %}
+{% macro snowflake__generate_set_results(a_query, b_query, primary_key, columns, event_time_props) %}
     {% set joined_cols = columns | join(", ") %}
     a as (
         select 
-            {{ joined_cols }},
-            hash({{ joined_cols }}) as dbt_compare_row_hash
+            {{ joined_cols }}, 
+            row_number() over (partition by {{ primary_key }} order by {{ primary_key}} ) as dbt_audit_pk_row_num,
+            hash({{ joined_cols }}, dbt_audit_pk_row_num) as dbt_audit_row_hash
         from ( {{-  a_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
@@ -138,8 +143,9 @@
 
     b as (
         select 
-            {{ joined_cols }},
-            hash({{ joined_cols }}) as dbt_compare_row_hash
+            {{ joined_cols }}, 
+            row_number() over (partition by {{ primary_key }} order by {{ primary_key}} ) as dbt_audit_pk_row_num,
+            hash({{ joined_cols }}, dbt_audit_pk_row_num) as dbt_audit_row_hash
         from ( {{-  b_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
@@ -150,21 +156,21 @@
     a_intersect_b as (
 
         select * from a
-        where a.dbt_compare_row_hash in (select b.dbt_compare_row_hash from b)
+        where a.dbt_audit_row_hash in (select b.dbt_audit_row_hash from b)
 
     ),
 
     a_except_b as (
 
         select * from a
-        where a.dbt_compare_row_hash not in (select b.dbt_compare_row_hash from b)
+        where a.dbt_audit_row_hash not in (select b.dbt_audit_row_hash from b)
 
     ),
 
     b_except_a as (
 
         select * from b
-        where b.dbt_compare_row_hash not in (select a.dbt_compare_row_hash from a)
+        where b.dbt_audit_row_hash not in (select a.dbt_audit_row_hash from a)
 
     )
 {% endmacro %}
