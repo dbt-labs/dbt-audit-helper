@@ -55,17 +55,17 @@ jobs:
       #       dbt run --target postgres
       #       dbt test --target postgres
 
-      # - run:
-      #     name: "Run Tests - Redshift"
-      #     command: |
-      #       . dbt_venv/bin/activate
-      #       echo `pwd`
-      #       cd integration_tests
-      #       dbt deps --target redshift
-      #       dbt seed --target redshift --full-refresh
-      #       dbt compile --target redshift
-      #       dbt run --target redshift
-      #       dbt test --target redshift
+      - run:
+          name: "Run Tests - Redshift"
+          command: |
+            . dbt_venv/bin/activate
+            echo `pwd`
+            cd integration_tests
+            dbt deps --target redshift
+            dbt seed --target redshift --full-refresh
+            dbt compile --target redshift
+            dbt run --target redshift
+            dbt test --target redshift
 
       - run:
           name: "Run Tests - Snowflake"
