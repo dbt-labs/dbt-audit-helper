@@ -10,6 +10,7 @@
     {#-
         Set generation is dispatched because it's possible to get performance optimisations 
         on some platforms, while keeping the post-processing standardised
+        See https://infinitelambda.com/data-validation-refactoring-snowflake/ for an example and background
     -#}
     {{ audit_helper.generate_set_results(a_query, b_query, primary_key_columns, columns, event_time_props)}}
     

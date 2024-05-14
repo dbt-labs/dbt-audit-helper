@@ -1,3 +1,12 @@
+/*
+As described by the Infinite Lambda team here: https://infinitelambda.com/data-validation-refactoring-snowflake/
+
+Some platforms let you take a hash of the whole table, which can be very very fast compared to comparing each row. 
+
+If you run this and it returns false, you still have to run the more in-depth queries to find out what specific changes there are, 
+but it's a good way to quickly verify identical results if that's what you're expecting. 
+*/
+
 {% macro quick_are_queries_identical(query_a, query_b, columns=[], event_time=None) %}
     {{ return (adapter.dispatch('quick_are_queries_identical', 'audit_helper')(query_a, query_b, columns, event_time)) }}
 {% endmacro %}
