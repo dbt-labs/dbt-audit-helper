@@ -1,3 +1,23 @@
+/*
+The idea here is that if the event_time is set, we will only compare records enclosed in both models.
+This improves performance and allows us to compare apples to apples, instead of detecting millions/billions
+of "deletions" identified due to prod having all data while CI only has a few days' worth.
+
+In the diagram below, the thatched section is the comparison bounds. You can think of it as
+                                                         
+         greatest(model_a.min_value, model_b.min_value)  
+            least(model_a.max_value, model_b.max_value)  
+                                                         
+                 ┌────────────────────────────┐          
+  a min_value    │                a max_value │        
+    └──► ┌───────┼────────────────────┐ ◄───┘ │        
+         │       │┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼│       │        
+model_a  │       │┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼│       │ model_b
+         │       │┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼│       │        
+         └───────┼────────────────────┘       │        
+            ┌──► └────────────────────────────┘ ◄────┐ 
+           b min_value                      b max_value 
+*/
 {% macro get_comparison_bounds(a_relation, b_relation, event_time) %}
     {% set min_max_queries %}
         with min_maxes as (
