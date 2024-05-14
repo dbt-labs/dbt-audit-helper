@@ -20,7 +20,7 @@ but it's a good way to quickly verify identical results if that's what you're ex
     select count(distinct hash_result) = 1 as are_tables_identical
     from (
         select hash_agg({{ joined_cols }}) as hash_result
-        from ({{ query_a }})
+        from ({{ query_a }}) query_a_subq
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
@@ -29,7 +29,7 @@ but it's a good way to quickly verify identical results if that's what you're ex
         union all
         
         select hash_agg({{ joined_cols }}) as hash_result
-        from ({{ query_b }})
+        from ({{ query_b }}) query_b_subq
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
