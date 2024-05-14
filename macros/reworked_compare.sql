@@ -83,11 +83,10 @@
 {% macro default__generate_set_results(a_query, b_query, primary_key_columns, columns, event_time_props) %}
     {% set joined_cols = columns | join(", ") %}
 
-    a as (
+    a_base as (
         select 
             {{ joined_cols }}, 
-            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key,
-            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num
+            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key
         from ( {{-  a_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
@@ -95,16 +94,29 @@
         {% endif %}
     ),
 
-    b as (
+    b_base as (
         select 
             {{ joined_cols }}, 
-            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key,
-            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num
+            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key
         from ( {{-  b_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
         {% endif %}
+    ),
+
+    a as (
+        select 
+            *, 
+            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key) as dbt_audit_pk_row_num
+        from a_base
+    ),
+
+    b as (
+        select 
+            *, 
+            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key) as dbt_audit_pk_row_num
+        from b_base
     ),
 
     a_intersect_b as (
