@@ -63,7 +63,7 @@
     final as (
         select 
             *,
-            count(distinct dbt_audit_surrogate_key, dbt_audit_pk_row_num) over (partition by dbt_audit_row_status) as dbt_audit_num_rows_in_status,
+            count(distinct {{ dbt.concat(["dbt_audit_surrogate_key", "dbt_audit_pk_row_num"]) }}) over (partition by dbt_audit_row_status) as dbt_audit_num_rows_in_status,
             dense_rank() over (partition by dbt_audit_row_status order by dbt_audit_surrogate_key, dbt_audit_pk_row_num) as dbt_audit_sample_number
         from classified
     )
