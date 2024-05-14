@@ -1,15 +1,17 @@
 {% macro reworked_compare(a_query, b_query, primary_key_columns=[], columns=[], event_time=None, sample_limit=20) %}
     
     {% set joined_cols = columns | join(", ") %}
-    {% set primary_key = primary_key_columns | join(", ") %}
 
     {% if event_time %}
         {% set event_time_props = audit_helper.get_comparison_bounds(a_query, b_query, event_time) %}
     {% endif %}
 
     with 
-
-    {{ audit_helper.generate_set_results(a_query, b_query, primary_key, columns, event_time_props)}}
+    {#-
+        Set generation is dispatched because it's possible to get performance optimisations 
+        on some platforms, while keeping the post-processing standardised
+    -#}
+    {{ audit_helper.generate_set_results(a_query, b_query, primary_key_columns, columns, event_time_props)}}
     
     ,
 
@@ -46,22 +48,22 @@
             *,
             case 
                 when in_a and in_b then 'identical'
-                when {{ dbt.bool_or('in_a') }} over (partition by {{ primary_key }}, dbt_audit_pk_row_num) 
-                    and {{ dbt.bool_or('in_b') }} over (partition by {{ primary_key }}, dbt_audit_pk_row_num)
+                when {{ dbt.bool_or('in_a') }} over (partition by dbt_audit_surrogate_key, dbt_audit_pk_row_num) 
+                    and {{ dbt.bool_or('in_b') }} over (partition by dbt_audit_surrogate_key, dbt_audit_pk_row_num)
                 then 'modified'
                 when in_a then 'removed'
                 when in_b then 'added'
             end as dbt_audit_row_status
         from all_records
-        order by {{ primary_key }}, in_a desc, in_b desc
+        order by dbt_audit_surrogate_key, in_a desc, in_b desc
 
     ),
 
     final as (
         select 
             *,
-            count(distinct {{ primary_key }}, dbt_audit_pk_row_num) over (partition by dbt_audit_row_status) as dbt_audit_num_rows_in_status,
-            dense_rank() over (partition by dbt_audit_row_status order by {{ primary_key }}, dbt_audit_pk_row_num) as dbt_audit_sample_number
+            count(distinct dbt_audit_surrogate_key, dbt_audit_pk_row_num) over (partition by dbt_audit_row_status) as dbt_audit_num_rows_in_status,
+            dense_rank() over (partition by dbt_audit_row_status order by dbt_audit_surrogate_key, dbt_audit_pk_row_num) as dbt_audit_sample_number
         from classified
     )
 
@@ -73,18 +75,18 @@
 
 {% endmacro %}
 
-{% macro generate_set_results(a_query, b_query, primary_key, columns, event_time_props=None) %}
-  {{ return(adapter.dispatch('generate_set_results', 'audit_helper')(a_query, b_query, primary_key, columns, event_time_props)) }}
+{% macro generate_set_results(a_query, b_query, primary_key_columns, columns, event_time_props=None) %}
+  {{ return(adapter.dispatch('generate_set_results', 'audit_helper')(a_query, b_query, primary_key_columns, columns, event_time_props)) }}
 {% endmacro %}
 
-{% macro default__generate_set_results(a_query, b_query, primary_key, columns, event_time_props) %}
+{% macro default__generate_set_results(a_query, b_query, primary_key_columns, columns, event_time_props) %}
     {% set joined_cols = columns | join(", ") %}
 
     a as (
         select 
             {{ joined_cols }}, 
-            row_number() over (partition by {{ primary_key }} order by {{ primary_key}} ) as dbt_audit_pk_row_num,
-            audit_helper.generate_surrogate_key(primary_keys + )
+            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key,
+            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num
         from ( {{-  a_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
@@ -95,7 +97,8 @@
     b as (
         select 
             {{ joined_cols }}, 
-            row_number() over (partition by {{ primary_key }} order by {{ primary_key}} ) as dbt_audit_pk_row_num
+            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key,
+            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num
         from ( {{-  b_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
@@ -128,12 +131,13 @@
     )
 {% endmacro %}
 
-{% macro snowflake__generate_set_results(a_query, b_query, primary_key, columns, event_time_props) %}
+{% macro snowflake__generate_set_results(a_query, b_query, primary_key_columns, columns, event_time_props) %}
     {% set joined_cols = columns | join(", ") %}
     a as (
         select 
             {{ joined_cols }}, 
-            row_number() over (partition by {{ primary_key }} order by {{ primary_key}} ) as dbt_audit_pk_row_num,
+            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key,
+            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num,
             hash({{ joined_cols }}, dbt_audit_pk_row_num) as dbt_audit_row_hash
         from ( {{-  a_query  -}} )
         {% if event_time_props %}
@@ -145,7 +149,8 @@
     b as (
         select 
             {{ joined_cols }}, 
-            row_number() over (partition by {{ primary_key }} order by {{ primary_key}} ) as dbt_audit_pk_row_num,
+            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key,
+            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num,
             hash({{ joined_cols }}, dbt_audit_pk_row_num) as dbt_audit_row_hash
         from ( {{-  b_query  -}} )
         {% if event_time_props %}

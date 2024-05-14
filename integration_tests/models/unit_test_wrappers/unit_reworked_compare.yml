@@ -150,9 +150,9 @@ unit_tests:
         
     expect:
       rows:
+        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
         - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
 
     overrides:
       vars:
@@ -179,17 +179,13 @@ unit_tests:
         
     expect:
       rows:
-        - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
         - {"dbt_audit_row_status": 'added', 'id': , dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 3}
 
     overrides:
       vars:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
-    
-    config:
-      tags: [bq_only]
-        
