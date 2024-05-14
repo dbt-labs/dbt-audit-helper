@@ -87,7 +87,7 @@
         select 
             {{ joined_cols }}, 
             {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key
-        from ( {{-  a_query  -}} )
+        from ( {{-  a_query  -}} ) a_base_subq
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
@@ -98,7 +98,7 @@
         select 
             {{ joined_cols }}, 
             {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key
-        from ( {{-  b_query  -}} )
+        from ( {{-  b_query  -}} ) b_base_subq
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
