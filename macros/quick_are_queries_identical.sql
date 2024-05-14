@@ -8,7 +8,7 @@
         {% set event_time_props = audit_helper.get_comparison_bounds(a_query, b_query, event_time) %}
     {% endif %}
 
-    select count(hash_result) = 1 as are_tables_identical
+    select count(distinct hash_result) = 1 as are_tables_identical
     from (
         select hash_agg({{ joined_cols }}) as hash_result
         from ({{ query_a }})
@@ -17,7 +17,7 @@
             and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
         {% endif %}
 
-        union 
+        union all
         
         select hash_agg({{ joined_cols }}) as hash_result
         from ({{ query_b }})
