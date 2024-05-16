@@ -108,6 +108,7 @@ unit_tests:
 
   - name: reworked_compare_identical_tables_single_null_pk
     model: unit_reworked_compare
+    description: "`nonunique_pk` status checks whether a PK is unique. It's intended to avoid arbitrary comparisons, not protect against null records (that's what constraints or tests are for)."
     
     given:
       - input: ref('unit_test_model_a')
@@ -150,9 +151,9 @@ unit_tests:
         
     expect:
       rows:
-        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 2}
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 2}
 
     overrides:
       vars:
@@ -161,7 +162,7 @@ unit_tests:
         reworked_compare__primary_key_columns: ['id']
 
   - name: reworked_compare_identical_tables_multiple_null_pk_with_duplicate_rows
-    description: The two rows with a null ID are identical. They should both be returned as individual rows instead of being combined
+    description: All rows with a null ID are identical. They should both be returned as individual rows instead of being combined
     model: unit_reworked_compare
     
     given:
@@ -179,10 +180,10 @@ unit_tests:
         
     expect:
       rows:
-        - {"dbt_audit_row_status": 'added', 'id': , dbt_audit_num_rows_in_status: 1}
-        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'identical', 'id': , dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
 
     overrides:
       vars:
