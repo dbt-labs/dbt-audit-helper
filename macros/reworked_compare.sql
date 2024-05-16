@@ -21,7 +21,7 @@
         select
             *,
             true as in_a,
-            true as in_b,
+            true as in_b
         from a_intersect_b
 
         union all
