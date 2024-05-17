@@ -191,9 +191,6 @@ unit_tests:
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
 
-  - name: reworked_compare_struct
-    model: my_model
-
   - name: reworked_compare_all_statuses_different_column_set
     model: unit_reworked_compare
     overrides:
