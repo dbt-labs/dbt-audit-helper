@@ -17,8 +17,8 @@ unit_tests:
     expect:
       rows:
         - {"dbt_audit_row_status": 'identical', 'id': 1, dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'identical', 'id': 2, dbt_audit_num_rows_in_status: 3}
         - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'identical', 'id': 2, dbt_audit_num_rows_in_status: 3}
 
     overrides:
       vars:
@@ -76,8 +76,8 @@ unit_tests:
         
     expect:
       rows:
-        - {"dbt_audit_row_status": 'identical', 'id': 1, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'identical', 'id': 1, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'removed', 'id': 3, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'added', 'id': 4, dbt_audit_num_rows_in_status: 1}
@@ -162,7 +162,7 @@ unit_tests:
         reworked_compare__primary_key_columns: ['id']
 
   - name: reworked_compare_identical_tables_multiple_null_pk_with_duplicate_rows
-    description: All rows with a null ID are identical. They should both be returned as individual rows instead of being combined
+    description: All rows with a null ID are identical. They should be returned as individual rows instead of being combined
     model: unit_reworked_compare
     
     given:
@@ -180,13 +180,43 @@ unit_tests:
         
     expect:
       rows:
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
         - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 1}
-        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
 
     overrides:
       vars:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
+
+  - name: reworked_compare_struct
+    model: my_model
+
+  - name: reworked_compare_all_statuses_different_column_set
+    model: unit_reworked_compare
+    overrides:
+      vars:
+        reworked_compare__primary_key_columns: ['id']
+        reworked_compare__columns: ['id', 'col1']
+        reworked_compare__event_time:
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc" }
+          - { "id": 2, "col1": "ddd" }
+          - { "id": 4, "col1": "nop" }
+        
+    expect:
+      rows:
+        - {"dbt_audit_row_status": 'added', 'id': 4, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'identical', 'id': 1, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'removed', 'id': 3, dbt_audit_num_rows_in_status: 1}
