@@ -76,8 +76,8 @@ unit_tests:
         
     expect:
       rows:
-        - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'identical', 'id': 1, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'removed', 'id': 3, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'added', 'id': 4, dbt_audit_num_rows_in_status: 1}
@@ -180,10 +180,10 @@ unit_tests:
         
     expect:
       rows:
-        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
-        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
         - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 1}
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 3}
 
     overrides:
       vars:
