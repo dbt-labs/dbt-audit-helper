@@ -133,6 +133,8 @@ unit_tests:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
+    config:
+      tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
   - name: reworked_compare_identical_tables_multiple_null_pk
     model: unit_reworked_compare
@@ -160,6 +162,8 @@ unit_tests:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
+    config:
+      tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
   - name: reworked_compare_identical_tables_multiple_null_pk_with_duplicate_rows
     description: All rows with a null ID are identical. They should be returned as individual rows instead of being combined
@@ -190,6 +194,8 @@ unit_tests:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
+    config:
+      tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
   - name: reworked_compare_all_statuses_different_column_set
     model: unit_reworked_compare
