@@ -19,7 +19,7 @@ unit_tests:
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
     config:
-      tags: "{{ 'works_on_my_machine' if (target.type in ['bq', 'redshift']) else 'skip' }}"
+      tags: "{{ 'skip' if (target.type in ['redshift']) else 'runnable' }}"
 
   - name: unit_reworked_compare_struct_identical_values_different_order
     model: unit_reworked_compare_struct

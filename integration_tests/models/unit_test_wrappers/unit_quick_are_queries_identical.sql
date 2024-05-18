@@ -1,4 +1,4 @@
-{{ config(tags=['skip' if target.type in ('redshift') else 'runnable']) }}
+{{ config(tags=['skip' if (target.type in ['redshift']) else 'runnable']) }}
 
 {{ 
     audit_helper.quick_are_queries_identical(
