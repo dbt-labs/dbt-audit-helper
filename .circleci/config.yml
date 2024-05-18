@@ -52,8 +52,8 @@ jobs:
       #       dbt deps --target postgres
       #       dbt seed --target postgres --full-refresh
       #       dbt compile --target postgres
-      #       dbt run --target postgres --exclude tag:skip+ temporary_skip+
-      #       dbt test --target postgres --exclude tag:skip+ temporary_skip+
+      #       dbt run --target postgres --exclude tag:skip+ tag:temporary_skip+
+      #       dbt test --target postgres --exclude tag:skip+ tag:temporary_skip+
 
       - run:
           name: "Run Tests - Redshift"
@@ -64,8 +64,8 @@ jobs:
             dbt deps --target redshift
             dbt seed --target redshift --full-refresh
             dbt compile --target redshift
-            dbt run --target redshift --exclude tag:skip+ temporary_skip+
-            dbt test --target redshift --exclude tag:skip+ temporary_skip+
+            dbt run --target redshift --exclude tag:skip+ tag:temporary_skip+
+            dbt test --target redshift --exclude tag:skip+ tag:temporary_skip+
 
       - run:
           name: "Run Tests - Snowflake"
@@ -76,8 +76,8 @@ jobs:
             dbt deps --target snowflake
             dbt seed --target snowflake --full-refresh
             dbt compile --target snowflake
-            dbt run --target snowflake --exclude tag:skip+ temporary_skip+
-            dbt test --target snowflake --exclude tag:skip+ temporary_skip+
+            dbt run --target snowflake --exclude tag:skip+ tag:temporary_skip+
+            dbt test --target snowflake --exclude tag:skip+ tag:temporary_skip+
 
       - run:
           name: "Run Tests - BigQuery"
@@ -91,8 +91,8 @@ jobs:
             dbt deps --target bigquery
             dbt seed --target bigquery --full-refresh
             dbt compile --target bigquery
-            dbt run --target bigquery --full-refresh --exclude tag:skip+ temporary_skip+
-            dbt test --target bigquery --exclude tag:skip+ temporary_skip+
+            dbt run --target bigquery --full-refresh --exclude tag:skip+ tag:temporary_skip+
+            dbt test --target bigquery --exclude tag:skip+ tag:temporary_skip+
 
 
       - save_cache:
