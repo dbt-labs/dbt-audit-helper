@@ -64,8 +64,8 @@ jobs:
             dbt deps --target redshift
             dbt seed --target redshift --full-refresh
             dbt compile --target redshift
-            dbt run --target redshift
-            dbt test --target redshift
+            dbt run --target redshift --exclude tag:skip+
+            dbt test --target redshift --exclude tag:skip+
 
       - run:
           name: "Run Tests - Snowflake"

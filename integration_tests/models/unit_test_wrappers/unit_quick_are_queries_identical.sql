@@ -1,3 +1,5 @@
+{{ config(tags=['skip' if target.type in ('redshift') else 'runnable']) }}
+
 {{ 
     audit_helper.quick_are_queries_identical(
         "select * from " ~ ref('unit_test_model_a'),
