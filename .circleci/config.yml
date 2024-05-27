@@ -33,7 +33,8 @@ jobs:
             . dbt_venv/bin/activate
 
             python -m pip install --upgrade pip setuptools
-            python -m pip install --pre dbt-core dbt-postgres dbt-redshift dbt-snowflake dbt-bigquery dbt-databricks
+            python -m pip install --pre dbt-postgres dbt-redshift dbt-snowflake dbt-bigquery dbt-databricks
+            python -m pip install git+https://github.com/dbt-labs/dbt-core.git@main
 
             mkdir -p ~/.dbt
             cp integration_tests/ci/sample.profiles.yml ~/.dbt/profiles.yml
