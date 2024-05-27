@@ -33,7 +33,7 @@ jobs:
             . dbt_venv/bin/activate
 
             python -m pip install --upgrade pip setuptools
-            python -m pip install --pre dbt-core dbt-postgres dbt-redshift dbt-snowflake dbt-bigquery
+            python -m pip install --pre dbt-core dbt-postgres dbt-redshift dbt-snowflake dbt-bigquery dbt-databricks
 
             mkdir -p ~/.dbt
             cp integration_tests/ci/sample.profiles.yml ~/.dbt/profiles.yml
@@ -94,6 +94,17 @@ jobs:
             dbt run --target bigquery --full-refresh --exclude tag:skip+ tag:temporary_skip+
             dbt test --target bigquery --exclude tag:skip+ tag:temporary_skip+
 
+      - run:
+          name: "Run Tests - Databricks"
+          command: |
+            . dbt_venv/bin/activate
+            echo `pwd`
+            cd integration_tests
+            dbt deps --target databricks
+            dbt seed --target databricks --full-refresh
+            dbt compile --target databricks
+            dbt run --target databricks --exclude tag:skip+ tag:temporary_skip+
+            dbt test --target databricks --exclude tag:skip+ tag:temporary_skip+
 
       - save_cache:
           key: deps1-{{ .Branch }}
@@ -115,3 +126,4 @@ workflows:
             - profile-redshift
             - profile-snowflake
             - profile-bigquery
+            - profile-databricks
