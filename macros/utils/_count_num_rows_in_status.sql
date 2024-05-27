@@ -11,11 +11,11 @@
 {% endmacro %}
 
 {%- macro postgres___count_num_rows_in_status() -%}
-    _count_num_rows_in_status_without_distinct_window_func()
+    {{ audit_helper._count_num_rows_in_status_without_distinct_window_func() }}
 {% endmacro %}
 
 {%- macro databricks___count_num_rows_in_status() -%}
-    _count_num_rows_in_status_without_distinct_window_func()
+    {{ audit_helper._count_num_rows_in_status_without_distinct_window_func() }}
 {% endmacro %}
 
 {% macro _count_num_rows_in_status_without_distinct_window_func() %}
