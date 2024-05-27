@@ -51,7 +51,6 @@ jobs:
             cd integration_tests
             dbt deps --target postgres
             dbt seed --target postgres --full-refresh
-            dbt compile --target postgres
             dbt run --target postgres --exclude tag:skip+ tag:temporary_skip+
             dbt test --target postgres --exclude tag:skip+ tag:temporary_skip+
 
@@ -63,7 +62,6 @@ jobs:
             cd integration_tests
             dbt deps --target redshift
             dbt seed --target redshift --full-refresh
-            dbt compile --target redshift
             dbt run --target redshift --exclude tag:skip+ tag:temporary_skip+
             dbt test --target redshift --exclude tag:skip+ tag:temporary_skip+
 
@@ -75,7 +73,6 @@ jobs:
             cd integration_tests
             dbt deps --target snowflake
             dbt seed --target snowflake --full-refresh
-            dbt compile --target snowflake
             dbt run --target snowflake --exclude tag:skip+ tag:temporary_skip+
             dbt test --target snowflake --exclude tag:skip+ tag:temporary_skip+
 
@@ -90,7 +87,6 @@ jobs:
             cd integration_tests
             dbt deps --target bigquery
             dbt seed --target bigquery --full-refresh
-            dbt compile --target bigquery
             dbt run --target bigquery --full-refresh --exclude tag:skip+ tag:temporary_skip+
             dbt test --target bigquery --exclude tag:skip+ tag:temporary_skip+
 
@@ -102,7 +98,6 @@ jobs:
             cd integration_tests
             dbt deps --target databricks
             dbt seed --target databricks --full-refresh
-            dbt compile --target databricks
             dbt run --target databricks --exclude tag:skip+ tag:temporary_skip+
             dbt test --target databricks --exclude tag:skip+ tag:temporary_skip+
 
