@@ -7,11 +7,11 @@
 {% endmacro %}
 
 {%- macro bigquery___count_num_rows_in_status() -%}
-    {{ _count_num_rows_in_status_concat() }}
+    {{ audit_helper._count_num_rows_in_status_concat() }}
 {% endmacro %}
 
 {%- macro postgres___count_num_rows_in_status() -%}
-    {{ _count_num_rows_in_status_concat() }}
+    {{ audit_helper._count_num_rows_in_status_concat() }}
 {% endmacro %}
 
 {%- macro redshift___count_num_rows_in_status() -%}
