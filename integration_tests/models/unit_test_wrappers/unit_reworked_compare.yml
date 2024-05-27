@@ -167,7 +167,7 @@ unit_tests:
     config:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
-  - name: reworked_compare_identical_tables_multiple_null_pk_with_duplicate_rows
+  - name: reworked_compare_identical_tables_multi_null_pk_dupe_rows
     description: All rows with a null ID are identical. They should be returned as individual rows instead of being combined
     model: unit_reworked_compare
     
