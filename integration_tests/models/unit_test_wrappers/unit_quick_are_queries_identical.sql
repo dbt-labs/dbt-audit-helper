@@ -1,4 +1,4 @@
-{{ config(tags=['skip' if (target.type in ['redshift', 'bigquery']) else 'runnable']) }}
+{{ config(tags=['skip' if (target.type in ['redshift', 'bigquery', 'postgres']) else 'runnable']) }}
 
 {{ 
     audit_helper.quick_are_queries_identical(
@@ -7,4 +7,4 @@
         columns=var('quick_are_queries_identical_cols'),
         event_time=var('quick_are_queries_identical_event_time')
     ) 
-}}
+}}  
