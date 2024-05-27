@@ -1,0 +1,47 @@
+unit_tests:
+  - name: identical_records_compare_queries
+    model: unit_compare_queries
+    description: The world's most basic unit test. 
+
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+    
+    expect:
+      rows:
+        - {"in_a": true, "in_b": true}
+
+    overrides:
+      vars:
+        compare_queries_summarize: true
+
+  - name: identical_records_compare_queries_no_summarize
+    model: unit_compare_queries
+    description: The world's second most basic unit test.
+
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+        
+    expect:
+      rows: []
+
+    overrides:
+      vars:
+        compare_queries_summarize: false
