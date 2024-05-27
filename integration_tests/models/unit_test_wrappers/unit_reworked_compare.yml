@@ -81,8 +81,8 @@ unit_tests:
         - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'removed', 'id': 3, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'added', 'id': 4, dbt_audit_num_rows_in_status: 1}
-    # config:
-    #   tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-core/issues/10167
+    config:
+      tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-core/issues/10167
 
   - name: reworked_compare_identical_tables_multiple_pk_cols
     model: unit_reworked_compare
@@ -135,8 +135,8 @@ unit_tests:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
-    # config:
-    #   tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
+    config:
+      tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
   - name: reworked_compare_identical_tables_multiple_null_pk
     model: unit_reworked_compare
@@ -164,8 +164,8 @@ unit_tests:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
-    # config:
-    #   tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
+    config:
+      tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
   - name: reworked_compare_identical_tables_multi_null_pk_dupe_rows
     description: All rows with a null ID are identical. They should be returned as individual rows instead of being combined
@@ -196,8 +196,8 @@ unit_tests:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
-    # config:
-    #   tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
+    config:
+      tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
   - name: reworked_compare_all_statuses_different_column_set
     model: unit_reworked_compare
@@ -225,5 +225,5 @@ unit_tests:
         - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'modified', 'id': 2, dbt_audit_num_rows_in_status: 1}
         - {"dbt_audit_row_status": 'removed', 'id': 3, dbt_audit_num_rows_in_status: 1}
-    # config:
-    #   tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-core/issues/10167
+    config:
+      tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-core/issues/10167
