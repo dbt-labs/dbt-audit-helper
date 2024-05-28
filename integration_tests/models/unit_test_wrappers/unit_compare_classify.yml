@@ -1,6 +1,6 @@
 unit_tests:
   - name: compare_classify_identical_tables
-    model: unit_reworked_compare
+    model: unit_compare_classify
     
     given:
       - input: ref('unit_test_model_a')
@@ -27,7 +27,7 @@ unit_tests:
         compare_classify__primary_key_columns: ['id']
 
   - name: compare_classify_identical_tables_event_time_filter
-    model: unit_reworked_compare
+    model: unit_compare_classify
     overrides:
       vars:
         compare_classify__columns: ['id', 'col1', 'col2', 'created_at']
@@ -56,7 +56,7 @@ unit_tests:
         - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 2}
     
   - name: compare_classify_all_statuses
-    model: unit_reworked_compare
+    model: unit_compare_classify
     overrides:
       vars:
         compare_classify__columns: ['id', 'col1', 'col2']
@@ -85,7 +85,7 @@ unit_tests:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-core/issues/10167
 
   - name: compare_classify_identical_tables_multiple_pk_cols
-    model: unit_reworked_compare
+    model: unit_compare_classify
     overrides:
       vars:
         compare_classify__columns: ['id', 'id_2', 'col1', 'col2']
@@ -109,7 +109,7 @@ unit_tests:
         - {"dbt_audit_row_status": 'identical', 'id': 3, "id_2": 4, "dbt_audit_num_rows_in_status": 3}
 
   - name: compare_classify_identical_tables_single_null_pk
-    model: unit_reworked_compare
+    model: unit_compare_classify
     description: "`nonunique_pk` status checks whether a PK is unique. It's intended to avoid arbitrary comparisons, not protect against null records (that's what constraints or tests are for)."
     
     given:
@@ -139,7 +139,7 @@ unit_tests:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
   - name: compare_classify_identical_tables_multiple_null_pk
-    model: unit_reworked_compare
+    model: unit_compare_classify
     
     given:
       - input: ref('unit_test_model_a')
@@ -169,7 +169,7 @@ unit_tests:
 
   - name: compare_classify_identical_tables_multi_null_pk_dupe_rows
     description: All rows with a null ID are identical. They should be returned as individual rows instead of being combined
-    model: unit_reworked_compare
+    model: unit_compare_classify
     
     given:
       - input: ref('unit_test_model_a')
@@ -200,7 +200,7 @@ unit_tests:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
   - name: compare_classify_all_statuses_different_column_set
-    model: unit_reworked_compare
+    model: unit_compare_classify
     overrides:
       vars:
         compare_classify__primary_key_columns: ['id']
