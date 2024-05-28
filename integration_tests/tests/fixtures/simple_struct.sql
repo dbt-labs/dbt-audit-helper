@@ -1,5 +1,3 @@
-{{ config(tags=['skip' if (target.type in ['postgres']) else 'runnable']) }}
-
 select 
     1 as id, 
     'John Doe' as col1, 
