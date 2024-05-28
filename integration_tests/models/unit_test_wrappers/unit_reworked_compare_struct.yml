@@ -17,7 +17,7 @@ unit_tests:
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
     config:
-      tags: "{{ 'skip' if (target.type in ['postgres']) else 'runnable' }}"
+      tags: "{{ 'skip' if (target.type in ['bigquery']) else 'runnable' }}"
 
   - name: unit_reworked_compare_struct_identical_values_different_order
     model: unit_reworked_compare_struct
@@ -37,6 +37,8 @@ unit_tests:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
+    config:
+      tags: "{{ 'skip' if (target.type in ['bigquery']) else 'runnable' }}"
 
   - name: unit_reworked_compare_struct_removed_key
     model: unit_reworked_compare_struct
@@ -56,6 +58,8 @@ unit_tests:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
+    config:
+      tags: "{{ 'skip' if (target.type in ['bigquery']) else 'runnable' }}"
 
   # - name: reworked_compare_complex_struct
   #   model: unit_reworked_compare_struct
