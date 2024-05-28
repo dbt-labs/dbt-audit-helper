@@ -20,9 +20,9 @@ seeds:
 
 vars:
   compare_queries_summarize: true
-  reworked_compare__primary_key_columns: ['col1']
-  reworked_compare__columns: ['col1']
-  reworked_compare__event_time:
+  compare_classify__primary_key_columns: ['col1']
+  compare_classify__columns: ['col1']
+  compare_classify__event_time:
   quick_are_queries_identical_cols: ['col1']
   quick_are_queries_identical_event_time:
 

@@ -1,5 +1,3 @@
-{{ config(tags=['skip' if (target.type in ['postgres']) else 'runnable']) }}
-
 {% if target.name != 'redshift' %}
 
 select 

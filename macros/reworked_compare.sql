@@ -1,4 +1,4 @@
-{% macro reworked_compare(a_query, b_query, primary_key_columns=[], columns=[], event_time=None, sample_limit=20) %}
+{% macro compare_and_classify_query_results(a_query, b_query, primary_key_columns=[], columns=[], event_time=None, sample_limit=20) %}
     
     {% set joined_cols = columns | join(", ") %}
 
@@ -38,7 +38,6 @@
 
     ),
 
-
     classified as (
         select 
             *,
@@ -50,6 +49,8 @@
         select 
             *,
             {{ audit_helper._count_num_rows_in_status() }} as dbt_audit_num_rows_in_status,
+            -- using dense_rank so that modified rows (which have a full row for both the left and right side) both get picked up in the sample. 
+            -- For every other type this is equivalent to a row_number()
             dense_rank() over (partition by dbt_audit_row_status order by dbt_audit_surrogate_key, dbt_audit_pk_row_num) as dbt_audit_sample_number
         from classified
     )
