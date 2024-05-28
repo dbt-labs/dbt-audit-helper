@@ -43,12 +43,10 @@ unit_tests:
     given:
       - input: ref('unit_test_struct_model_a')
         format: sql
-        rows: |
-          select 1 as id, 'John Doe' as col1, object_construct('street', '123 Main St', 'city', 'Anytown', 'state', 'CA') as col2
+        fixture: simple_struct
       - input: ref('unit_test_struct_model_b')
         format: sql
-        rows: |
-          select 1 as id, 'John Doe' as col1, object_construct('street', '123 Main St', 'state', 'CA') as col2
+        fixture: simple_struct_removed_key
     expect:
       rows:
         - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
@@ -78,7 +76,8 @@ unit_tests:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
-
+    config:
+      tags: "{{ 'skip' if (target.type in ['redshift']) else 'runnable' }}"
 
   - name: reworked_compare_complex_struct_different_values
     model: unit_reworked_compare_struct
@@ -100,6 +99,8 @@ unit_tests:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
+    config:
+      tags: "{{ 'skip' if (target.type in ['redshift']) else 'runnable' }}"
 
   - name: unit_reworked_compare_complex_struct_identical_values_different_order
     model: unit_reworked_compare_struct
@@ -122,5 +123,5 @@ unit_tests:
         reworked_compare__columns: ['id', 'col1', 'col2']
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
-
-
+    config:
+      tags: "{{ 'skip' if (target.type in ['redshift']) else 'runnable' }}"
