@@ -7,7 +7,8 @@
         map
     {%- elif target.type == 'redshift' -%}
         json_build_object
-    {%- else -%}
+    {%- elif execute -%}
+        {# Only raise exception if it's actually being called, not during parsing #}
         {%- do exceptions.raise_compiler_error("Unknown adapter '"~ target.type ~ "'")-%}
     {%- endif -%}
 {%- endmacro -%}
