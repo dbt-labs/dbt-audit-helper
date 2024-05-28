@@ -17,7 +17,7 @@ unit_tests:
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
     config:
-      tags: "{{ 'skip' if (target.type in ['bigquery']) else 'runnable' }}"
+      tags: "{{ 'skip' if (target.type in ['bigquery']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
 
   - name: unit_reworked_compare_struct_identical_values_different_order
     model: unit_reworked_compare_struct
@@ -38,7 +38,7 @@ unit_tests:
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
     config:
-      tags: "{{ 'skip' if (target.type in ['bigquery']) else 'runnable' }}"
+      tags: "{{ 'skip' if (target.type in ['bigquery']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
 
   - name: unit_reworked_compare_struct_removed_key
     model: unit_reworked_compare_struct
@@ -59,73 +59,73 @@ unit_tests:
         reworked_compare__event_time:
         reworked_compare__primary_key_columns: ['id']
     config:
-      tags: "{{ 'skip' if (target.type in ['bigquery']) else 'runnable' }}"
+      tags: "{{ 'skip' if (target.type in ['bigquery']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
 
-  # - name: reworked_compare_complex_struct
-  #   model: unit_reworked_compare_struct
-  #   given:
-  #     - input: ref('unit_test_struct_model_a')
-  #       format: sql
-  #       rows: |
-  #         select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
-  #     - input: ref('unit_test_struct_model_b')
-  #       format: sql
-  #       rows: |
-  #         select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
-  #   expect:
-  #     rows:
-  #       - {"id": 1, "dbt_audit_row_status": "identical", "dbt_audit_num_rows_in_status": 1}
-  #   overrides:
-  #     vars:
-  #       reworked_compare__columns: ['id', 'col1', 'col2']
-  #       reworked_compare__event_time:
-  #       reworked_compare__primary_key_columns: ['id']
-  #   config:
-  #     tags: "{{ 'skip' if (target.type in ['redshift']) else 'runnable' }}"
+  - name: reworked_compare_complex_struct
+    model: unit_reworked_compare_struct
+    given:
+      - input: ref('unit_test_struct_model_a')
+        format: sql
+        rows: |
+          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+      - input: ref('unit_test_struct_model_b')
+        format: sql
+        rows: |
+          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+    expect:
+      rows:
+        - {"id": 1, "dbt_audit_row_status": "identical", "dbt_audit_num_rows_in_status": 1}
+    overrides:
+      vars:
+        reworked_compare__columns: ['id', 'col1', 'col2']
+        reworked_compare__event_time:
+        reworked_compare__primary_key_columns: ['id']
+    config:
+      tags: "{{ 'skip' if (target.type in ['redshift', 'bigquery', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
 
-  # - name: reworked_compare_complex_struct_different_values
-  #   model: unit_reworked_compare_struct
-  #   given:
-  #     - input: ref('unit_test_struct_model_a')
-  #       format: sql
-  #       rows: |
-  #         select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
-  #     - input: ref('unit_test_struct_model_b')
-  #       format: sql
-  #       rows: |
-  #         select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.smith@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
-  #   expect:
-  #     rows:
-  #       - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
-  #       - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
-  #   overrides:
-  #     vars:
-  #       reworked_compare__columns: ['id', 'col1', 'col2']
-  #       reworked_compare__event_time:
-  #       reworked_compare__primary_key_columns: ['id']
-  #   config:
-  #     tags: "{{ 'skip' if (target.type in ['redshift']) else 'runnable' }}"
+  - name: reworked_compare_complex_struct_different_values
+    model: unit_reworked_compare_struct
+    given:
+      - input: ref('unit_test_struct_model_a')
+        format: sql
+        rows: |
+          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+      - input: ref('unit_test_struct_model_b')
+        format: sql
+        rows: |
+          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.smith@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+    expect:
+      rows:
+        - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
+        - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
+    overrides:
+      vars:
+        reworked_compare__columns: ['id', 'col1', 'col2']
+        reworked_compare__event_time:
+        reworked_compare__primary_key_columns: ['id']
+    config:
+      tags: "{{ 'skip' if (target.type in ['redshift', 'bigquery', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
 
-  # - name: unit_reworked_compare_complex_struct_identical_values_different_order
-  #   model: unit_reworked_compare_struct
-  #   description: Snowflake sorts objects' keys alphabetically, but respects the order items are added to arrays so differences are detected.
-  #   given:
-  #     - input: ref('unit_test_struct_model_a')
-  #       format: sql
-  #       rows: |
-  #         select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
-  #     - input: ref('unit_test_struct_model_b')
-  #       format: sql
-  #       rows: |
-  #         select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'work', 'number', '987-654-3210'), object_construct('type', 'home', 'number', '123-456-7890'))) as col2
-  #   expect:
-  #     rows:
-  #       - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
-  #       - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
-  #   overrides:
-  #     vars:
-  #       reworked_compare__columns: ['id', 'col1', 'col2']
-  #       reworked_compare__event_time:
-  #       reworked_compare__primary_key_columns: ['id']
-  #   config:
-  #     tags: "{{ 'skip' if (target.type in ['redshift']) else 'runnable' }}"
+  - name: unit_reworked_compare_complex_struct_identical_values_different_order
+    model: unit_reworked_compare_struct
+    description: Snowflake sorts objects' keys alphabetically, but respects the order items are added to arrays so differences are detected.
+    given:
+      - input: ref('unit_test_struct_model_a')
+        format: sql
+        rows: |
+          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+      - input: ref('unit_test_struct_model_b')
+        format: sql
+        rows: |
+          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'work', 'number', '987-654-3210'), object_construct('type', 'home', 'number', '123-456-7890'))) as col2
+    expect:
+      rows:
+        - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
+        - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
+    overrides:
+      vars:
+        reworked_compare__columns: ['id', 'col1', 'col2']
+        reworked_compare__event_time:
+        reworked_compare__primary_key_columns: ['id']
+    config:
+      tags: "{{ 'skip' if (target.type in ['redshift', 'bigquery', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
