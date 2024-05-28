@@ -1,4 +1,4 @@
-{% macro reworked_compare(a_query, b_query, primary_key_columns=[], columns=[], event_time=None, sample_limit=20) %}
+{% macro compare_and_classify_query_results(a_query, b_query, primary_key_columns=[], columns=[], event_time=None, sample_limit=20) %}
     
     {% set joined_cols = columns | join(", ") %}
 

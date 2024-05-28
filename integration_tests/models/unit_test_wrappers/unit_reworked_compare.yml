@@ -1,5 +1,5 @@
 unit_tests:
-  - name: reworked_compare_identical_tables
+  - name: compare_classify_identical_tables
     model: unit_reworked_compare
     
     given:
@@ -22,17 +22,17 @@ unit_tests:
 
     overrides:
       vars:
-        reworked_compare__columns: ['id', 'col1', 'col2']
-        reworked_compare__event_time:
-        reworked_compare__primary_key_columns: ['id']
+        compare_classify__columns: ['id', 'col1', 'col2']
+        compare_classify__event_time:
+        compare_classify__primary_key_columns: ['id']
 
-  - name: reworked_compare_identical_tables_event_time_filter
+  - name: compare_classify_identical_tables_event_time_filter
     model: unit_reworked_compare
     overrides:
       vars:
-        reworked_compare__columns: ['id', 'col1', 'col2', 'created_at']
-        reworked_compare__event_time: 'created_at'
-        reworked_compare__primary_key_columns: ['id']
+        compare_classify__columns: ['id', 'col1', 'col2', 'created_at']
+        compare_classify__event_time: 'created_at'
+        compare_classify__primary_key_columns: ['id']
       macros: 
         audit_helper.get_comparison_bounds:
           "min_event_time": "2024-01-02"
@@ -55,13 +55,13 @@ unit_tests:
         - {"dbt_audit_row_status": 'identical', 'id': 2, dbt_audit_num_rows_in_status: 2}
         - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 2}
     
-  - name: reworked_compare_all_statuses
+  - name: compare_classify_all_statuses
     model: unit_reworked_compare
     overrides:
       vars:
-        reworked_compare__columns: ['id', 'col1', 'col2']
-        reworked_compare__event_time:
-        reworked_compare__primary_key_columns: ['id']
+        compare_classify__columns: ['id', 'col1', 'col2']
+        compare_classify__event_time:
+        compare_classify__primary_key_columns: ['id']
     given:
       - input: ref('unit_test_model_a')
         rows:
@@ -84,13 +84,13 @@ unit_tests:
     config:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-core/issues/10167
 
-  - name: reworked_compare_identical_tables_multiple_pk_cols
+  - name: compare_classify_identical_tables_multiple_pk_cols
     model: unit_reworked_compare
     overrides:
       vars:
-        reworked_compare__columns: ['id', 'id_2', 'col1', 'col2']
-        reworked_compare__event_time:
-        reworked_compare__primary_key_columns: ['id', 'id_2']
+        compare_classify__columns: ['id', 'id_2', 'col1', 'col2']
+        compare_classify__event_time:
+        compare_classify__primary_key_columns: ['id', 'id_2']
     given:
       - input: ref('unit_test_model_a')
         rows:
@@ -108,7 +108,7 @@ unit_tests:
         - {"dbt_audit_row_status": 'identical', 'id': 1, "id_2": 23, "dbt_audit_num_rows_in_status": 3}
         - {"dbt_audit_row_status": 'identical', 'id': 3, "id_2": 4, "dbt_audit_num_rows_in_status": 3}
 
-  - name: reworked_compare_identical_tables_single_null_pk
+  - name: compare_classify_identical_tables_single_null_pk
     model: unit_reworked_compare
     description: "`nonunique_pk` status checks whether a PK is unique. It's intended to avoid arbitrary comparisons, not protect against null records (that's what constraints or tests are for)."
     
@@ -132,13 +132,13 @@ unit_tests:
 
     overrides:
       vars:
-        reworked_compare__columns: ['id', 'col1', 'col2']
-        reworked_compare__event_time:
-        reworked_compare__primary_key_columns: ['id']
+        compare_classify__columns: ['id', 'col1', 'col2']
+        compare_classify__event_time:
+        compare_classify__primary_key_columns: ['id']
     config:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
-  - name: reworked_compare_identical_tables_multiple_null_pk
+  - name: compare_classify_identical_tables_multiple_null_pk
     model: unit_reworked_compare
     
     given:
@@ -161,13 +161,13 @@ unit_tests:
 
     overrides:
       vars:
-        reworked_compare__columns: ['id', 'col1', 'col2']
-        reworked_compare__event_time:
-        reworked_compare__primary_key_columns: ['id']
+        compare_classify__columns: ['id', 'col1', 'col2']
+        compare_classify__event_time:
+        compare_classify__primary_key_columns: ['id']
     config:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
-  - name: reworked_compare_identical_tables_multi_null_pk_dupe_rows
+  - name: compare_classify_identical_tables_multi_null_pk_dupe_rows
     description: All rows with a null ID are identical. They should be returned as individual rows instead of being combined
     model: unit_reworked_compare
     
@@ -193,19 +193,19 @@ unit_tests:
 
     overrides:
       vars:
-        reworked_compare__columns: ['id', 'col1', 'col2']
-        reworked_compare__event_time:
-        reworked_compare__primary_key_columns: ['id']
+        compare_classify__columns: ['id', 'col1', 'col2']
+        compare_classify__event_time:
+        compare_classify__primary_key_columns: ['id']
     config:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
-  - name: reworked_compare_all_statuses_different_column_set
+  - name: compare_classify_all_statuses_different_column_set
     model: unit_reworked_compare
     overrides:
       vars:
-        reworked_compare__primary_key_columns: ['id']
-        reworked_compare__columns: ['id', 'col1']
-        reworked_compare__event_time:
+        compare_classify__primary_key_columns: ['id']
+        compare_classify__columns: ['id', 'col1']
+        compare_classify__event_time:
     given:
       - input: ref('unit_test_model_a')
         rows:
