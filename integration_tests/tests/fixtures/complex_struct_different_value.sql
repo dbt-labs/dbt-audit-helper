@@ -5,4 +5,4 @@
 select 
     1 as id, 
     'John Doe' as col1, 
-    {{ _complex_json_function(json) }} as col2
+    {{ audit_helper_integration_tests._complex_json_function(json) }} as col2
