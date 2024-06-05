@@ -137,6 +137,8 @@
 
 {% macro databricks___generate_set_results(a_query, b_query, primary_key_columns, columns, event_time_props) %}
     {% set cast_columns = [] %}
+    {# Map types can't be compared by default (you need to opt in to a legacy behaviour flag) #}
+    {# so everything needs to be cast as a string first :( #}
     {% for col in columns %}
         {% do cast_columns.append(dbt.cast(col, api.Column.translate_type("string"))) %}
     {% endfor %}

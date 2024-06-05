@@ -38,57 +38,57 @@ jobs:
             mkdir -p ~/.dbt
             cp integration_tests/ci/sample.profiles.yml ~/.dbt/profiles.yml
 
-      # - run:
-      #     name: "Run Tests - Postgres"
-      #     environment:
-      #       POSTGRES_TEST_HOST: localhost
-      #       POSTGRES_TEST_USER: root
-      #       POSTGRES_TEST_PASS: ''
-      #       POSTGRES_TEST_PORT: 5432
-      #       POSTGRES_TEST_DBNAME: circle_test
-      #     command: |
-      #       . dbt_venv/bin/activate
-      #       cd integration_tests
-      #       dbt deps --target postgres
-      #       dbt seed --target postgres --full-refresh
-      #       dbt run --target postgres --exclude tag:skip+ tag:temporary_skip+
-      #       dbt test --target postgres --exclude tag:skip+ tag:temporary_skip+
+      - run:
+          name: "Run Tests - Postgres"
+          environment:
+            POSTGRES_TEST_HOST: localhost
+            POSTGRES_TEST_USER: root
+            POSTGRES_TEST_PASS: ''
+            POSTGRES_TEST_PORT: 5432
+            POSTGRES_TEST_DBNAME: circle_test
+          command: |
+            . dbt_venv/bin/activate
+            cd integration_tests
+            dbt deps --target postgres
+            dbt seed --target postgres --full-refresh
+            dbt run --target postgres --exclude tag:skip+ tag:temporary_skip+
+            dbt test --target postgres --exclude tag:skip+ tag:temporary_skip+
 
-      # - run:
-      #     name: "Run Tests - Redshift"
-      #     command: |
-      #       . dbt_venv/bin/activate
-      #       echo `pwd`
-      #       cd integration_tests
-      #       dbt deps --target redshift
-      #       dbt seed --target redshift --full-refresh
-      #       dbt run --target redshift --exclude tag:skip+ tag:temporary_skip+
-      #       dbt test --target redshift --exclude tag:skip+ tag:temporary_skip+
+      - run:
+          name: "Run Tests - Redshift"
+          command: |
+            . dbt_venv/bin/activate
+            echo `pwd`
+            cd integration_tests
+            dbt deps --target redshift
+            dbt seed --target redshift --full-refresh
+            dbt run --target redshift --exclude tag:skip+ tag:temporary_skip+
+            dbt test --target redshift --exclude tag:skip+ tag:temporary_skip+
 
-      # - run:
-      #     name: "Run Tests - Snowflake"
-      #     command: |
-      #       . dbt_venv/bin/activate
-      #       echo `pwd`
-      #       cd integration_tests
-      #       dbt deps --target snowflake
-      #       dbt seed --target snowflake --full-refresh
-      #       dbt run --target snowflake --exclude tag:skip+ tag:temporary_skip+
-      #       dbt test --target snowflake --exclude tag:skip+ tag:temporary_skip+
+      - run:
+          name: "Run Tests - Snowflake"
+          command: |
+            . dbt_venv/bin/activate
+            echo `pwd`
+            cd integration_tests
+            dbt deps --target snowflake
+            dbt seed --target snowflake --full-refresh
+            dbt run --target snowflake --exclude tag:skip+ tag:temporary_skip+
+            dbt test --target snowflake --exclude tag:skip+ tag:temporary_skip+
 
-      # - run:
-      #     name: "Run Tests - BigQuery"
-      #     environment:
-      #         BIGQUERY_SERVICE_KEY_PATH: "/home/circleci/bigquery-service-key.json"
+      - run:
+          name: "Run Tests - BigQuery"
+          environment:
+              BIGQUERY_SERVICE_KEY_PATH: "/home/circleci/bigquery-service-key.json"
 
-      #     command: |
-      #       . dbt_venv/bin/activate
-      #       echo `pwd`
-      #       cd integration_tests
-      #       dbt deps --target bigquery
-      #       dbt seed --target bigquery --full-refresh
-      #       dbt run --target bigquery --full-refresh --exclude tag:skip+ tag:temporary_skip+
-      #       dbt test --target bigquery --exclude tag:skip+ tag:temporary_skip+
+          command: |
+            . dbt_venv/bin/activate
+            echo `pwd`
+            cd integration_tests
+            dbt deps --target bigquery
+            dbt seed --target bigquery --full-refresh
+            dbt run --target bigquery --full-refresh --exclude tag:skip+ tag:temporary_skip+
+            dbt test --target bigquery --exclude tag:skip+ tag:temporary_skip+
 
       - run:
           name: "Run Tests - Databricks"
