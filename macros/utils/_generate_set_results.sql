@@ -72,6 +72,70 @@
     )
 {% endmacro %}
 
+
+
+{% macro bigquery___generate_set_results(a_query, b_query, primary_key_columns, columns, event_time_props) %}
+    {% set joined_cols = columns | join(", ") %}
+    subset_columns_a as (
+        select 
+            {{ joined_cols }}, 
+            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key,
+            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num
+        from ( {{-  a_query  -}} )
+        {% if event_time_props %}
+            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
+            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
+        {% endif %}
+    ),
+
+    subset_columns_b as (
+        select 
+            {{ joined_cols }}, 
+            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key,
+            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num
+        from ( {{-  b_query  -}} )
+        {% if event_time_props %}
+            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
+            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
+        {% endif %}
+    ),
+
+    a as (
+        select
+            *,
+            farm_fingerprint(to_json_string(subset_columns_a)) as dbt_audit_row_hash
+        from subset_columns_a
+    ), 
+
+    b as (
+        select
+            *,
+            farm_fingerprint(to_json_string(subset_columns_b)) as dbt_audit_row_hash
+        from subset_columns_b
+    ),
+
+    a_intersect_b as (
+
+        select * from a
+        where a.dbt_audit_row_hash in (select b.dbt_audit_row_hash from b)
+
+    ),
+
+    a_except_b as (
+
+        select * from a
+        where a.dbt_audit_row_hash not in (select b.dbt_audit_row_hash from b)
+
+    ),
+
+    b_except_a as (
+
+        select * from b
+        where b.dbt_audit_row_hash not in (select a.dbt_audit_row_hash from a)
+
+    )
+{% endmacro %}
+
 {% macro snowflake___generate_set_results(a_query, b_query, primary_key_columns, columns, event_time_props) %}
     {% set joined_cols = columns | join(", ") %}
     a as (
