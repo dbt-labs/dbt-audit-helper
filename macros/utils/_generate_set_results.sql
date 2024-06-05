@@ -136,7 +136,11 @@
 {% endmacro %}
 
 {% macro databricks___generate_set_results(a_query, b_query, primary_key_columns, columns, event_time_props) %}
-    {% set joined_cols = columns | join(", ") %}
+    {% set cast_columns = [] %}
+    {% for col in columns %}
+        {% do cast_columns.append(dbt.cast(col, api.Column.translate_type("string"))) %}
+    {% endfor %}
+    {% set joined_cols = cast_columns | join(", ") %}
     {% set surrogate_key = audit_helper.generate_null_safe_surrogate_key(primary_key_columns) %}
     a as (
         select 
