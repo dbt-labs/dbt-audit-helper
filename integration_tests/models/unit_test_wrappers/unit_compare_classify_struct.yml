@@ -88,12 +88,11 @@ unit_tests:
     given:
       - input: ref('unit_test_struct_model_a')
         format: sql
-        rows: |
-          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+        fixture: complex_struct
       - input: ref('unit_test_struct_model_b')
         format: sql
-        rows: |
-          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.smith@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+        fixture: complex_struct_different_value
+          
     expect:
       rows:
         - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
