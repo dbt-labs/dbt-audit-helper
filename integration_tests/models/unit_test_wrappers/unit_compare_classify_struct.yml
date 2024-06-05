@@ -16,8 +16,8 @@ unit_tests:
         compare_classify__columns: ['id', 'col1', 'col2']
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
-    config:
-      tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
+    # config:
+    #   tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
 
   - name: unit_compare_classify_struct_identical_values_different_order
     model: unit_compare_classify_struct
@@ -37,8 +37,8 @@ unit_tests:
         compare_classify__columns: ['id', 'col1', 'col2']
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
-    config:
-      tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
+    # config:
+    #   tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
 
   - name: unit_compare_classify_struct_removed_key
     model: unit_compare_classify_struct
@@ -58,8 +58,8 @@ unit_tests:
         compare_classify__columns: ['id', 'col1', 'col2']
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
-    config:
-      tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
+    # config:
+    #   tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
 
   - name: compare_classify_complex_struct
     model: unit_compare_classify_struct
@@ -78,8 +78,8 @@ unit_tests:
         compare_classify__columns: ['id', 'col1', 'col2']
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
-    config:
-      tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
+    # config:
+    #   tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
 
   - name: compare_classify_complex_struct_different_values
     model: unit_compare_classify_struct
@@ -100,8 +100,8 @@ unit_tests:
         compare_classify__columns: ['id', 'col1', 'col2']
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
-    config:
-      tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
+    # config:
+    #   tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
 
   - name: unit_compare_classify_complex_struct_identical_values_different_order
     model: unit_compare_classify_struct
@@ -122,5 +122,5 @@ unit_tests:
         compare_classify__columns: ['id', 'col1', 'col2']
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
-    config:
-      tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
+    # config:
+    #   tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet

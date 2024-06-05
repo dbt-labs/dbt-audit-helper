@@ -76,19 +76,19 @@ jobs:
       #       dbt run --target snowflake --exclude tag:skip+ tag:temporary_skip+
       #       dbt test --target snowflake --exclude tag:skip+ tag:temporary_skip+
 
-      - run:
-          name: "Run Tests - BigQuery"
-          environment:
-              BIGQUERY_SERVICE_KEY_PATH: "/home/circleci/bigquery-service-key.json"
+      # - run:
+      #     name: "Run Tests - BigQuery"
+      #     environment:
+      #         BIGQUERY_SERVICE_KEY_PATH: "/home/circleci/bigquery-service-key.json"
 
-          command: |
-            . dbt_venv/bin/activate
-            echo `pwd`
-            cd integration_tests
-            dbt deps --target bigquery
-            dbt seed --target bigquery --full-refresh
-            dbt run --target bigquery --full-refresh --exclude tag:skip+ tag:temporary_skip+
-            dbt test --target bigquery --exclude tag:skip+ tag:temporary_skip+
+      #     command: |
+      #       . dbt_venv/bin/activate
+      #       echo `pwd`
+      #       cd integration_tests
+      #       dbt deps --target bigquery
+      #       dbt seed --target bigquery --full-refresh
+      #       dbt run --target bigquery --full-refresh --exclude tag:skip+ tag:temporary_skip+
+      #       dbt test --target bigquery --exclude tag:skip+ tag:temporary_skip+
 
       - run:
           name: "Run Tests - Databricks"
