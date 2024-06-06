@@ -1,5 +1,6 @@
 {% macro compare_and_classify_query_results(a_query, b_query, primary_key_columns=[], columns=[], event_time=None, sample_limit=20) %}
     
+    {% set columns = audit_helper._ensure_all_pks_are_in_column_set(primary_key_columns, columns) %}
     {% set joined_cols = columns | join(", ") %}
 
     {% if event_time %}
