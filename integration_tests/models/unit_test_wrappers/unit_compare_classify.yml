@@ -34,7 +34,7 @@ unit_tests:
         compare_classify__event_time: 'created_at'
         compare_classify__primary_key_columns: ['id']
       macros: 
-        audit_helper.get_comparison_bounds:
+        audit_helper._get_comparison_bounds:
           "min_event_time": "2024-01-02"
           "max_event_time": "2024-01-03"
           "event_time": 'created_at'

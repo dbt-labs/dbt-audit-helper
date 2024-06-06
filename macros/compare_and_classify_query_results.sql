@@ -3,7 +3,7 @@
     {% set joined_cols = columns | join(", ") %}
 
     {% if event_time %}
-        {% set event_time_props = audit_helper.get_comparison_bounds(a_query, b_query, event_time) %}
+        {% set event_time_props = audit_helper._get_comparison_bounds(a_query, b_query, event_time) %}
     {% endif %}
 
     with 

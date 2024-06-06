@@ -18,7 +18,7 @@ model_a  │       │┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼�
             ┌──► └────────────────────────────┘ ◄────┐ 
            b min_value                      b max_value 
 */
-{% macro get_comparison_bounds(a_relation, b_relation, event_time) %}
+{% macro _get_comparison_bounds(a_relation, b_relation, event_time) %}
     {% set min_max_queries %}
         with min_maxes as (
             select min({{ event_time }}) as min_event_time, max({{ event_time }}) as max_event_time

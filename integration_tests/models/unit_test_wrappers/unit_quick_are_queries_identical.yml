@@ -30,7 +30,7 @@ unit_tests:
         quick_are_queries_identical_cols: ['id', 'col1', 'col2', 'created_at']
         quick_are_queries_identical_event_time: 'created_at'
       macros: 
-        audit_helper.get_comparison_bounds:
+        audit_helper._get_comparison_bounds:
           "min_event_time": "2024-01-02"
           "max_event_time": "2024-01-03"
           "event_time": 'created_at'
