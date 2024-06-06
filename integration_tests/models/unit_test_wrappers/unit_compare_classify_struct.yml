@@ -16,12 +16,12 @@ unit_tests:
         compare_classify__columns: ['id', 'col1', 'col2']
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
-    config:
-      tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
+    # config:
+    #   tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
 
   - name: unit_compare_classify_struct_identical_values_different_order
     model: unit_compare_classify_struct
-    description: Objects' keys are sorted alphabetically, so sort order is ignored.
+    description: Objects' keys are generally sorted alphabetically, so sort order is ignored.
     given:
       - input: ref('unit_test_struct_model_a')
         format: sql
@@ -38,7 +38,31 @@ unit_tests:
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
     config:
-      tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
+      #Databricks cares about the order and considers it a difference. We're not trying to have identical behaviour across warehouses so that's OK.
+      tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}"
+
+  - name: unit_compare_classify_struct_identical_values_different_order_dbx
+    model: unit_compare_classify_struct
+    description: Most platforms don't care about sort order. Databricks does.
+    given:
+      - input: ref('unit_test_struct_model_a')
+        format: sql
+        fixture: simple_struct
+      - input: ref('unit_test_struct_model_b')
+        format: sql
+        fixture: simple_struct_different_order
+    expect:
+      rows:
+        - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
+        - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
+    overrides:
+      vars:
+        compare_classify__columns: ['id', 'col1', 'col2']
+        compare_classify__event_time:
+        compare_classify__primary_key_columns: ['id']
+    config:
+      #Only for databricks
+      tags: "{{ 'skip' if (target.type not in ['databricks']) else 'runnable' }}"
 
   - name: unit_compare_classify_struct_removed_key
     model: unit_compare_classify_struct
@@ -58,20 +82,18 @@ unit_tests:
         compare_classify__columns: ['id', 'col1', 'col2']
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
-    config:
-      tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
+    # config:
+    #   tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
 
   - name: compare_classify_complex_struct
     model: unit_compare_classify_struct
     given:
       - input: ref('unit_test_struct_model_a')
         format: sql
-        rows: |
-          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+        fixture: complex_struct
       - input: ref('unit_test_struct_model_b')
         format: sql
-        rows: |
-          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+        fixture: complex_struct
     expect:
       rows:
         - {"id": 1, "dbt_audit_row_status": "identical", "dbt_audit_num_rows_in_status": 1}
@@ -80,20 +102,19 @@ unit_tests:
         compare_classify__columns: ['id', 'col1', 'col2']
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
-    config:
-      tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
+    # config:
+    #   tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
 
   - name: compare_classify_complex_struct_different_values
     model: unit_compare_classify_struct
     given:
       - input: ref('unit_test_struct_model_a')
         format: sql
-        rows: |
-          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+        fixture: complex_struct
       - input: ref('unit_test_struct_model_b')
         format: sql
-        rows: |
-          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.smith@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+        fixture: complex_struct_different_value
+          
     expect:
       rows:
         - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
@@ -103,8 +124,8 @@ unit_tests:
         compare_classify__columns: ['id', 'col1', 'col2']
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
-    config:
-      tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
+    # config:
+    #   tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
 
   - name: unit_compare_classify_complex_struct_identical_values_different_order
     model: unit_compare_classify_struct
@@ -112,12 +133,10 @@ unit_tests:
     given:
       - input: ref('unit_test_struct_model_a')
         format: sql
-        rows: |
-          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'home', 'number', '123-456-7890'), object_construct('type', 'work', 'number', '987-654-3210'))) as col2
+        fixture: complex_struct
       - input: ref('unit_test_struct_model_b')
         format: sql
-        rows: |
-          select 1 as id, 'John Doe' as col1, object_construct('emails', array_construct('john.doe@example.com', 'john.d@example.com'), 'phones', array_construct(object_construct('type', 'work', 'number', '987-654-3210'), object_construct('type', 'home', 'number', '123-456-7890'))) as col2
+        fixture: complex_struct_different_order
     expect:
       rows:
         - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
@@ -127,5 +146,5 @@ unit_tests:
         compare_classify__columns: ['id', 'col1', 'col2']
         compare_classify__event_time:
         compare_classify__primary_key_columns: ['id']
-    config:
-      tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
+    # config:
+    #   tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet

@@ -155,9 +155,9 @@ unit_tests:
         
     expect:
       rows:
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 2}
+        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 2}
         - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 1}
-        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 2}
-        - {"dbt_audit_row_status": 'nonunique_pk', 'id': , dbt_audit_num_rows_in_status: 2}
 
     overrides:
       vars:
@@ -227,3 +227,30 @@ unit_tests:
         - {"dbt_audit_row_status": 'removed', 'id': 3, dbt_audit_num_rows_in_status: 1}
     config:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-core/issues/10167
+
+  - name: compare_classify_identical_tables_without_pk_in_cols_list
+    model: unit_compare_classify
+    
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+        
+    expect:
+      rows:
+        - {"dbt_audit_row_status": 'identical', 'id': 1, dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'identical', 'id': 3, dbt_audit_num_rows_in_status: 3}
+        - {"dbt_audit_row_status": 'identical', 'id': 2, dbt_audit_num_rows_in_status: 3}
+
+    overrides:
+      vars:
+        compare_classify__columns: ['col1', 'col2']
+        compare_classify__event_time:
+        compare_classify__primary_key_columns: ['id']

@@ -72,16 +72,14 @@
     )
 {% endmacro %}
 
-
-
 {% macro bigquery___generate_set_results(a_query, b_query, primary_key_columns, columns, event_time_props) %}
     {% set joined_cols = columns | join(", ") %}
     {% set surrogate_key = audit_helper._generate_null_safe_surrogate_key(primary_key_columns) %}
     subset_columns_a as (
         select 
             {{ joined_cols }}, 
-            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key,
-            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num
+            {{ surrogate_key }} as dbt_audit_surrogate_key,
+            row_number() over (partition by {{ surrogate_key }} order by 1 ) as dbt_audit_pk_row_num
         from ( {{-  a_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
@@ -92,8 +90,8 @@
     subset_columns_b as (
         select 
             {{ joined_cols }}, 
-            {{ audit_helper.generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key,
-            row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num
+            {{ surrogate_key }} as dbt_audit_surrogate_key,
+            row_number() over (partition by {{ surrogate_key }} order by 1 ) as dbt_audit_pk_row_num
         from ( {{-  b_query  -}} )
         {% if event_time_props %}
             where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
