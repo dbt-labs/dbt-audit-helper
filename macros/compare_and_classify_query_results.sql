@@ -1,5 +1,6 @@
 {% macro compare_and_classify_query_results(a_query, b_query, primary_key_columns=[], columns=[], event_time=None, sample_limit=20) %}
     
+    {% set columns = audit_helper._ensure_all_pks_are_in_column_set(primary_key_columns, columns) %}
     {% set joined_cols = columns | join(", ") %}
 
     {% if event_time %}
@@ -16,24 +17,24 @@
 
         select
             *,
-            true as in_a,
-            true as in_b
+            true as dbt_audit_in_a,
+            true as dbt_audit_in_b
         from a_intersect_b
 
         union all
 
         select
             *,
-            true as in_a,
-            false as in_b
+            true as dbt_audit_in_a,
+            false as dbt_audit_in_b
         from a_except_b
 
         union all
 
         select
             *,
-            false as in_a,
-            true as in_b
+            false as dbt_audit_in_a,
+            true as dbt_audit_in_b
         from b_except_a
 
     ),
