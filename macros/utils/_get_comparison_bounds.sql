@@ -18,14 +18,14 @@ model_a  │       │┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼�
             ┌──► └────────────────────────────┘ ◄────┐ 
            b min_value                      b max_value 
 */
-{% macro _get_comparison_bounds(a_relation, b_relation, event_time) %}
+{% macro _get_comparison_bounds(a_query, b_query, event_time) %}
     {% set min_max_queries %}
         with min_maxes as (
             select min({{ event_time }}) as min_event_time, max({{ event_time }}) as max_event_time
-            from {{ a_relation }}
+            from ({{ a_query }}) a_subq
             union all 
             select min({{ event_time }}) as min_event_time, max({{ event_time }}) as max_event_time
-            from {{ b_relation }}
+            from ({{ b_query }}) b_subq
         )
         select max(min_event_time) as min_event_time, min(max_event_time) as max_event_time
         from min_maxes
@@ -34,6 +34,9 @@ model_a  │       │┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼�
     {% set query_response = dbt_utils.get_query_results_as_dict(min_max_queries) %}
     
     {% set event_time_props = {"event_time": event_time} %}
+    
+    {# query_response.keys() are only `min_event_time` and `max_event_time`, but they have indeterminate capitalisation #}
+    {# hence the dynamic approach for what is otherwise just two well-known values #}
     {% for k in query_response.keys() %}
         {% do event_time_props.update({k | lower: query_response[k][0]}) %}
     {% endfor %}
