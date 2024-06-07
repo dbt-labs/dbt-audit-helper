@@ -21,14 +21,14 @@ unit_tests:
     overrides:
       vars:
         quick_are_queries_identical_cols: ['id', 'col1', 'col2']
-        quick_are_queries_identical_event_time:
+        event_time_var:
 
   - name: quick_are_queries_identical_identical_tables_event_time_filter
     model: unit_quick_are_queries_identical
     overrides:
       vars:
         quick_are_queries_identical_cols: ['id', 'col1', 'col2', 'created_at']
-        quick_are_queries_identical_event_time: 'created_at'
+        event_time_var: 'created_at'
       macros: 
         audit_helper._get_comparison_bounds:
           "min_event_time": "2024-01-02"
@@ -55,7 +55,7 @@ unit_tests:
     overrides:
       vars:
         quick_are_queries_identical_cols: ['id', 'col1', 'col2']
-        quick_are_queries_identical_event_time:
+        event_time_var:
     given:
       - input: ref('unit_test_model_a')
         rows:
@@ -94,4 +94,4 @@ unit_tests:
     overrides:
       vars:
         quick_are_queries_identical_cols: ['id', 'col1', 'col2']
-        quick_are_queries_identical_event_time:
+        event_time_var:

@@ -40,3 +40,10 @@ model_a  │       │┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼�
     
     {% do return(event_time_props) %}
 {% endmacro %}
+
+{% macro event_time_filter(event_time_props) %}
+    {% if event_time_props %}
+        where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
+        and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
+    {% endif %}
+{% endmacro %}
