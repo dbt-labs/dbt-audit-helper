@@ -16,8 +16,6 @@ unit_tests:
         columns_var: ['id', 'col1', 'col2']
         event_time_var:
         primary_key_columns_var: ['id']
-    # config:
-    #   tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
 
   - name: unit_compare_classify_struct_identical_values_different_order
     model: unit_compare_classify_struct
