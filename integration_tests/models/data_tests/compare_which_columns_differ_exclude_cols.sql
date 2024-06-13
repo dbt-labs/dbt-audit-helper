@@ -11,7 +11,7 @@ from (
     {{ audit_helper.compare_which_relation_columns_differ(
         a_relation=a_relation,
         b_relation=b_relation,
-        primary_key=['id'],
+        primary_key_columns=['id'],
         columns=['id','value_changes','becomes_not_null','does_not_change']
     ) }}
 
