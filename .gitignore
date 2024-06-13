@@ -2,3 +2,6 @@ target/
 dbt_packages/
 logs/
 logfile
+.DS_Store
+package-lock.yml
+integration_tests/package-lock.yml

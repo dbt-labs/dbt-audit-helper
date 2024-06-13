@@ -2,96 +2,96 @@ version: 2
 
 models:
   - name: compare_queries
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_relations_without_exclude')
 
   - name: compare_queries_concat_pk_without_summary
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_without_summary')
           
   - name: compare_queries_with_summary
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_with_summary')
 
   - name: compare_queries_without_summary
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_without_summary')
           
   - name: compare_relations_with_summary
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_with_summary')
 
   - name: compare_relations_without_summary
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_without_summary')
 
   - name: compare_relations_with_exclude
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_relations_with_exclude')
 
   - name: compare_relations_without_exclude
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_relations_without_exclude')
 
   - name: compare_all_columns_with_summary
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_all_columns_with_summary')
 
   - name: compare_all_columns_without_summary
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_all_columns_without_summary')
 
   - name: compare_all_columns_concat_pk_with_summary
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_all_columns_concat_pk_with_summary')
 
   - name: compare_all_columns_concat_pk_without_summary
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_all_columns_concat_pk_without_summary')
 
   - name: compare_all_columns_with_summary_and_exclude
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_all_columns_with_summary_and_exclude')
   
   - name: compare_all_columns_where_clause
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_all_columns_where_clause')
 
   - name: compare_relation_columns
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_relation_columns')
 
   - name: compare_relations_concat_pk_without_summary
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_without_summary')
 
   - name: compare_which_columns_differ
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_which_columns_differ')
 
   - name: compare_which_columns_differ_exclude_cols
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_which_columns_differ_exclude_cols')
           
   - name: compare_row_counts
-    tests:
+    data_tests:
       - dbt_utils.equality:
           compare_model: ref('expected_results__compare_row_counts')

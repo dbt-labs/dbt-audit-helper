@@ -1,0 +1,130 @@
+unit_tests:
+  - name: ensure_all_pks_in_columns
+    model: unit_ensure_all_pks_are_in_column_set
+    given: []
+    overrides:
+      vars:
+        primary_key_columns_var: ['pk1', 'pk2']
+        columns_var: ['pk1', 'pk2', 'column_a', 'column_b']
+        
+    expect:
+      rows:
+        - {"col": 'pk1', "row_index": 1}
+        - {"col": 'pk2', "row_index": 2}
+        - {"col": 'column_a', "row_index": 3}
+        - {"col": 'column_b', "row_index": 4}
+  
+  - name: ensure_all_pks_in_columns_pks_at_end
+    model: unit_ensure_all_pks_are_in_column_set
+    description: PKs are specified in `columns` so should be at end of list
+    given: []
+    overrides:
+      vars:
+        primary_key_columns_var: ['pk1', 'pk2']
+        columns_var: ['column_a', 'column_b', 'pk1', 'pk2']
+        
+    expect:
+      rows:
+        - {"col": 'column_a', "row_index": 1}
+        - {"col": 'column_b', "row_index": 2}
+        - {"col": 'pk1', "row_index": 3}
+        - {"col": 'pk2', "row_index": 4}
+      
+  - name: ensure_all_pks_in_columns_one_missing_pk
+    model: unit_ensure_all_pks_are_in_column_set
+    description: PK specified in `columns` should be at end of list, missing PK will be added at front
+    given: []
+    overrides:
+      vars:
+        primary_key_columns_var: ['pk1', 'pk2']
+        columns_var: ['column_a', 'column_b', 'pk2']
+        
+    expect:
+      rows:
+        - {"col": 'pk1', "row_index": 1}
+        - {"col": 'column_a', "row_index": 2}
+        - {"col": 'column_b', "row_index": 3}
+        - {"col": 'pk2', "row_index": 4}
+      
+  - name: ensure_all_pks_in_columns_empty_sets
+    model: unit_ensure_all_pks_are_in_column_set
+    given: []
+    overrides:
+      vars:
+        primary_key_columns_var: []
+        columns_var: []
+        
+    expect:
+      rows: []
+
+  - name: ensure_all_pks_in_columns_no_pks
+    model: unit_ensure_all_pks_are_in_column_set
+    given: []
+    overrides:
+      vars:
+        primary_key_columns_var: []
+        columns_var: ['column_a', 'column_b']
+        
+    expect:
+      rows:
+        - {"col": 'column_a', "row_index": 1}
+        - {"col": 'column_b', "row_index": 2}
+
+  - name: ensure_all_pks_in_columns_no_cols
+    model: unit_ensure_all_pks_are_in_column_set
+    given: []
+    overrides:
+      vars:
+        primary_key_columns_var: ['pk1', 'pk2']
+        columns_var: []
+        
+    expect:
+      rows:
+        - {"col": 'pk1', "row_index": 1}
+        - {"col": 'pk2', "row_index": 2}
+
+  - name: ensure_all_pks_in_columns_caps_pk
+    model: unit_ensure_all_pks_are_in_column_set
+    given: []
+    overrides:
+      vars:
+        primary_key_columns_var: ['pk2', 'PK1']
+        columns_var: ['pk1', 'pk2', 'column_a', 'column_b']
+        
+    expect:
+      rows:
+        - {"col": 'pk1', "row_index": 1}
+        - {"col": 'pk2', "row_index": 2}
+        - {"col": 'column_a', "row_index": 3}
+        - {"col": 'column_b', "row_index": 4}
+  
+  - name: ensure_all_pks_in_columns_caps_col
+    model: unit_ensure_all_pks_are_in_column_set
+    given: []
+    overrides:
+      vars:
+        primary_key_columns_var: ['pk2', 'pk1']
+        columns_var: ['pk1', 'pk2', 'COLUMN_A', 'column_b']
+        
+    expect:
+      rows:
+        - {"col": 'pk1', "row_index": 1}
+        - {"col": 'pk2', "row_index": 2}
+        - {"col": 'COLUMN_A', "row_index": 3}
+        - {"col": 'column_b', "row_index": 4}
+  
+  - name: ensure_all_pks_in_columns_caps_pk_in_both
+    model: unit_ensure_all_pks_are_in_column_set
+    given: []
+    overrides:
+      vars:
+        primary_key_columns_var: ['pk2', 'PK1']
+        columns_var: ['PK1', 'pk2', 'column_a', 'column_b']
+        
+    expect:
+      rows:
+        - {"col": 'PK1', "row_index": 1}
+        - {"col": 'pk2', "row_index": 2}
+        - {"col": 'column_a', "row_index": 3}
+        - {"col": 'column_b', "row_index": 4}
+  

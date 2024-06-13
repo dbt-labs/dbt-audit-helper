@@ -1,0 +1,124 @@
+unit_tests:
+  - name: compare_cols_identical_tables
+    model: unit_compare_which_query_columns_differ
+    
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+        
+    expect:
+      rows:
+        - {"column_name": 'id', 'has_difference': false}
+        - {"column_name": 'col1', 'has_difference': false}
+        - {"column_name": 'col2', 'has_difference': false}
+
+    overrides:
+      vars:
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
+    config:
+      tags: "{{ 'skip' if (target.type in ['snowflake']) else 'runnable' }}" #Case sensitivity 
+
+  - name: compare_cols_identical_tables_event_time_filter
+    model: unit_compare_which_query_columns_differ
+    overrides:
+      vars:
+        columns_var: ['id', 'col1', 'col2', 'created_at']
+        event_time_var: 'created_at'
+        primary_key_columns_var: ['id']
+      macros: 
+        audit_helper._get_comparison_bounds:
+          "min_event_time": "2024-01-02"
+          "max_event_time": "2024-01-03"
+          "event_time": 'created_at'
+      
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def", "created_at": '2024-01-01' }
+          - { "id": 2, "col1": "hij", "col2": "klm", "created_at": '2024-01-02' }
+          - { "id": 3, "col1": "nop", "col2": "qrs", "created_at": '2024-01-03' }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 2, "col1": "hij", "col2": "klm", "created_at": '2024-01-02' }
+          - { "id": 3, "col1": "nop", "col2": "qrs", "created_at": '2024-01-03' }
+        
+    expect:
+      rows:
+        - {"column_name": 'id', "has_difference": false}
+        - {"column_name": 'col1', "has_difference": false}
+        - {"column_name": 'col2', "has_difference": false}
+        - {"column_name": 'created_at', "has_difference": false}
+    config:
+      tags: "{{ 'skip' if (target.type in ['snowflake']) else 'runnable' }}" #Case sensitivity 
+
+  - name: compare_cols_identical_tables_snowflake
+    model: unit_compare_which_query_columns_differ
+    
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+        
+    expect:
+      rows:
+        - {"column_name": 'ID', 'has_difference': false}
+        - {"column_name": 'COL1', 'has_difference': false}
+        - {"column_name": 'COL2', 'has_difference': false}
+
+    overrides:
+      vars:
+        columns_var: ['ID', 'COL1', 'COL2']
+        event_time_var:
+        primary_key_columns_var: ['ID']
+    config:
+      tags: "{{ 'skip' if (target.type not in ['snowflake']) else 'runnable' }}" #Case sensitivity 
+
+  - name: compare_cols_identical_tables_event_time_filter_snowflake
+    model: unit_compare_which_query_columns_differ
+    overrides:
+      vars:
+        columns_var: ['ID', 'COL1', 'COL2', 'CREATED_AT']
+        event_time_var: 'CREATED_AT'
+        primary_key_columns_var: ['ID']
+      macros: 
+        audit_helper._get_comparison_bounds:
+          "min_event_time": "2024-01-02"
+          "max_event_time": "2024-01-03"
+          "event_time": 'created_at'
+      
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def", "created_at": '2024-01-01' }
+          - { "id": 2, "col1": "hij", "col2": "klm", "created_at": '2024-01-02' }
+          - { "id": 3, "col1": "nop", "col2": "qrs", "created_at": '2024-01-03' }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 2, "col1": "hij", "col2": "klm", "created_at": '2024-01-02' }
+          - { "id": 3, "col1": "nop", "col2": "qrs", "created_at": '2024-01-03' }
+        
+    expect:
+      rows:
+        - {"column_name": 'ID', "has_difference": false}
+        - {"column_name": 'COL1', "has_difference": false}
+        - {"column_name": 'COL2', "has_difference": false}
+        - {"column_name": 'CREATED_AT', "has_difference": false}
+    config:
+      tags: "{{ 'skip' if (target.type not in ['snowflake']) else 'runnable' }}" #Case sensitivity 

@@ -1,0 +1,97 @@
+unit_tests:
+  - name: quick_are_queries_identical_identical_tables
+    model: unit_quick_are_queries_identical
+    
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+        
+    expect:
+      rows:
+        - {"are_tables_identical": true}
+
+    overrides:
+      vars:
+        quick_are_queries_identical_cols: ['id', 'col1', 'col2']
+        event_time_var:
+
+  - name: quick_are_queries_identical_identical_tables_event_time_filter
+    model: unit_quick_are_queries_identical
+    overrides:
+      vars:
+        quick_are_queries_identical_cols: ['id', 'col1', 'col2', 'created_at']
+        event_time_var: 'created_at'
+      macros: 
+        audit_helper._get_comparison_bounds:
+          "min_event_time": "2024-01-02"
+          "max_event_time": "2024-01-03"
+          "event_time": 'created_at'
+      
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def", "created_at": '2024-01-01' }
+          - { "id": 2, "col1": "hij", "col2": "klm", "created_at": '2024-01-02' }
+          - { "id": 3, "col1": "nop", "col2": "qrs", "created_at": '2024-01-03' }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 2, "col1": "hij", "col2": "klm", "created_at": '2024-01-02' }
+          - { "id": 3, "col1": "nop", "col2": "qrs", "created_at": '2024-01-03' }
+        
+    expect:
+      rows:
+        - {"are_tables_identical": true}
+
+  - name: quick_are_queries_identical_differences
+    model: unit_quick_are_queries_identical
+    overrides:
+      vars:
+        quick_are_queries_identical_cols: ['id', 'col1', 'col2']
+        event_time_var:
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id": 1, "col1": "abc", "col2": "def" }
+          - { "id": 2, "col1": "changed", "col2": "values" }
+          - { "id": 4, "col1": "nop", "col2": "qrs" }
+        
+    expect:
+      rows:
+        - {"are_tables_identical": false}
+
+  - name: quick_are_queries_identical_identical_tables_with_null_pks
+    model: unit_quick_are_queries_identical
+    
+    given:
+      - input: ref('unit_test_model_a')
+        rows:
+          - { "id":, "col1": "abc", "col2": "def" }
+          - { "id":, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+      - input: ref('unit_test_model_b')
+        rows:
+          - { "id":, "col1": "abc", "col2": "def" }
+          - { "id":, "col1": "hij", "col2": "klm" }
+          - { "id": 3, "col1": "nop", "col2": "qrs" }
+        
+    expect:
+      rows:
+        - {"are_tables_identical": true}
+
+    overrides:
+      vars:
+        quick_are_queries_identical_cols: ['id', 'col1', 'col2']
+        event_time_var:
