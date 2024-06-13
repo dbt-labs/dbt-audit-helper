@@ -14,14 +14,14 @@
             select 
                 {{ joined_cols }},
                 {{ audit_helper._generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key
-            from ({{ a_query }})
+            from ({{ a_query }}) as a_subq
             {{ audit_helper.event_time_filter(event_time_props) }}
         ),
         b as (
             select 
                 {{ joined_cols }},
                 {{ audit_helper._generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key
-            from ({{ b_query }})
+            from ({{ b_query }}) as b_subq
             {{ audit_helper.event_time_filter(event_time_props) }}
         ),
 
