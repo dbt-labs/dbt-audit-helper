@@ -20,11 +20,10 @@ seeds:
 
 vars:
   compare_queries_summarize: true
-  compare_classify__primary_key_columns: ['col1']
-  compare_classify__columns: ['col1']
-  compare_classify__event_time:
+  primary_key_columns_var: ['col1']
+  columns_var: ['col1']
+  event_time_var:
   quick_are_queries_identical_cols: ['col1']
-  quick_are_queries_identical_event_time:
 
 flags:
   send_anonymous_usage_stats: False

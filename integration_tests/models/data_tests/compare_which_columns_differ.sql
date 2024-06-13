@@ -9,9 +9,9 @@ select
     has_difference
 from (
 
-    {{ audit_helper.compare_which_columns_differ(
+    {{ audit_helper.compare_which_relation_columns_differ(
         a_relation=a_relation,
         b_relation=b_relation,
-        primary_key="id"
+        primary_key_columns=["id"]
     ) }}
 ) as macro_output

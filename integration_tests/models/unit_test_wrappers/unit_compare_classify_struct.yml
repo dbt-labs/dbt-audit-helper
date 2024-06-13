@@ -13,11 +13,9 @@ unit_tests:
         - {"id": 1, "dbt_audit_row_status": "identical", "dbt_audit_num_rows_in_status": 1}
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
-    # config:
-    #   tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
 
   - name: unit_compare_classify_struct_identical_values_different_order
     model: unit_compare_classify_struct
@@ -34,9 +32,9 @@ unit_tests:
         - {"id": 1, "dbt_audit_row_status": "identical", "dbt_audit_num_rows_in_status": 1}
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
     config:
       #Databricks cares about the order and considers it a difference. We're not trying to have identical behaviour across warehouses so that's OK.
       tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}"
@@ -57,9 +55,9 @@ unit_tests:
         - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
     config:
       #Only for databricks
       tags: "{{ 'skip' if (target.type not in ['databricks']) else 'runnable' }}"
@@ -79,9 +77,9 @@ unit_tests:
         - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
     # config:
     #   tags: "{{ 'skip' if (target.type in ['databricks']) else 'runnable' }}" #Can't do set operations on even simple JSON cols
 
@@ -99,9 +97,9 @@ unit_tests:
         - {"id": 1, "dbt_audit_row_status": "identical", "dbt_audit_num_rows_in_status": 1}
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
     # config:
     #   tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
 
@@ -121,9 +119,9 @@ unit_tests:
         - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
     # config:
     #   tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet
 
@@ -143,8 +141,8 @@ unit_tests:
         - {"id": 1, "dbt_audit_row_status": "modified", "dbt_audit_num_rows_in_status": 1}
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
     # config:
     #   tags: "{{ 'skip' if (target.type in ['redshift', 'databricks']) else 'runnable' }}" #haven't ported these to be multi-warehouse yet

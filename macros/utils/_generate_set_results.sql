@@ -16,10 +16,7 @@
             {{ joined_cols }}, 
             {{ audit_helper._generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key
         from ( {{-  a_query  -}} ) a_base_subq
-        {% if event_time_props %}
-            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
-        {% endif %}
+        {{ audit_helper.event_time_filter(event_time_props) }}
     ),
 
     b_base as (
@@ -27,10 +24,7 @@
             {{ joined_cols }}, 
             {{ audit_helper._generate_null_safe_surrogate_key(primary_key_columns) }} as dbt_audit_surrogate_key
         from ( {{-  b_query  -}} ) b_base_subq
-        {% if event_time_props %}
-            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
-        {% endif %}
+        {{ audit_helper.event_time_filter(event_time_props) }}
     ),
 
     a as (
@@ -81,10 +75,7 @@
             {{ surrogate_key }} as dbt_audit_surrogate_key,
             row_number() over (partition by {{ surrogate_key }} order by 1 ) as dbt_audit_pk_row_num
         from ( {{-  a_query  -}} )
-        {% if event_time_props %}
-            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
-        {% endif %}
+        {{ audit_helper.event_time_filter(event_time_props) }}
     ),
 
     subset_columns_b as (
@@ -93,10 +84,7 @@
             {{ surrogate_key }} as dbt_audit_surrogate_key,
             row_number() over (partition by {{ surrogate_key }} order by 1 ) as dbt_audit_pk_row_num
         from ( {{-  b_query  -}} )
-        {% if event_time_props %}
-            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
-        {% endif %}
+        {{ audit_helper.event_time_filter(event_time_props) }}
     ),
 
     a as (
@@ -151,10 +139,7 @@
             row_number() over (partition by {{ surrogate_key }} order by 1 ) as dbt_audit_pk_row_num,
             xxhash64({{ joined_cols }}, dbt_audit_pk_row_num) as dbt_audit_row_hash
         from ( {{-  a_query  -}} )
-        {% if event_time_props %}
-            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
-        {% endif %}
+        {{ audit_helper.event_time_filter(event_time_props) }}
     ),
 
     b as (
@@ -164,10 +149,7 @@
             row_number() over (partition by {{ surrogate_key }} order by 1 ) as dbt_audit_pk_row_num,
             xxhash64({{ joined_cols }}, dbt_audit_pk_row_num) as dbt_audit_row_hash
         from ( {{-  b_query  -}} )
-        {% if event_time_props %}
-            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
-        {% endif %}
+        {{ audit_helper.event_time_filter(event_time_props) }}
     ),
 
     a_intersect_b as (
@@ -201,10 +183,7 @@
             row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num,
             hash({{ joined_cols }}, dbt_audit_pk_row_num) as dbt_audit_row_hash
         from ( {{-  a_query  -}} )
-        {% if event_time_props %}
-            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
-        {% endif %}
+        {{ audit_helper.event_time_filter(event_time_props) }}
     ),
 
     b as (
@@ -214,10 +193,7 @@
             row_number() over (partition by dbt_audit_surrogate_key order by dbt_audit_surrogate_key ) as dbt_audit_pk_row_num,
             hash({{ joined_cols }}, dbt_audit_pk_row_num) as dbt_audit_row_hash
         from ( {{-  b_query  -}} )
-        {% if event_time_props %}
-            where {{ event_time_props["event_time"] }} >= '{{ event_time_props["min_event_time"] }}'
-            and {{ event_time_props["event_time"] }} <= '{{ event_time_props["max_event_time"] }}'
-        {% endif %}
+        {{ audit_helper.event_time_filter(event_time_props) }}
     ),
 
     a_intersect_b as (

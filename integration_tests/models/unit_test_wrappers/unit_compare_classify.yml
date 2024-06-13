@@ -22,17 +22,17 @@ unit_tests:
 
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
 
   - name: compare_classify_identical_tables_event_time_filter
     model: unit_compare_classify
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2', 'created_at']
-        compare_classify__event_time: 'created_at'
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2', 'created_at']
+        event_time_var: 'created_at'
+        primary_key_columns_var: ['id']
       macros: 
         audit_helper._get_comparison_bounds:
           "min_event_time": "2024-01-02"
@@ -59,9 +59,9 @@ unit_tests:
     model: unit_compare_classify
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
     given:
       - input: ref('unit_test_model_a')
         rows:
@@ -88,9 +88,9 @@ unit_tests:
     model: unit_compare_classify
     overrides:
       vars:
-        compare_classify__columns: ['id', 'id_2', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id', 'id_2']
+        columns_var: ['id', 'id_2', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id', 'id_2']
     given:
       - input: ref('unit_test_model_a')
         rows:
@@ -132,9 +132,9 @@ unit_tests:
 
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
     config:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
@@ -161,9 +161,9 @@ unit_tests:
 
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
     config:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
@@ -193,9 +193,9 @@ unit_tests:
 
     overrides:
       vars:
-        compare_classify__columns: ['id', 'col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['id', 'col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
     config:
       tags: "{{ 'temporary_skip' if (target.type in ['redshift']) else 'runnable' }}" #https://github.com/dbt-labs/dbt-redshift/issues/821
 
@@ -203,9 +203,9 @@ unit_tests:
     model: unit_compare_classify
     overrides:
       vars:
-        compare_classify__primary_key_columns: ['id']
-        compare_classify__columns: ['id', 'col1']
-        compare_classify__event_time:
+        primary_key_columns_var: ['id']
+        columns_var: ['id', 'col1']
+        event_time_var:
     given:
       - input: ref('unit_test_model_a')
         rows:
@@ -251,6 +251,6 @@ unit_tests:
 
     overrides:
       vars:
-        compare_classify__columns: ['col1', 'col2']
-        compare_classify__event_time:
-        compare_classify__primary_key_columns: ['id']
+        columns_var: ['col1', 'col2']
+        event_time_var:
+        primary_key_columns_var: ['id']
