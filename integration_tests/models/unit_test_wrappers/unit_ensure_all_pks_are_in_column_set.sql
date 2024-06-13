@@ -8,7 +8,7 @@
 {% if (var('primary_key_columns_var') | length == 0) and (var('columns_var') | length == 0) %}
 -- need to still provide a table shape
 select 'abcdefabcdef' as col, 1 as row_index
-where 1=2
+limit 0
 {% endif %}
 
 {% for result in results %}
