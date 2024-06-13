@@ -1,8 +1,8 @@
 {% macro compare_which_query_columns_differ(a_query, b_query, primary_key_columns=[], columns=[], event_time=None) %}
-    {{ return(adapter.dispatch('compare_which_columns_differ', 'audit_helper')(a_query, b_query, primary_key_columns, columns, event_time)) }}
+    {{ return(adapter.dispatch('compare_which_query_columns_differ', 'audit_helper')(a_query, b_query, primary_key_columns, columns, event_time)) }}
 {% endmacro %}
 
-{% macro default__compare_which_columns_differ(a_query, b_query, primary_key_columns, columns, event_time) %}
+{% macro default__compare_which_query_columns_differ(a_query, b_query, primary_key_columns, columns, event_time) %}
     {% set columns = audit_helper._ensure_all_pks_are_in_column_set(primary_key_columns, columns) %}
     {% if event_time %}
         {% set event_time_props = audit_helper._get_comparison_bounds(event_time) %}
