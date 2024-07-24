@@ -27,6 +27,7 @@ Useful macros when performing data audits
 - [Legacy Macros](#legacy-macros)
   - [compare\_queries](#compare_queries-source)
   - [compare\_relations](#compare_relations-source)
+- [Internal Macros](#internal-macros)
 
 ## Installation instructions
 
@@ -609,8 +610,7 @@ group by 1
 
 You can write a `compare_all_columns` test on individual table; and the test will be run as part of a full test suite run - `dbt test --select stg_customers`.
 
-If you want to [store results in the warehouse for further analysis](https://docs.getdbt.com/docs/building-a-dbt-project/tests#storing-test-failures), add the `--store-failures`
-flag.
+If you want to [store results in the warehouse for further analysis](https://docs.getdbt.com/docs/building-a-dbt-project/tests#storing-test-failures), add the `--store-failures` flag.
 
 ### Event time
 
@@ -722,3 +722,7 @@ Each relation must have the same columns with the same names, but they do not ha
 ) }}
 
 ```
+
+## Internal Macros
+
+Macros prefixed with an `_` (such as those in the `utils/` subdirectory) are for private use. They are not documented or contracted and can change without notice.
