@@ -23,7 +23,6 @@ Useful macros when performing data audits
 - [Advanced Usage](#advanced-usage)
   - [Print Output To Logs](#print-output-to-logs)
   - [Use Output For Custom Singular Test](#use-output-for-custom-singular-test)
-  - [Event time](#event-time)
 - [Legacy Macros](#legacy-macros)
   - [compare\_queries](#compare_queries-source)
   - [compare\_relations](#compare_relations-source)
@@ -60,7 +59,6 @@ Note that there are 4 rows with the `modified` status, but `dbt_audit_num_rows_i
 - `a_query` and `b_query`: The queries you want to compare.
 - `primary_key_columns` (required): A list of primary key column(s) used to join the queries together for comparison.
 - `columns` (required): The columns present in the two queries you want to compare.
-- `event_time`: See the [separate section on event_time](#event-time).
 - `sample_limit`: Number of sample records to return per status. Defaults to 20.
 
 #### Usage
@@ -105,7 +103,6 @@ Each relation must have the same columns with the same names, but they do not ha
 - `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation) you want to compare.
 - `primary_key_columns` (required): A list of primary key column(s) used to join the queries together for comparison.
 - `columns` (optional): The columns present in the two queries you want to compare. Build long lists with a few exclusions with `dbt_utils.get_filtered_columns_in_relation`, or pass `None` and the macro will find all intersecting columns automatically.
-- `event_time`: See the [separate section on event_time](#event-time).
 - `sample_limit`: Number of sample records to return per status. Defaults to 20.
 
 #### Usage
@@ -139,7 +136,6 @@ This can be calculated relatively quickly compared to other macros in this packa
 
 - `a_query` and `b_query`: The queries you want to compare.
 - `columns` (required): The columns present in the two queries you want to compare.
-- `event_time`: See the [separate section on event_time](#event-time).
 
 #### Output
 
@@ -255,7 +251,6 @@ The generated query returns whether or not each column has any differences:
 - `a_query` and `b_query`: The queries to compare
 - `primary_key_columns` (required): A list of primary key column(s) used to join the queries together for comparison.
 - `columns` (required): The columns present in the two queries you want to compare.
-- `event_time`: See the [separate section on event_time](#event-time).
 
 ### compare_which_relation_columns_differ ([source](macros/compare_which_relation_columns_differ.sql))
 
@@ -279,8 +274,7 @@ Each relation must have the same columns with the same names, but they do not ha
     a_relation = old_relation,
     b_relation = dbt_relation,
     primary_key_columns = ["order_id"],
-    columns = None,
-    event_time = "order_date"
+    columns = None
 ) }}
 
 ```
@@ -611,12 +605,6 @@ group by 1
 You can write a `compare_all_columns` test on individual table; and the test will be run as part of a full test suite run - `dbt test --select stg_customers`.
 
 If you want to [store results in the warehouse for further analysis](https://docs.getdbt.com/docs/building-a-dbt-project/tests#storing-test-failures), add the `--store-failures` flag.
-
-### Event time
-
-It's good practice to filter to a subset of your data in CI or development environments compared to the whole dataset in production. To avoid false positives caused by detecting rows that exist only in production, you can specify an event_time config on your models. Supported audit helper macros will determine the overlapping time periods of the two models/queries and only compare those sections.
-
-For more details, see the implementation of [_get_comparison_bounds](macros/utils/_get_comparison_bounds.sql).
 
 ## Legacy Macros
 
