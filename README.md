@@ -6,17 +6,27 @@ Useful macros when performing data audits
 
 - [Installation instructions](#installation-instructions)
 - [Compare Data Outputs](#compare-data-outputs)
-  - [compare\_relations (source)](#compare_relations-source)
-  - [compare\_queries (source)](#compare_queries-source)
-  - [compare\_row\_counts (source)](#compare_row_counts-source)
+  - Compare and classify:  
+    - [compare_and_classify_query_results](#compare_and_classify_query_results-source)
+    - [compare_and_classify_relation_rows](#compare_and_classify_relation_rows-source)
+  - Quick identical check:
+    - [quick_are_queries_identical](#quick_are_queries_identical-source)
+    - [quick_are_relations_identical](#quick_are_relations_identical-source)
+  - [compare\_row\_counts](#compare_row_counts-source)
 - [Compare Columns](#compare-columns)
-  - [compare\_column\_values (source)](#compare_column_values-source)
-  - [compare\_all\_columns (source)](#compare_all_columns-source)
-  - [compare\_which\_columns\_differ (source)](#compare_which_columns_differ-source)
-  - [compare\_relation\_columns (source)](#compare_relation_columns-source)
+  - [compare\_column\_values](#compare_column_values-source)
+  - [compare\_all\_columns](#compare_all_columns-source)
+  - Compare which columns differ:
+    - [compare\_which\_query\_columns\_differ](#compare_which_query_columns_differ-source)
+    - [compare\_which\_relation\_columns\_differ](#compare_which_relation_columns_differ-source)
+  - [compare\_relation\_columns](#compare_relation_columns-source)
 - [Advanced Usage](#advanced-usage)
   - [Print Output To Logs](#print-output-to-logs)
   - [Use Output For Custom Singular Test](#use-output-for-custom-singular-test)
+- [Legacy Macros](#legacy-macros)
+  - [compare\_queries](#compare_queries-source)
+  - [compare\_relations](#compare_relations-source)
+- [Internal Macros](#internal-macros)
 
 ## Installation instructions
 
@@ -27,39 +37,29 @@ New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/bu
 
 ## Compare Data Outputs
 
-### compare_queries ([source](macros/compare_queries.sql))
+### compare_and_classify_query_results ([source](macros/compare_and_classify_query_results.sql))
 
-This macro generates SQL that can be used to do a row-by-row comparison of two queries. This macro is particularly useful when you want to check that a refactored model (or a model that you are moving over from a legacy system) are identical. `compare_queries` provides flexibility when:
-
-- You need to filter out records from one of the relations.
-- You need to rename or recast some columns to get them to match up.
-- You only want to compare a small number of columns, so it's easier write the columns you want to compare, rather than the columns you want to exclude.
+Generates a row-by-row comparison of two queries, as well as summary stats of added, removed, identical and modified records. This prevents you from having to query your comparison tables multiple times to get raw data and summary data.
 
 #### Output
 
-By default, the generated query returns a summary of the count of rows that are unique to `a`, unique to `b`, and identical:
+| order_id | order_date | status    | dbt_audit_in_a | dbt_audit_in_b | dbt_audit_row_status | dbt_audit_num_rows_in_status | dbt_audit_sample_number |
+|----------|------------|-----------|----------------|----------------|----------------------|------------------------------|-------------------------|
+| 1        | 2024-01-01 | completed | True           | True           | identical            | 1                            | 1                       |
+| 2        | 2024-01-02 | completed | True           | False          | modified             | 2                            | 1                       |
+| 2        | 2024-01-02 | returned  | False          | True           | modified             | 2                            | 1                       |
+| 3        | 2024-01-03 | completed | True           | False          | modified             | 2                            | 2                       |
+| 3        | 2024-01-03 | completed | False          | True           | modified             | 2                            | 2                       |
+| 4        | 2024-01-04 | completed | False          | True           | added                | 1                            | 1                       |
 
-| in_a  | in_b  | count | percent_of_total |
-|-------|-------|------:|-----------------:|
-| True  | True  | 6870  | 99.74            |
-| True  | False | 9     | 0.13             |
-| False | True  | 9     | 0.13             |
-
-Setting the `summarize` argument to `false` lets you check which rows do not match between relations:
-
-| order_id | order_date | status    | in_a  | in_b  |
-|----------|------------|-----------|-------|-------|
-| 1        | 2018-01-01 | completed | True  | False |
-| 1        | 2018-01-01 | returned  | False | True  |
-| 2        | 2018-01-02 | completed | True  | False |
-| 2        | 2018-01-02 | returned  | False | True  |
+Note that there are 4 rows with the `modified` status, but `dbt_audit_num_rows_in_status` says 2. This is because it is counting each primary key only once.
 
 #### Arguments
 
 - `a_query` and `b_query`: The queries you want to compare.
-- `primary_key` (optional): The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched results for row-by-row validation.
-- `summarize` (optional): Allows you to switch between a summary or detailed view of the compared data. Accepts `true` or `false` values. Defaults to `true`.
-- `limit` (optional): Allows you to limit the number of rows returned when `summarize = False`. Defaults to `None` (no limit).
+- `primary_key_columns` (required): A list of primary key column(s) used to join the queries together for comparison.
+- `columns` (required): The columns present in the two queries you want to compare.
+- `sample_limit`: Number of sample records to return per status. Defaults to 20.
 
 #### Usage
 
@@ -81,46 +81,29 @@ Setting the `summarize` argument to `false` lets you check which rows do not mat
   from {{ ref('fct_orders') }}
 {% endset %}
 
-{{ audit_helper.compare_queries(
-    a_query = old_query,
-    b_query = new_query,
-    primary_key = "order_id"
-) }}
+{{ 
+  audit_helper.compare_and_classify_query_results(
+    old_query, 
+    new_query, 
+    primary_key_columns=['order_id'], 
+    columns=['order_id', 'amount', 'customer_id']
+  )
+}}
 
 ```
 
-### compare_relations ([source](macros/compare_relations.sql))
+### compare_and_classify_relation_rows ([source](macros/compare_and_classify_relation_rows.sql))
 
-Similar around to `compare_relations`, except it takes two relations (instead of two queries).
+A wrapper to `compare_which_query_columns_differ`, except it takes two [Relations](https://docs.getdbt.com/reference/dbt-classes#relation) (instead of two queries).
 
-Each relation must have the same columns with the same names, but they do not have to be in the same order. Use `exclude_columns` if some columns only exist in one relation.
-
-#### Output
-
-By default, the generated query returns a summary of the count of rows that are unique to `a`, unique to `b`, and identical:
-
-| in_a  | in_b  | count | percent_of_total |
-|-------|-------|------:|-----------------:|
-| True  | True  | 6870  | 99.74            |
-| True  | False | 9     | 0.13             |
-| False | True  | 9     | 0.13             |
-
-Setting the `summarize` argument to `false` lets you check which rows do not match between relations:
-
-| order_id | order_date | status    | in_a  | in_b  |
-|----------|------------|-----------|-------|-------|
-| 1        | 2018-01-01 | completed | True  | False |
-| 1        | 2018-01-01 | returned  | False | True  |
-| 2        | 2018-01-02 | completed | True  | False |
-| 2        | 2018-01-02 | returned  | False | True  |
+Each relation must have the same columns with the same names, but they do not have to be in the same order.
 
 #### Arguments
 
 - `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation) you want to compare.
-- `primary_key` (optional): The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched results for row-by-row validation.
-- `exclude_columns` (optional): Any columns you wish to exclude from the validation.
-- `summarize` (optional): Allows you to switch between a summary or detailed view of the compared data. Accepts `true` or `false` values. Defaults to `true`.
-- `limit` (optional): Allows you to limit the number of rows returned when `summarize = False`. Defaults to `None` (no limit).
+- `primary_key_columns` (required): A list of primary key column(s) used to join the queries together for comparison.
+- `columns` (optional): The columns present in the two queries you want to compare. Build long lists with a few exclusions with `dbt_utils.get_filtered_columns_in_relation`, or pass `None` and the macro will find all intersecting columns automatically.
+- `sample_limit`: Number of sample records to return per status. Defaults to 20.
 
 #### Usage
 
@@ -134,11 +117,75 @@ Setting the `summarize` argument to `false` lets you check which rows do not mat
 
 {% set dbt_relation = ref('fct_orders') %}
 
-{{ audit_helper.compare_relations(
+{{ audit_helper.compare_and_classify_relation_rows(
     a_relation = old_relation,
     b_relation = dbt_relation,
-    exclude_columns = ["loaded_at"],
-    primary_key = "order_id"
+    primary_key_columns = ["order_id"],
+    columns = None
+) }}
+
+```
+
+### quick_are_queries_identical ([source](macros/quick_are_queries_identical.sql))
+
+On supported adapters (currently Snowflake and BigQuery), take a hash of all rows in two queries and compare them.
+
+This can be calculated relatively quickly compared to other macros in this package and can efficiently provide reassurance that a refactor introduced no changes.
+
+#### Output
+
+| are_tables_identical |
+|----------------------|
+| true                 |
+
+#### Arguments
+
+- `a_query` and `b_query`: The queries you want to compare.
+- `columns` (required): The columns present in the two queries you want to compare.
+
+#### Usage
+
+```sql
+
+{% set old_query %}
+    select * from old_database.old_schema.dim_product
+{% endset %}
+
+{% set new_query %}
+    select * from {{ ref('dim_product') }}
+{% endset %}
+
+{{ audit_helper.compare_column_values(
+    a_query = old_query,
+    b_query = new_query,
+    columns=['order_id', 'amount', 'customer_id']
+  ) 
+}}
+
+```
+
+### quick_are_relations_identical ([source](macros/quick_are_relations_identical.sql))
+
+A wrapper to `quick_are_queries_identical`, except it takes two [Relations](https://docs.getdbt.com/reference/dbt-classes#relation) (instead of two queries).
+
+Each relation must have the same columns with the same names, but they do not have to be in the same order. Build long lists with a few exclusions with `dbt_utils.get_filtered_columns_in_relation`, or pass `None` and the macro will find all intersecting columns automatically.
+
+#### Usage
+
+```sql
+
+{% set old_relation = adapter.get_relation(
+      database = "old_database",
+      schema = "old_schema",
+      identifier = "fct_orders"
+) -%}
+
+{% set dbt_relation = ref('fct_orders') %}
+
+{{ audit_helper.quick_are_relations_identical(
+    a_relation = old_relation,
+    b_relation = dbt_relation,
+    columns = None
 ) }}
 
 ```
@@ -158,7 +205,7 @@ Calling this macro on two different relations will return a very simple table co
 
 #### Arguments
 
-- `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation) you want to compare.
+- `a_relation` and `b_relation`: The [Relations](https://docs.getdbt.com/reference/dbt-classes#relation) you want to compare.
 
 #### Usage
 
@@ -181,15 +228,15 @@ Calling this macro on two different relations will return a very simple table co
 
 ## Compare Columns
 
-### compare_which_columns_differ ([source](macros/compare_which_columns_differ.sql))
+### compare_which_query_columns_differ ([source](macros/compare_which_query_columns_differ.sql))
 
-This macro generates SQL that can be used to detect which common columns between two relations contain _any_ value level changes. It does not return the magnitude of the change, only whether or not a difference has occurred.
+This macro generates SQL that can be used to detect which columns returned by two queries contain _any_ value level changes.
 
-This can be useful when comparing two versions of a model between development and production environments.
+It does not return the magnitude of the change, only whether or not a difference has occurred. Only records that exist in both queries (as determined by the primary key) are considered.
 
 #### Output
 
-The generated query returns whether or not each column has any differecnes:
+The generated query returns whether or not each column has any differences:
 
 | column_name | has_difference |
 |-------------|----------------|
@@ -201,9 +248,15 @@ The generated query returns whether or not each column has any differecnes:
 
 #### Arguments
 
-- `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference#relation) you want to compare.
-- `primary_key` (required): The primary key of the model used to join the relations to ensure that the same rows are being compared.
-- `exclude_columns` (optional): Any columns you wish to exclude from the validation.
+- `a_query` and `b_query`: The queries to compare
+- `primary_key_columns` (required): A list of primary key column(s) used to join the queries together for comparison.
+- `columns` (required): The columns present in the two queries you want to compare.
+
+### compare_which_relation_columns_differ ([source](macros/compare_which_relation_columns_differ.sql))
+
+A wrapper to `compare_which_query_columns_differ`, except it takes two [Relations](https://docs.getdbt.com/reference/dbt-classes#relation) (instead of two queries).
+
+Each relation must have the same columns with the same names, but they do not have to be in the same order. Build long lists with a few exclusions with `dbt_utils.get_filtered_columns_in_relation`, or pass `None` and the macro will find all intersecting columns automatically.
 
 #### Usage
 
@@ -220,15 +273,36 @@ The generated query returns whether or not each column has any differecnes:
 {{ audit_helper.compare_which_columns_differ(
     a_relation = old_relation,
     b_relation = dbt_relation,
-    exclude_columns = ["loaded_at"],
-    primary_key = "order_id"
+    primary_key_columns = ["order_id"],
+    columns = None
+) }}
+
+```
+
+```sql
+
+{% set old_relation = adapter.get_relation(
+      database = "old_database",
+      schema = "old_schema",
+      identifier = "fct_orders"
+) -%}
+
+{% set dbt_relation = ref('fct_orders') %}
+
+{% set columns = dbt_utils.get_filtered_columns_in_relation(old_relation, exclude=["loaded_at"]) %}
+
+{{ audit_helper.compare_which_columns_differ(
+    a_relation = old_relation,
+    b_relation = dbt_relation,
+    primary_key_columns = ["order_id"],
+    columns = columns
 ) }}
 
 ```
 
 ### compare_column_values ([source](macros/compare_column_values.sql))
 
-This macro generates SQL that can be used to compare a column's values across two queries. This macro is useful when you've used the `compare_which_columns_differ` macro to identify a column with differing values and want to understand how many discrepancies are caused by that column.
+This macro generates SQL that can be used to compare a column's values across two queries. This macro is useful when you've used the `compare_which_query_columns_differ` macro to identify a column with differing values and want to understand how many discrepancies are caused by that column.
 
 #### Output
 
@@ -310,9 +384,9 @@ Setting the `summarize` argument to `false` lets you check the match status of a
 #### Arguments
 
 - `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation) you want to compare. Any two relations that have the same columns can be used.
-- `primary_key`: The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched results for row-by-row validation. Must be a unique key (unqiue and never `null`) in both tables, otherwise the join won't work as expected.
+- `primary_key`: The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched results for row-by-row validation. Must be a unique key (unique and never `null`) in both tables, otherwise the join won't work as expected.
 - `exclude_columns` (optional): Any columns you wish to exclude from the validation.
-- `summarize` (optional): Allows you to switch between a summary or detailed view of the compared data. Accepts `true` or `false` values. Defaults to `true`.
+- `summarize` (optional): Allows you to switch between a summary or detailed view of the compared data. Defaults to `true`.
 
 #### Usage
 
@@ -530,5 +604,113 @@ group by 1
 
 You can write a `compare_all_columns` test on individual table; and the test will be run as part of a full test suite run - `dbt test --select stg_customers`.
 
-If you want to [store results in the warehouse for further analysis](https://docs.getdbt.com/docs/building-a-dbt-project/tests#storing-test-failures), add the `--store-failures`
-flag.
+If you want to [store results in the warehouse for further analysis](https://docs.getdbt.com/docs/building-a-dbt-project/tests#storing-test-failures), add the `--store-failures` flag.
+
+## Legacy Macros
+
+### compare_queries ([source](macros/compare_queries.sql))
+
+> [!TIP]
+> Consider `compare_and_classify_query_results` instead
+
+This macro generates SQL that can be used to do a row-by-row comparison of two queries. This macro is particularly useful when you want to check that a refactored model (or a model that you are moving over from a legacy system) are identical. `compare_queries` provides flexibility when:
+
+- You need to filter out records from one of the relations.
+- You need to rename or recast some columns to get them to match up.
+- You only want to compare a small number of columns, so it's easier to write the columns you want to compare, rather than the columns you want to exclude.
+
+#### Output
+
+By default, the generated query returns a summary of the count of rows that are unique to `a`, unique to `b`, and identical:
+
+| in_a  | in_b  | count | percent_of_total |
+|-------|-------|------:|-----------------:|
+| True  | True  | 6870  | 99.74            |
+| True  | False | 9     | 0.13             |
+| False | True  | 9     | 0.13             |
+
+Setting the `summarize` argument to `false` lets you check which rows do not match between relations:
+
+| order_id | order_date | status    | in_a  | in_b  |
+|----------|------------|-----------|-------|-------|
+| 1        | 2018-01-01 | completed | True  | False |
+| 1        | 2018-01-01 | returned  | False | True  |
+| 2        | 2018-01-02 | completed | True  | False |
+| 2        | 2018-01-02 | returned  | False | True  |
+
+#### Arguments
+
+- `a_query` and `b_query`: The queries you want to compare.
+- `primary_key` (optional): The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched results for row-by-row validation.
+- `summarize` (optional): Allows you to switch between a summary or detailed view of the compared data. Accepts `true` or `false` values. Defaults to `true`.
+- `limit` (optional): Allows you to limit the number of rows returned when `summarize = False`. Defaults to `None` (no limit).
+
+#### Usage
+
+```sql
+
+{% set old_query %}
+  select
+    id as order_id,
+    amount,
+    customer_id
+  from old_database.old_schema.fct_orders
+{% endset %}
+
+{% set new_query %}
+  select
+    order_id,
+    amount,
+    customer_id
+  from {{ ref('fct_orders') }}
+{% endset %}
+
+{{ audit_helper.compare_queries(
+    a_query = old_query,
+    b_query = new_query,
+    primary_key = "order_id"
+) }}
+
+```
+
+### compare_relations ([source](macros/compare_relations.sql))
+
+> [!TIP]
+> Consider `compare_and_classify_relation_rows` instead
+
+A wrapper to `compare_queries`, except it takes two [Relations](https://docs.getdbt.com/reference/dbt-classes#relation) (instead of two queries).
+
+Each relation must have the same columns with the same names, but they do not have to be in the same order. Use `exclude_columns` if some columns only exist in one relation.
+
+#### Arguments
+
+- `a_relation` and `b_relation`: The [relations](https://docs.getdbt.com/reference/dbt-classes#relation) you want to compare.
+- `primary_key` (optional): The primary key of the model (or concatenated sql to create the primary key). Used to sort unmatched results for row-by-row validation.
+- `exclude_columns` (optional): Any columns you wish to exclude from the validation.
+- `summarize` (optional): Allows you to switch between a summary or detailed view of the compared data. Accepts `true` or `false` values. Defaults to `true`.
+- `limit` (optional): Allows you to limit the number of rows returned when `summarize = False`. Defaults to `None` (no limit).
+
+#### Usage
+
+```sql
+
+{% set old_relation = adapter.get_relation(
+      database = "old_database",
+      schema = "old_schema",
+      identifier = "fct_orders"
+) -%}
+
+{% set dbt_relation = ref('fct_orders') %}
+
+{{ audit_helper.compare_relations(
+    a_relation = old_relation,
+    b_relation = dbt_relation,
+    exclude_columns = ["loaded_at"],
+    primary_key = "order_id"
+) }}
+
+```
+
+## Internal Macros
+
+Macros prefixed with an `_` (such as those in the `utils/` subdirectory) are for private use. They are not documented or contracted and can change without notice.
