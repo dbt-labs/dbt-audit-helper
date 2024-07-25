@@ -132,16 +132,16 @@ On supported adapters (currently Snowflake and BigQuery), take a hash of all row
 
 This can be calculated relatively quickly compared to other macros in this package and can efficiently provide reassurance that a refactor introduced no changes.
 
-#### Arguments
-
-- `a_query` and `b_query`: The queries you want to compare.
-- `columns` (required): The columns present in the two queries you want to compare.
-
 #### Output
 
 | are_tables_identical |
 |----------------------|
 | true                 |
+
+#### Arguments
+
+- `a_query` and `b_query`: The queries you want to compare.
+- `columns` (required): The columns present in the two queries you want to compare.
 
 #### Usage
 
