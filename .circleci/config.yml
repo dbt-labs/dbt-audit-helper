@@ -10,8 +10,12 @@ jobs:
           username: dbt-labs
           password: ''
         environment:
+          POSTGRES_HOST: localhost
           POSTGRES_USER: root
-          POSTGRES_DB: circle_test
+          POSTGRES_PORT: 5432
+          POSTGRES_DATABASE: circle_test
+          POSTGRES_SCHEMA: dbt_utils_integration_tests_postgres
+          DBT_ENV_SECRET_POSTGRES_PASS: ''
 
     steps:
       - checkout
