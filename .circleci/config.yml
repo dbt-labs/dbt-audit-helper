@@ -35,9 +35,6 @@ jobs:
             python -m pip install --upgrade pip setuptools
             python -m pip install --pre dbt-core dbt-postgres dbt-redshift dbt-snowflake dbt-bigquery dbt-databricks
 
-            mkdir -p ~/.dbt
-            cp integration_tests/ci/sample.profiles.yml ~/.dbt/profiles.yml
-
       - run:
           name: "Run Tests - Postgres"
           environment:
