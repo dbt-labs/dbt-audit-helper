@@ -42,11 +42,12 @@ jobs:
       - run:
           name: "Run Tests - Postgres"
           environment:
-            POSTGRES_HOST: localhost
-            POSTGRES_USER: root
-            POSTGRES_PASS: ''
-            POSTGRES_PORT: 5432
-            POSTGRES_DBNAME: circle_test
+          POSTGRES_HOST: localhost
+          POSTGRES_USER: root
+          POSTGRES_PORT: 5432
+          POSTGRES_DATABASE: circle_test
+          POSTGRES_SCHEMA: dbt_utils_integration_tests_postgres
+          DBT_ENV_SECRET_POSTGRES_PASS: ''
           command: |
             . dbt_venv/bin/activate
             cd integration_tests
