@@ -10,8 +10,12 @@ jobs:
           username: dbt-labs
           password: ''
         environment:
+          POSTGRES_HOST: localhost
           POSTGRES_USER: root
-          POSTGRES_DB: circle_test
+          POSTGRES_PORT: 5432
+          POSTGRES_DATABASE: circle_test
+          POSTGRES_SCHEMA: dbt_utils_integration_tests_postgres
+          DBT_ENV_SECRET_POSTGRES_PASS: ''
 
     steps:
       - checkout
@@ -35,17 +39,15 @@ jobs:
             python -m pip install --upgrade pip setuptools
             python -m pip install --pre dbt-core dbt-postgres dbt-redshift dbt-snowflake dbt-bigquery dbt-databricks
 
-            mkdir -p ~/.dbt
-            cp integration_tests/ci/sample.profiles.yml ~/.dbt/profiles.yml
-
       - run:
           name: "Run Tests - Postgres"
           environment:
-            POSTGRES_TEST_HOST: localhost
-            POSTGRES_TEST_USER: root
-            POSTGRES_TEST_PASS: ''
-            POSTGRES_TEST_PORT: 5432
-            POSTGRES_TEST_DBNAME: circle_test
+            POSTGRES_HOST: localhost
+            POSTGRES_USER: root
+            POSTGRES_PORT: 5432
+            POSTGRES_DATABASE: circle_test
+            POSTGRES_SCHEMA: dbt_utils_integration_tests_postgres
+            DBT_ENV_SECRET_POSTGRES_PASS: ''
           command: |
             . dbt_venv/bin/activate
             cd integration_tests
