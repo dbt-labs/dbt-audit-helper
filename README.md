@@ -270,7 +270,7 @@ Each relation must have the same columns with the same names, but they do not ha
 
 {% set dbt_relation = ref('fct_orders') %}
 
-{{ audit_helper.compare_which_columns_differ(
+{{ audit_helper.compare_which_relation_columns_differ(
     a_relation = old_relation,
     b_relation = dbt_relation,
     primary_key_columns = ["order_id"],
@@ -291,7 +291,7 @@ Each relation must have the same columns with the same names, but they do not ha
 
 {% set columns = dbt_utils.get_filtered_columns_in_relation(old_relation, exclude=["loaded_at"]) %}
 
-{{ audit_helper.compare_which_columns_differ(
+{{ audit_helper.compare_which_relation_columns_differ(
     a_relation = old_relation,
     b_relation = dbt_relation,
     primary_key_columns = ["order_id"],
