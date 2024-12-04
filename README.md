@@ -155,7 +155,7 @@ This can be calculated relatively quickly compared to other macros in this packa
     select * from {{ ref('dim_product') }}
 {% endset %}
 
-{{ audit_helper.compare_column_values(
+{{ audit_helper.quick_are_queries_identical(
     a_query = old_query,
     b_query = new_query,
     columns=['order_id', 'amount', 'customer_id']
