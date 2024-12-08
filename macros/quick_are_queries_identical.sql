@@ -36,7 +36,7 @@ but it's a good way to quickly verify identical results if that's what you're ex
         {{ audit_helper.event_time_filter(event_time_props) }}
     )
 
-    select count(distinct hash_result) = 1 as are_tables_identical
+    select count(distinct IFNULL(hash_result,0)) = 1 as are_tables_identical
     from (
         select bit_xor(farm_fingerprint(to_json_string(query_a))) as hash_result
         from query_a
