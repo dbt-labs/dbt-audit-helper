@@ -289,7 +289,7 @@ Each relation must have the same columns with the same names, but they do not ha
 
 {% set dbt_relation = ref('fct_orders') %}
 
-{% set columns = dbt_utils.get_filtered_columns_in_relation(old_relation, exclude=["loaded_at"]) %}
+{% set columns = dbt_utils.get_filtered_columns_in_relation(old_relation, except=["loaded_at"]) %}
 
 {{ audit_helper.compare_which_relation_columns_differ(
     a_relation = old_relation,
