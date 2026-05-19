@@ -60,6 +60,7 @@ Note that there are 4 rows with the `modified` status, but `dbt_audit_num_rows_i
 - `primary_key_columns` (required): A list of primary key column(s) used to join the queries together for comparison.
 - `columns` (required): The columns present in the two queries you want to compare.
 - `sample_limit`: Number of sample records to return per status. Defaults to 20.
+- `event_time`: Timestamp or date column to filter only the overlapping records from both tables. Defaults to none.
 
 #### Usage
 
@@ -104,6 +105,7 @@ Each relation must have the same columns with the same names, but they do not ha
 - `primary_key_columns` (required): A list of primary key column(s) used to join the queries together for comparison.
 - `columns` (optional): The columns present in the two queries you want to compare. Build long lists with a few exclusions with `dbt_utils.get_filtered_columns_in_relation`, or pass `None` and the macro will find all intersecting columns automatically.
 - `sample_limit`: Number of sample records to return per status. Defaults to 20.
+- `event_time`: Timestamp or date column to filter only the overlapping records from both tables. Defaults to none.
 
 #### Usage
 
@@ -142,6 +144,7 @@ This can be calculated relatively quickly compared to other macros in this packa
 
 - `a_query` and `b_query`: The queries you want to compare.
 - `columns` (required): The columns present in the two queries you want to compare.
+- `event_time`: Timestamp or date column to filter only the overlapping records from both tables. Defaults to none.
 
 #### Usage
 
@@ -251,6 +254,7 @@ The generated query returns whether or not each column has any differences:
 - `a_query` and `b_query`: The queries to compare
 - `primary_key_columns` (required): A list of primary key column(s) used to join the queries together for comparison.
 - `columns` (required): The columns present in the two queries you want to compare.
+- `event_time`: Timestamp or date column to filter only the overlapping records from both tables. Defaults to none.
 
 ### compare_which_relation_columns_differ ([source](macros/compare_which_relation_columns_differ.sql))
 
