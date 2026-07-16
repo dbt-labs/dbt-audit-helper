@@ -1,8 +1,8 @@
 # **what?**
-# Run tests for dbt-codegen against supported adapters
+# Run tests for dbt-audit-helper against supported adapters
 
 # **why?**
-# To ensure that dbt-codegen works as expected with all supported adapters
+# To ensure that dbt-audit-helper works as expected with all supported adapters
 
 # **when?**
 # On every PR, and every push to main and when manually triggered
