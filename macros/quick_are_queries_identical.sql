@@ -22,7 +22,7 @@ but it's a good way to quickly verify identical results if that's what you're ex
 {% macro bigquery__quick_are_queries_identical(query_a, query_b, columns, event_time) %}
     {% set joined_cols = columns | join(", ") %}
     {% if event_time %}
-        {% set event_time_props = audit_helper._get_comparison_bounds(a_query, b_query, event_time) %}
+        {% set event_time_props = audit_helper._get_comparison_bounds(query_a, query_b, event_time) %}
     {% endif %}
 
     with query_a as (
@@ -51,7 +51,7 @@ but it's a good way to quickly verify identical results if that's what you're ex
 {% macro snowflake__quick_are_queries_identical(query_a, query_b, columns, event_time) %}
     {% set joined_cols = columns | join(", ") %}
     {% if event_time %}
-        {% set event_time_props = audit_helper._get_comparison_bounds(a_query, b_query, event_time) %}
+        {% set event_time_props = audit_helper._get_comparison_bounds(query_a, query_b, event_time) %}
     {% endif %}
 
     select count(distinct hash_result) = 1 as are_tables_identical
