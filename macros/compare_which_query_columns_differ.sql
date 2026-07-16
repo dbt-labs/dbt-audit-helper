@@ -5,7 +5,7 @@
 {% macro default__compare_which_query_columns_differ(a_query, b_query, primary_key_columns, columns, event_time) %}
     {% set columns = audit_helper._ensure_all_pks_are_in_column_set(primary_key_columns, columns) %}
     {% if event_time %}
-        {% set event_time_props = audit_helper._get_comparison_bounds(event_time) %}
+        {% set event_time_props = audit_helper._get_comparison_bounds(a_query, b_query, event_time) %}
     {% endif %}
 
     {% set joined_cols = columns | join (", ") %}
